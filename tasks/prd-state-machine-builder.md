@@ -31,6 +31,70 @@ As a system analyst, I want to export the generated state machine to GraphML or 
 ### Story 4: Developer
 As a developer, I want to configure depth and state count limits, so that I can control the exploration process and prevent my application from running out of memory on large or potentially infinite state spaces.
 
+## User Stories in Gherkin Format
+
+### Feature: Automated State Machine Generation
+
+**Scenario 1: Test Engineer generates comprehensive test coverage**
+```gherkin
+Feature: Generate all possible application states for testing
+
+Scenario: Generate test states from user actions
+  Given I am a test engineer with a set of user action rules
+  And I have defined an initial application state
+  When I build the state machine with these rules
+  Then all possible reachable states are generated
+  And I can create comprehensive test coverage without manual enumeration
+```
+
+**Scenario 2: Developer implements custom domain rules**
+```gherkin
+Feature: Define custom state transition rules
+
+Scenario: Implement domain-specific rules with simple interface
+  Given I am a developer who needs to model domain-specific transitions
+  And I have the IRule interface with IsAvailable and Execute methods
+  When I implement the interface for my custom rule
+  Then I can model my state transitions without learning complex APIs
+  And the rule integrates seamlessly with the builder
+```
+
+**Scenario 3: System Analyst exports for visualization**
+```gherkin
+Feature: Export state machines to standard formats
+
+Scenario: Export state machine to GraphML format
+  Given I am a system analyst with a generated state machine
+  When I export the state machine to GraphML format
+  Then I receive a valid GraphML file
+  And I can open and visualize it in yEd
+
+Scenario: Export state machine to DOT format
+  Given I am a system analyst with a generated state machine
+  When I export the state machine to DOT format
+  Then I receive a valid DOT file
+  And I can visualize it using Graphviz
+```
+
+**Scenario 4: Developer configures exploration limits**
+```gherkin
+Feature: Control state space exploration
+
+Scenario: Set depth limit to prevent deep exploration
+  Given I am a developer working with a potentially large state space
+  And I configure BuilderConfig with MaxDepth = 10
+  When I build the state machine
+  Then exploration stops at 10 levels deep
+  And my application does not run out of memory
+
+Scenario: Set state count limit to cap total states
+  Given I am a developer working with a potentially infinite state space
+  And I configure BuilderConfig with MaxStates = 1000
+  When I build the state machine
+  Then exploration stops after generating 1000 states
+  And my application does not run out of memory
+```
+
 ## Functional Requirements
 
 ### Core Data Structures
