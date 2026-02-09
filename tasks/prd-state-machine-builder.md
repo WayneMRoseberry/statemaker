@@ -14,8 +14,10 @@ The State Machine Builder is a C#/.NET library that generates all possible state
 2. **Cycle Prevention:** Detect and prevent infinite loops by recognizing previously encountered states
 3. **Configurable Exploration:** Support depth and state count limits to handle large state spaces
 4. **Extensibility:** Allow developers to define custom rules by implementing a simple interface
-5. **Export Capabilities:** Enable export of generated state machines to standard formats (GraphML, DOT, JSON) for visualization and analysis
-6. **Type Safety:** Leverage C#/.NET type system for compile-time safety and IDE support
+5. **Declarative Rule Definition:** Enable users to define rules without writing code, using boolean expressions and transformations
+6. **File-Based Configuration:** Support loading rule definitions from external files for non-programmers
+7. **Export Capabilities:** Enable export of generated state machines to standard formats (GraphML, DOT, JSON) for visualization and analysis
+8. **Type Safety:** Leverage C#/.NET type system for compile-time safety and IDE support
 
 ## User Stories
 
@@ -30,6 +32,9 @@ As a system analyst, I want to export the generated state machine to GraphML or 
 
 ### Story 4: Developer
 As a developer, I want to configure depth and state count limits, so that I can control the exploration process and prevent my application from running out of memory on large or potentially infinite state spaces.
+
+### Story 5: Business Analyst
+As a business analyst without programming expertise, I want to define state machine rules using a declarative format (via API or file), so that I can model workflows and processes without writing C# code.
 
 ## User Stories in Gherkin Format
 
@@ -95,6 +100,28 @@ Scenario: Set state count limit to cap total states
   And my application does not run out of memory
 ```
 
+**Scenario 5: Business Analyst defines rules declaratively**
+```gherkin
+Feature: Define rules without writing code
+
+Scenario: Define a rule using declarative API
+  Given I am a business analyst without programming skills
+  And I want to create a rule named "ApproveOrder"
+  When I use the declarative API to define:
+    | Property      | Value                           |
+    | Conditions    | OrderStatus == "Pending"        |
+    | Transformation| OrderStatus = "Approved"        |
+  Then the rule is created and available for state machine building
+  And I did not need to write any C# code
+
+Scenario: Load rules from a definition file
+  Given I am a business analyst with a rule definition file
+  And the file contains multiple rule definitions with conditions and transformations
+  When I load the definition file using the library
+  Then all rules are parsed and created successfully
+  And I can build a state machine using these rules
+```
+
 ## Functional Requirements
 
 ### Core Data Structures
@@ -136,6 +163,28 @@ Scenario: Set state count limit to cap total states
 21. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
 22. Rule names should be automatically derived from the rule class name (or configurable)
 
+### Declarative Rule Definition
+
+23. The system must provide a declarative rule definition mechanism that does not require writing custom C# classes
+24. A declarative rule definition must include:
+    - Rule name (string identifier)
+    - Availability condition (boolean expression evaluated against state variables)
+    - Variable transformations (mapping of variable names to new values or expressions)
+25. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
+26. The system must support boolean expressions for conditions using standard operators:
+    - Equality: `==`, `!=`
+    - Comparison: `<`, `>`, `<=`, `>=`
+    - Logical: `&&`, `||`, `!`
+    - Example: `"Age >= 18 && Status == 'Active'"`
+27. The system must support transformation expressions that can:
+    - Set variables to literal values: `Status = "Approved"`
+    - Reference current state variables: `Count = Count + 1`
+    - Use basic arithmetic: `+`, `-`, `*`, `/`
+28. The system must provide a file loader that reads rule definitions from an external file
+29. The file format must be structured and human-readable (JSON, YAML, or XML)
+30. The file loader must validate rule definitions and provide clear error messages for invalid syntax
+31. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
+
 ## Non-Goals (Out of Scope)
 
 The following are explicitly **not** included in the initial version:
@@ -167,31 +216,70 @@ The `BuilderConfig` class should include:
 - `ExplorationStrategy` (enum: BFS, DFS)
 - `GenerateStateIds` (Func<State, string>): Custom ID generator (optional)
 
+### Declarative Rule File Format
+For declarative rule definitions loaded from files, consider:
+- **JSON Format:** Most common, built-in .NET support via System.Text.Json
+- **YAML Format:** More human-readable, requires third-party library (YamlDotNet)
+- **XML Format:** Verbose but schema-validatable
+
+Example JSON structure:
+```json
+{
+  "rules": [
+    {
+      "name": "ApproveOrder",
+      "condition": "OrderStatus == 'Pending' && Amount < 1000",
+      "transformations": {
+        "OrderStatus": "Approved",
+        "ApprovedDate": "$now"
+      }
+    }
+  ]
+}
+```
+
+### Expression Evaluation
+- Use a lightweight expression evaluator for boolean conditions and transformations
+- Consider libraries like NCalc, DynamicExpresso, or CSharpCodeProvider for expression parsing
+- Ensure expressions are sandboxed and cannot execute arbitrary code
+- Support variable references using simple syntax (e.g., variable names without quotes)
+
 ## Technical Considerations
 
 1. **Target Framework:** .NET 6.0 or later (LTS version) for broad compatibility
-2. **Dependencies:** Minimal external dependencies; consider using `System.Text.Json` for JSON export
+2. **Dependencies:**
+   - Core library: Minimal external dependencies
+   - `System.Text.Json` for JSON export and declarative rule file parsing
+   - Expression evaluator library (e.g., NCalc, DynamicExpresso) for declarative rule conditions and transformations
+   - Optional: YAML parser (YamlDotNet) if YAML format is supported
 3. **Performance:** Use `HashSet<State>` for O(1) duplicate detection; ensure `State.GetHashCode()` is efficient
 4. **Memory Management:** Large state spaces could consume significant memory; limits in `BuilderConfig` are critical
 5. **Extensibility Pattern:** Interface-based design (`IRule`, `IStateMachineBuilder`) allows mocking and testing
 6. **Export Libraries:** Consider using third-party libraries for GraphML/DOT generation or implement minimal spec compliance
 7. **Namespace:** `StateMaker` (matches the assembly/repository name)
-8. **Testing:** Unit tests should cover:
+8. **Security:** Expression evaluation must be sandboxed to prevent code injection attacks in declarative rules
+9. **Testing:** Unit tests should cover:
    - State equality and hashing
    - Rule application logic
    - Cycle detection
    - Depth and count limits
    - Export format validity
+   - Declarative rule parsing and execution
+   - Expression evaluation correctness
+   - File loading error handling
 
 ## Success Metrics
 
 1. **Correctness:** 100% of reachable states are discovered (up to configured limits)
 2. **Cycle Prevention:** No infinite loops; equivalent states are correctly identified
 3. **Performance:** Can build state machines with 1000+ states in under 10 seconds on standard hardware
-4. **Usability:** Developers can implement a custom rule and build a state machine in under 30 lines of code
-5. **Export Validity:** Exported files are valid and can be opened in target tools (yEd, Graphviz, JSON parsers)
-6. **Test Coverage:** Core library achieves >90% code coverage
-7. **API Clarity:** Junior developers can understand and use the library with minimal documentation
+4. **Usability (Code-based):** Developers can implement a custom rule and build a state machine in under 30 lines of code
+5. **Usability (Declarative):** Non-programmers can define a simple rule (condition + transformation) in under 5 minutes
+6. **Export Validity:** Exported files are valid and can be opened in target tools (yEd, Graphviz, JSON parsers)
+7. **Test Coverage:** Core library achieves >90% code coverage
+8. **API Clarity:** Junior developers can understand and use the library with minimal documentation
+9. **Declarative Rule Parity:** Declarative rules produce identical state machines as equivalent code-based rules
+10. **File Loading Reliability:** Rule definition files with valid syntax load successfully 100% of the time with clear error messages for invalid files
 
 ## Open Questions
 
@@ -202,3 +290,8 @@ The `BuilderConfig` class should include:
 5. **Partial State Matching:** Should rules support wildcard matching (e.g., "applies to any state where X > 5")?
 6. **Logging/Diagnostics:** What level of logging should be built in for debugging state generation?
 7. **Version Compatibility:** How should the library handle serialized state machines from older versions?
+8. **Declarative File Format:** Should the initial version support JSON only, or also YAML/XML? What's the priority?
+9. **Expression Language Complexity:** How complex should expressions be? Should they support functions (e.g., `ToUpper()`, `Math.Max()`)?
+10. **Declarative Rule Validation:** Should the library validate expressions at definition time or only at execution time?
+11. **Mixed Rules:** Can a state machine be built with both code-based and declarative rules simultaneously?
+12. **Expression Variable Scoping:** How should declarative expressions reference state variables? Case-sensitive? String interpolation?

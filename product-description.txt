@@ -39,3 +39,14 @@ functions:
 The interfaces for Rule, StateMachineBuilder, as well as the classes State and
 BuilderConfig go in the statemaker assembly namespace. The namespace is imported
 to allow building of custom rules.
+
+Declarative State Machine Building:
+It is possible to declare state machines without writing custom rules. There
+will be a set of rules implemented that allow someone to define simple rules by
+supplying the following information:
+- rule name
+- boolean expressions of state variable conditions that make the rule available
+- transformation of which variables from original value to new value
+There should be an API to call to define rules in this fashion. It should also
+be possible to load a definition file describing declarative state machine
+building.
