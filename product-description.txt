@@ -1,0 +1,41 @@
+Here's the product I want to build:
+A tool that will generate possible states from a description of a
+finite state machine. A finite state machine is built by a set of
+rules that define transitions from one state to another.
+
+State Definitions:
+A state is defined by a set of variables set to specific values. A state also
+may also be compared with another state to establish whether they are equivalent.
+Two states are equivalent if they share all the same variables set to the same
+values.
+
+Rule Definitions:
+A rule describes an action or event which will transform a given set of variables
+in the given state to a new set of values, which will comprise a new state.
+A rule may be queried by passing it a current state definition, to which
+the rull will indicate whether it is available.
+
+Rule Implementation:
+Rules implement a rule interface. The interface exposes two functions:
+ - boolean isAvailable(state) - returns true if the rule is available with the current state
+ - state execute(state) - returns a new state derived from executing the given state
+
+State Machine Definition:
+A state machine has the following properties
+- States - a dictionary of states in the machine where each entry is keyed with an ID
+- StartingState - the ID of the first state in the machine
+- Transitions - the paths through the machine indicated by a starting and ending
+  state ID and the action that causes the transition. The action corresponds to the
+  name of the rule that created the transition.
+
+State machine builder:
+Implements a machine builder interface. The builder implements the following
+functions:
+ - StateMachine build(state initialState, Rule[] rules, BuilderConfig configuration)
+   Returns a StateMachine built starting from initialSate and applying the rules specified
+   the array rules. The configuration specifies behavior settings for the build
+   method.
+
+The interfaces for Rule, StateMachineBuilder, as well as the classes State and
+BuilderConfig go in the statemaker assembly namespace. The namespace is imported
+to allow building of custom rules.
