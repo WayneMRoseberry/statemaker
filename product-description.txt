@@ -50,3 +50,23 @@ supplying the following information:
 There should be an API to call to define rules in this fashion. It should also
 be possible to load a definition file describing declarative state machine
 building.
+
+Project Considerations:
+  
+Continuous Integration
+This project will use continuous integration with trunk-based development
+practices.
+- The unit tests need to run and pass prior to merging into trun. This needs
+  to be enforced in Github, outside the control of Claude.
+- There needs to be a set of static inspection checks to look for code
+  coverage and internal code quality checks. These checks must be executed
+  and pass prior to merging into trunk.
+
+Continuous Deployment
+This project is producing a standalone tool. There is no service deployment.
+There will be a release process for the tool. There should be a released
+version of the tool binaries available after every build. The default shall
+be to treat every change like a minor release until someone specifies otherwise.
+
+The initial product version shall be less than 1.0.0 (semantic versioning)
+until specified otherwise.

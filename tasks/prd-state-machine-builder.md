@@ -244,6 +244,41 @@ Example JSON structure:
 - Ensure expressions are sandboxed and cannot execute arbitrary code
 - Support variable references using simple syntax (e.g., variable names without quotes)
 
+## Development & Release Process
+
+### Continuous Integration
+The project follows **trunk-based development** practices with continuous integration:
+
+1. **Unit Test Requirements:**
+   - All unit tests must run and pass before merging to trunk (main branch)
+   - This requirement must be enforced via GitHub branch protection rules
+   - Pull requests cannot be merged if tests fail
+
+2. **Static Code Analysis:**
+   - Static inspection checks must be configured to analyze:
+     - Code coverage metrics
+     - Internal code quality (linting, complexity, etc.)
+   - These checks must execute automatically on every pull request
+   - Pull requests cannot be merged if quality checks fail
+
+### Continuous Deployment
+The project produces a **standalone library/tool** (not a service):
+
+1. **Release Strategy:**
+   - Binaries are released after every successful build on the main branch
+   - By default, every change is treated as a **minor version release** (semantic versioning)
+   - Version increments can be explicitly specified when needed (e.g., major or patch)
+
+2. **Versioning:**
+   - Follow semantic versioning (MAJOR.MINOR.PATCH)
+   - Initial product versions shall be **< 1.0.0** (e.g., 0.1.0, 0.2.0) until stable
+   - Version 1.0.0 will be released when explicitly specified (feature-complete and stable)
+
+3. **Release Artifacts:**
+   - NuGet package for library distribution
+   - Compiled binaries for direct usage
+   - Release notes generated from commit messages
+
 ## Technical Considerations
 
 1. **Target Framework:** .NET 6.0 or later (LTS version) for broad compatibility
@@ -258,15 +293,16 @@ Example JSON structure:
 6. **Export Libraries:** Consider using third-party libraries for GraphML/DOT generation or implement minimal spec compliance
 7. **Namespace:** `StateMaker` (matches the assembly/repository name)
 8. **Security:** Expression evaluation must be sandboxed to prevent code injection attacks in declarative rules
-9. **Testing:** Unit tests should cover:
-   - State equality and hashing
-   - Rule application logic
-   - Cycle detection
-   - Depth and count limits
-   - Export format validity
-   - Declarative rule parsing and execution
-   - Expression evaluation correctness
-   - File loading error handling
+9. **CI/CD Pipeline:** GitHub Actions or similar for automated testing, quality checks, and releases
+10. **Testing:** Unit tests should cover:
+    - State equality and hashing
+    - Rule application logic
+    - Cycle detection
+    - Depth and count limits
+    - Export format validity
+    - Declarative rule parsing and execution
+    - Expression evaluation correctness
+    - File loading error handling
 
 ## Success Metrics
 
@@ -280,9 +316,13 @@ Example JSON structure:
 8. **API Clarity:** Junior developers can understand and use the library with minimal documentation
 9. **Declarative Rule Parity:** Declarative rules produce identical state machines as equivalent code-based rules
 10. **File Loading Reliability:** Rule definition files with valid syntax load successfully 100% of the time with clear error messages for invalid files
+11. **CI/CD Reliability:** 100% of commits that pass local tests also pass CI pipeline; no flaky tests
+12. **Build Success Rate:** >95% of builds succeed without manual intervention
+13. **Release Cadence:** Automated releases occur within 10 minutes of merging to trunk
 
 ## Open Questions
 
+### Core Library
 1. **State Variable Types:** Should `State` support only primitives, or also complex objects? How to handle equality for complex types?
 2. **Rule Priority:** If multiple rules are available for a state, should there be a priority mechanism, or are all applied?
 3. **Transition Metadata:** Should transitions store additional data (e.g., timestamps, execution order)?
@@ -290,8 +330,18 @@ Example JSON structure:
 5. **Partial State Matching:** Should rules support wildcard matching (e.g., "applies to any state where X > 5")?
 6. **Logging/Diagnostics:** What level of logging should be built in for debugging state generation?
 7. **Version Compatibility:** How should the library handle serialized state machines from older versions?
+
+### Declarative Features
 8. **Declarative File Format:** Should the initial version support JSON only, or also YAML/XML? What's the priority?
 9. **Expression Language Complexity:** How complex should expressions be? Should they support functions (e.g., `ToUpper()`, `Math.Max()`)?
 10. **Declarative Rule Validation:** Should the library validate expressions at definition time or only at execution time?
 11. **Mixed Rules:** Can a state machine be built with both code-based and declarative rules simultaneously?
 12. **Expression Variable Scoping:** How should declarative expressions reference state variables? Case-sensitive? String interpolation?
+
+### CI/CD & Tooling
+13. **CI Platform:** Should we use GitHub Actions, Azure Pipelines, or another CI/CD platform?
+14. **Code Coverage Tool:** What tool should be used for code coverage analysis (Coverlet, dotCover, etc.)?
+15. **Quality Gates:** What are the minimum thresholds for code coverage (80%? 90%?) and code quality metrics?
+16. **Static Analysis Tools:** Which static analysis tools should be used (SonarQube, ReSharper, Roslyn analyzers)?
+17. **Release Automation:** Should releases be triggered automatically on every merge, or require manual approval?
+18. **Pre-release Versions:** How should pre-release versions be tagged (alpha, beta, rc)?
