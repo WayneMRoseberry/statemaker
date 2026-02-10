@@ -124,6 +124,24 @@ Scenario: Implement a custom rule class
   And I implement the Execute(State state) method to return the new state
   Then I have a custom rule class ready to use
 
+Scenario: Developer implements custom rule AddOption.IsAvailable so that the rule will fire when "OptionList <> Empty"
+  Given I am implementing the AddOption rule class
+  And the rule should only apply when the OptionList is not empty
+  When I implement the IsAvailable(State state) method
+  And I check if state contains a variable "OptionList"
+  And I verify that "OptionList" is not empty
+  Then the method returns true when OptionList has items
+  And the method returns false when OptionList is empty or missing
+
+Scenario: Developer implements AddOption.Execute so that it returns a new state when triggered
+  Given I am implementing the AddOption rule class
+  And the rule should add an option to the current state
+  When I implement the Execute(State state) method
+  And I create a new State object based on the input state
+  And I modify the appropriate variables to reflect adding an option
+  Then the method returns the new state with the option added
+  And the original state remains unchanged
+
 Scenario: Use custom rules with the builder
   Given I have implemented one or more custom rule classes
   And I have created an initial state
