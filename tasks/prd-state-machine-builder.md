@@ -116,12 +116,30 @@ Scenario: Generate test states from user actions
 ```gherkin
 Feature: Define custom state transition rules
 
-Scenario: Implement domain-specific rules with simple interface
+Scenario: Implement a custom rule class
   Given I am a developer who needs to model domain-specific transitions
-  And I have the IRule interface with IsAvailable and Execute methods
-  When I implement the interface for my custom rule
-  Then I can model my state transitions without learning complex APIs
-  And the rule integrates seamlessly with the builder
+  And I have imported the StateMaker namespace
+  When I create a class that implements the IRule interface
+  And I implement the IsAvailable(State state) method to check if the rule applies
+  And I implement the Execute(State state) method to return the new state
+  Then I have a custom rule class ready to use
+
+Scenario: Use custom rules with the builder
+  Given I have implemented one or more custom rule classes
+  And I have created an initial state
+  And I have created a BuilderConfig with appropriate limits
+  When I create an array of my custom rule instances
+  And I call builder.Build(initialState, rules, config)
+  Then the builder uses my custom rules to generate the state machine
+  And my custom rule logic determines the state transitions
+
+Scenario: Share custom rules as a reusable library
+  Given I have implemented custom rule classes for my domain
+  When I compile my rules into a separate assembly/NuGet package
+  And I reference the StateMaker namespace in my package
+  Then other developers can reference my package
+  And they can use my custom rules by creating instances and passing them to the builder
+  And they can combine my rules with their own custom or declarative rules
 ```
 
 **Scenario 3: System Analyst exports for visualization**
