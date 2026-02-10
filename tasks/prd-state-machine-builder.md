@@ -40,6 +40,9 @@ As a developer, I want to configure depth and state count limits, so that I can 
 ### Story 5: Business Analyst
 As a business analyst without programming expertise, I want to define state machine rules using a declarative format via file so that I can model workflows and processes without writing C# code.
 
+### Story 6: Developer - Configuration Validation
+As a developer using the library, I want the builder to validate my configuration settings and initial state before attempting to build the state machine, so that I receive clear error messages about invalid configurations rather than unexpected runtime behavior or infinite loops.
+
 ## User Stories in Gherkin Format
 
 ### Feature: Automated State Machine Generation
@@ -55,6 +58,58 @@ Scenario: Generate test states from user actions
   When I build the state machine with these rules and configuration
   Then all reachable states are generated
   And I can create comprehensive test coverage without manual enumeration
+
+  Scenario: tester builds full coverage from initial state and configuration
+    Given Test engineer has a set of user action rules
+    And defined initial state (YES)
+    And configured exhaustive (YES)
+    When build state machine
+    Then all possible reachable states generated
+    And I can create comprehensive coverage
+
+  Scenario: tester builds coverage with depth and state limit
+    Given Test engineer has a set of user action rules
+    And defined initial state (YES)
+    And configured exhaustive (NO)
+    And configured depth limit? (YES)
+    And configured state limit (YES)
+    When build state machine
+    Then possible states up to limit are generated.
+    And I can create comprehensive coverage
+
+  Scenario: tester builds coverage with depth limit
+    Given Test engineer has a set of user action rules
+    And defined initial state (YES)
+    And configured exhaustive (NO)
+    And configured depth limit? (YES)
+    And configured state limit (NO)
+    When build state machine
+    Then an error saying invalid configuration state
+
+  Scenario: tester builds coverage with state limit
+    Given Test engineer has a set of user action rules
+    And defined initial state (YES)
+    And configured exhaustive (NO)
+    And configured depth limit? (NO)
+    And configured state limit (YES)
+    When build state machine
+    Then possible states up to limit are generated.
+    And I can create comprehensive coverage
+
+  Scenario: tester submits configuration with no setting
+    Given Test engineer has a set of user action rules
+    And defined initial state (YES)
+    And configured exhaustive (NO)
+    And configured depth limit? (NO)
+    And configured state limit (NO)
+    When build state machine
+    Then an error saying invalid configuration state
+
+  Scenario: tester builds without initial state
+    Given Test engineer has a set of user action rules
+    And defined initial state (NO)
+    When build state machine
+    Then an error is displayed saying no state presented
 ```
 
 **Scenario 2: Developer implements custom domain rules**
@@ -156,53 +211,68 @@ Scenario: Load rules from a definition file
 15. If both `MaxDepth` and `MaxStates` are null (not set), the builder performs **exhaustive exploration** generating all reachable states
 16. The builder must assign unique IDs to each state
 
+### Configuration Validation
+
+17. The builder must validate that the initial state parameter is not null before beginning exploration
+18. If the initial state is null, the builder must throw an `ArgumentNullException` with the message "No initial state provided"
+19. The builder must validate the configuration settings before beginning exploration
+20. Valid configuration combinations are:
+    - **Exhaustive mode:** Both `MaxDepth` and `MaxStates` are null
+    - **State-limited mode:** `MaxStates` is set (with or without `MaxDepth`)
+    - **Dual-limited mode:** Both `MaxDepth` and `MaxStates` are set
+21. Invalid configuration combinations that must result in an error:
+    - **Depth-only mode:** `MaxDepth` is set but `MaxStates` is null (invalid - requires state limit)
+    - **No limits configured:** Both `MaxDepth` and `MaxStates` are null AND exhaustive mode is not explicitly enabled
+22. When an invalid configuration is detected, the builder must throw an `InvalidOperationException` with the message "Invalid configuration: {specific reason}"
+23. The error message must clearly indicate which configuration requirement was violated
+
 ### Export Capabilities
 
-16. The system must provide an export mechanism to serialize the state machine to JSON format
-17. The system must provide an export mechanism to generate GraphML format for tools like yEd
-18. The system must provide an export mechanism to generate DOT format for Graphviz
-19. Each export format must include all states, transitions, and rule names
+24. The system must provide an export mechanism to serialize the state machine to JSON format
+25. The system must provide an export mechanism to generate GraphML format for tools like yEd
+26. The system must provide an export mechanism to generate DOT format for Graphviz
+27. Each export format must include all states, transitions, and rule names
 
 ### Namespace and Extensibility
 
-20. All interfaces (`IRule`, `IStateMachineBuilder`) and core classes (`State`, `StateMachine`, `BuilderConfig`, `Transition`) must be in the `StateMaker` namespace
-21. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
-22. Rule names should be automatically derived from the rule class name (or configurable)
+28. All interfaces (`IRule`, `IStateMachineBuilder`) and core classes (`State`, `StateMachine`, `BuilderConfig`, `Transition`) must be in the `StateMaker` namespace
+29. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
+30. Rule names should be automatically derived from the rule class name (or configurable)
 
 ### Declarative Rule Definition
 
-23. The system must provide a declarative rule definition mechanism that does not require writing custom C# classes
-24. A declarative rule definition must include:
+31. The system must provide a declarative rule definition mechanism that does not require writing custom C# classes
+32. A declarative rule definition must include:
     - Rule name (string identifier)
     - Availability condition (boolean expression evaluated against state variables)
     - Variable transformations (mapping of variable names to new values or expressions)
-25. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
-26. The system must support boolean expressions for conditions using standard operators (initial version):
+33. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
+34. The system must support boolean expressions for conditions using standard operators (initial version):
     - Equality: `==`, `!=`
     - Comparison: `<`, `>`, `<=`, `>=`
     - Logical: `&&`, `||`, `!`
     - Example: `"Age >= 18 && Status == 'Active'"`
-27. The system must support transformation expressions that can (initial version):
+35. The system must support transformation expressions that can (initial version):
     - Set variables to literal values: `Status = "Approved"`
     - Reference current state variables: `Count = Count + 1`
     - Use basic arithmetic: `+`, `-`, `*`, `/`, and parenthetical expressions
-28. The system must provide a file loader that reads rule definitions from an external file
-29. The file format must be JSON only (structured and human-readable)
-30. The file loader must validate rule definitions at execution time and provide clear error messages for invalid syntax
-31. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
-32. State variable references in expressions must be case-sensitive exact name matches
-33. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
+36. The system must provide a file loader that reads rule definitions from an external file
+37. The file format must be JSON only (structured and human-readable)
+38. The file loader must validate rule definitions at execution time and provide clear error messages for invalid syntax
+39. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
+40. State variable references in expressions must be case-sensitive exact name matches
+41. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
 
 ### Logging and Diagnostics
 
-34. The system must provide a logging mechanism with three severity levels:
+42. The system must provide a logging mechanism with three severity levels:
     - INFO: General information about state machine building progress
     - DEBUG: Detailed information for in-depth investigation
     - ERROR: Error conditions
-35. The default logging level must be INFO and ERROR (DEBUG disabled by default)
-36. The logging system must support extensible loggers to allow custom destinations
-37. The default logger must output to the console
-38. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
+43. The default logging level must be INFO and ERROR (DEBUG disabled by default)
+44. The logging system must support extensible loggers to allow custom destinations
+45. The default logger must output to the console
+46. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
 
 ## Non-Goals (Out of Scope)
 
@@ -239,17 +309,20 @@ The following are explicitly **not** included in the initial version (may be con
 
 ### Configuration Options
 The `BuilderConfig` class should include:
-- `MaxDepth` (int, nullable): Maximum depth of exploration. If null, no depth limit (exhaustive)
-- `MaxStates` (int, nullable): Maximum number of states. If null, no state count limit (exhaustive)
+- `MaxDepth` (int, nullable): Maximum depth of exploration. If null, no depth limit
+- `MaxStates` (int, nullable): Maximum number of states. If null, no state count limit
 - `ExplorationStrategy` (enum: BFS, DFS)
 - `GenerateStateIds` (Func<State, string>): Custom ID generator (optional)
 - `LogLevel` (enum: INFO, DEBUG, ERROR): Logging verbosity
 
-**Exploration Modes:**
+**Valid Exploration Modes:**
 - **Exhaustive Mode:** Both `MaxDepth` and `MaxStates` are null - generates all reachable states
-- **Depth-Limited Mode:** `MaxDepth` is set - limits exploration depth regardless of state count
-- **State-Limited Mode:** `MaxStates` is set - limits total states regardless of depth
-- **Dual-Limited Mode:** Both limits set - stops when either limit is reached
+- **State-Limited Mode:** `MaxStates` is set, `MaxDepth` is null - limits total states regardless of depth
+- **Dual-Limited Mode:** Both `MaxDepth` and `MaxStates` are set - stops when either limit is reached
+
+**Invalid Configuration (will throw error):**
+- **Depth-Only Mode:** `MaxDepth` is set but `MaxStates` is null - **INVALID** (depth limit alone is not sufficient; must include state limit to prevent unbounded exploration)
+- **No Configuration:** Both limits are null without explicit exhaustive mode indication - **INVALID** (ambiguous intent)
 
 ### Declarative Rule File Format
 **JSON Format Only:** Built-in .NET support via System.Text.Json
@@ -351,6 +424,9 @@ The project produces a **standalone library/tool** (not a service):
     - File loading error handling
     - Logging functionality at all levels
     - Mixed rule scenarios (code-based + declarative)
+    - Configuration validation (valid and invalid combinations)
+    - Initial state validation (null state handling)
+    - Error message clarity for validation failures
 
 ## Success Metrics
 
