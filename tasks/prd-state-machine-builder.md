@@ -2,7 +2,11 @@
 
 ## Introduction/Overview
 
-The State Machine Builder is a C#/.NET library that generates all possible states and transitions of a finite state machine from an initial state and a set of transformation rules. The tool explores the state space systematically, creating a complete state machine definition that can be used for various purposes including software testing, workflow modeling, and system analysis.
+The State Machine Builder is a C#/.NET library that generates states and transitions of a finite state machine from an initial state and a set of transformation rules. The tool explores the state space systematically according to configurable limits, creating a state machine definition that can be used for various purposes including software testing, workflow modeling, and system analysis.
+
+Users configure the builder's exploration behavior through `BuilderConfig`:
+- **Exhaustive exploration** (no limits) generates all reachable states
+- **Limited exploration** (with depth/state count limits) generates a bounded subset of states
 
 **Problem it solves:** Manually defining all possible states and transitions in a complex system is time-consuming, error-prone, and difficult to maintain. This tool automates the discovery of states by applying rules iteratively, to help establish completeness and correctness.
 
@@ -22,7 +26,7 @@ The State Machine Builder is a C#/.NET library that generates all possible state
 ## User Stories
 
 ### Story 1: Test Engineer
-As a test engineer, I want to automatically generate all possible states of my application from a set of user actions, so that I can create comprehensive test coverage without manually enumerating every scenario.
+As a test engineer, I want to configure the state machine builder to automatically generate all reachable states of my application from a set of user actions, so that I can create comprehensive test coverage without manually enumerating every scenario.
 
 ### Story 2: Library User
 As a developer using the library, I want to define custom rules by implementing a simple interface (isAvailable, execute), so that I can model my domain-specific state transitions without learning complex APIs.
@@ -47,8 +51,9 @@ Feature: Generate all possible application states for testing
 Scenario: Generate test states from user actions
   Given I am a test engineer with a set of user action rules
   And I have defined an initial application state
-  When I build the state machine with these rules
-  Then all possible reachable states are generated
+  And I configure the builder for exhaustive exploration (no depth or state limits)
+  When I build the state machine with these rules and configuration
+  Then all reachable states are generated
   And I can create comprehensive test coverage without manual enumeration
 ```
 
@@ -140,15 +145,16 @@ Scenario: Load rules from a definition file
 ### State Machine Builder
 
 6. The system must provide a `StateMachineBuilder` class implementing an `IStateMachineBuilder` interface
-7. The builder must implement a `Build(State initialState, Rule[] rules, BuilderConfig config)` method
+7. The builder must implement a `Build(State initialState, Rule[] rules, BuilderConfig config)` method that requires a configuration parameter
 8. The builder must start from the initial state and iteratively apply all available rules
 9. For each new state generated, the builder must check if an equivalent state already exists
 10. If an equivalent state exists, the builder must create a transition to the existing state and **stop exploring that path** (cycle prevention)
 11. If the state is new, the builder must add it to the state machine and continue exploration
-12. The builder must respect the depth limit specified in `BuilderConfig` (maximum levels of transitions from initial state)
-13. The builder must respect the state count limit specified in `BuilderConfig` (maximum total states)
-14. The builder must stop exploration when either limit is reached
-15. The builder must assign unique IDs to each state
+12. The builder must respect the depth limit specified in `BuilderConfig.MaxDepth` if set (maximum levels of transitions from initial state)
+13. The builder must respect the state count limit specified in `BuilderConfig.MaxStates` if set (maximum total states)
+14. The builder must stop exploration when either limit is reached, if configured
+15. If both `MaxDepth` and `MaxStates` are null (not set), the builder performs **exhaustive exploration** generating all reachable states
+16. The builder must assign unique IDs to each state
 
 ### Export Capabilities
 
@@ -233,11 +239,17 @@ The following are explicitly **not** included in the initial version (may be con
 
 ### Configuration Options
 The `BuilderConfig` class should include:
-- `MaxDepth` (int, nullable): Maximum depth of exploration
-- `MaxStates` (int, nullable): Maximum number of states
+- `MaxDepth` (int, nullable): Maximum depth of exploration. If null, no depth limit (exhaustive)
+- `MaxStates` (int, nullable): Maximum number of states. If null, no state count limit (exhaustive)
 - `ExplorationStrategy` (enum: BFS, DFS)
 - `GenerateStateIds` (Func<State, string>): Custom ID generator (optional)
 - `LogLevel` (enum: INFO, DEBUG, ERROR): Logging verbosity
+
+**Exploration Modes:**
+- **Exhaustive Mode:** Both `MaxDepth` and `MaxStates` are null - generates all reachable states
+- **Depth-Limited Mode:** `MaxDepth` is set - limits exploration depth regardless of state count
+- **State-Limited Mode:** `MaxStates` is set - limits total states regardless of depth
+- **Dual-Limited Mode:** Both limits set - stops when either limit is reached
 
 ### Declarative Rule File Format
 **JSON Format Only:** Built-in .NET support via System.Text.Json
@@ -342,7 +354,7 @@ The project produces a **standalone library/tool** (not a service):
 
 ## Success Metrics
 
-1. **Correctness:** 100% of reachable states are discovered (up to configured limits)
+1. **Correctness:** 100% of reachable states are discovered when configured for exhaustive exploration; limited exploration respects configured bounds accurately
 2. **Cycle Prevention:** No infinite loops; equivalent states are correctly identified
 3. **Performance:** Can build state machines with 1000+ states in under 10 seconds on standard hardware
 4. **Usability (Code-based):** Developers can implement a custom rule and build a state machine in under 30 lines of code
