@@ -499,6 +499,16 @@ The project produces a **standalone library/tool** (not a service):
     - Custom rule Execute method not modifying input state
     - Custom rules from external assemblies/packages
     - Combining custom rules from multiple sources (local + external + declarative)
+12. **Documentation:**
+    - Developer documentation is maintained in the `/docs` directory
+    - Architecture documents in `/docs/architecture/` explain design decisions and component interactions
+    - When implementing features, update relevant architecture documents to reflect actual implementation
+    - When modifying core functionality (IRule, State, Builder, etc.), review and update corresponding documentation
+    - Add new architecture documents for significant features or design patterns
+    - Keep documentation synchronized with code changes during PRs
+    - Current architecture documents:
+      - `/docs/architecture/declarative-rules.md` - Declarative rule building architecture
+    - See `/docs/README.md` for documentation standards and contribution guidelines
 
 ## Success Metrics
 
