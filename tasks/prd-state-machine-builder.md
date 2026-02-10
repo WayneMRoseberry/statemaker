@@ -151,6 +151,17 @@ Scenario: Use custom rules with the builder
   Then the builder uses my custom rules to generate the state machine
   And my custom rule logic determines the state transitions
 
+Scenario: Developer calls custom rule from declarative state machine definition
+  Given I have implemented a custom rule class (e.g., ComplexValidationRule)
+  And I have a declarative rule definition file with multiple declarative rules
+  When I load the declarative rules from the file
+  And I create an instance of my custom rule
+  And I combine both declarative and custom rules into a single rule array
+  And I call builder.Build(initialState, combinedRules, config)
+  Then the builder uses both declarative and custom rules together
+  And the state machine includes transitions from both rule types
+  And the custom rule executes alongside the declarative rules
+
 Scenario: Share custom rules as a reusable library
   Given I have implemented custom rule classes for my domain
   When I compile my rules into a separate assembly/NuGet package
