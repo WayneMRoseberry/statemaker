@@ -189,6 +189,14 @@ Scenario: Export state machine to DOT format
   When I export the state machine to DOT format
   Then I receive a valid DOT file
   And I can visualize it using Graphviz
+
+Scenario: Import state machine from JSON and re-export to different format
+  Given I have a previously generated state machine exported to JSON format
+  When I import the state machine from the JSON file
+  And I export it to GraphML format
+  Then I receive a valid GraphML file
+  And the state machine structure is preserved from the original
+  And I can visualize it in yEd without loss of information
 ```
 
 **Scenario 4: Developer configures exploration limits**
@@ -276,61 +284,64 @@ Scenario: Load rules from a definition file
 22. When an invalid configuration is detected, the builder must throw an `InvalidOperationException` with the message "Invalid configuration: {specific reason}"
 23. The error message must clearly indicate which configuration requirement was violated
 
-### Export Capabilities
+### Export and Import Capabilities
 
 24. The system must provide an export mechanism to serialize the state machine to JSON format
 25. The system must provide an export mechanism to generate GraphML format for tools like yEd
 26. The system must provide an export mechanism to generate DOT format for Graphviz
 27. Each export format must include all states, transitions, and rule names
+28. The system must provide an import mechanism to deserialize a state machine from JSON format
+29. The imported state machine must preserve all states, transitions, state IDs, and rule names from the original
+30. An imported state machine must be exportable to any supported format (JSON, GraphML, DOT) without loss of information
 
 ### Namespace and Extensibility
 
-28. All interfaces (`IRule`, `IStateMachineBuilder`) and core classes (`State`, `StateMachine`, `BuilderConfig`, `Transition`) must be in the `StateMaker` namespace
-29. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
-30. Rule names should be automatically derived from the rule class name (or configurable)
+31. All interfaces (`IRule`, `IStateMachineBuilder`) and core classes (`State`, `StateMachine`, `BuilderConfig`, `Transition`) must be in the `StateMaker` namespace
+32. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
+33. Rule names should be automatically derived from the rule class name (or configurable)
 
 ### Declarative Rule Definition
 
-31. The system must provide a declarative rule definition mechanism that does not require writing custom C# classes
-32. A declarative rule definition must include:
+34. The system must provide a declarative rule definition mechanism that does not require writing custom C# classes
+35. A declarative rule definition must include:
     - Rule name (string identifier)
     - Availability condition (boolean expression evaluated against state variables)
     - Variable transformations (mapping of variable names to new values or expressions)
-33. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
-34. The system must support boolean expressions for conditions using standard operators (initial version):
+36. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
+37. The system must support boolean expressions for conditions using standard operators (initial version):
     - Equality: `==`, `!=`
     - Comparison: `<`, `>`, `<=`, `>=`
     - Logical: `&&`, `||`, `!`
     - Example: `"Age >= 18 && Status == 'Active'"`
-35. The system must support transformation expressions that can (initial version):
+38. The system must support transformation expressions that can (initial version):
     - Set variables to literal values: `Status = "Approved"`
     - Reference current state variables: `Count = Count + 1`
     - Use basic arithmetic: `+`, `-`, `*`, `/`, and parenthetical expressions
-36. The system must provide a file loader that reads rule definitions from an external file
-37. The file format must be JSON only (structured and human-readable)
-38. The file loader must validate rule definitions at execution time and provide clear error messages for invalid syntax
-39. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
-40. State variable references in expressions must be case-sensitive exact name matches
-41. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
+39. The system must provide a file loader that reads rule definitions from an external file
+40. The file format must be JSON only (structured and human-readable)
+41. The file loader must validate rule definitions at execution time and provide clear error messages for invalid syntax
+42. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
+43. State variable references in expressions must be case-sensitive exact name matches
+44. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
 
 ### Custom Rule Implementation
 
-47. Custom rule implementations must not modify the input state in the Execute method
-48. The Execute method must return a new State object, leaving the original state unchanged (immutability)
-49. Custom rules must be implementable in external assemblies that reference the StateMaker namespace
-50. Custom rules packaged in external assemblies must work identically to rules defined in the main application
-51. The system must support loading and using custom rules from referenced NuGet packages or DLLs
+45. Custom rule implementations must not modify the input state in the Execute method
+46. The Execute method must return a new State object, leaving the original state unchanged (immutability)
+47. Custom rules must be implementable in external assemblies that reference the StateMaker namespace
+48. Custom rules packaged in external assemblies must work identically to rules defined in the main application
+49. The system must support loading and using custom rules from referenced NuGet packages or DLLs
 
 ### Logging and Diagnostics
 
-52. The system must provide a logging mechanism with three severity levels:
+50. The system must provide a logging mechanism with three severity levels:
     - INFO: General information about state machine building progress
     - DEBUG: Detailed information for in-depth investigation
     - ERROR: Error conditions
-53. The default logging level must be INFO and ERROR (DEBUG disabled by default)
-54. The logging system must support extensible loggers to allow custom destinations
-55. The default logger must output to the console
-56. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
+51. The default logging level must be INFO and ERROR (DEBUG disabled by default)
+52. The logging system must support extensible loggers to allow custom destinations
+53. The default logger must output to the console
+54. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
 
 ## Non-Goals (Out of Scope)
 
@@ -485,7 +496,10 @@ The project produces a **standalone library/tool** (not a service):
     - Rule application logic
     - Cycle detection
     - Depth and count limits
-    - Export format validity
+    - Export format validity (JSON, GraphML, DOT)
+    - Import from JSON format
+    - Round-trip JSON export/import (data preservation)
+    - Re-export imported state machines to other formats
     - Declarative rule parsing and execution
     - Expression evaluation correctness
     - File loading error handling
