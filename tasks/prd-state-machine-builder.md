@@ -29,7 +29,7 @@ Users configure the builder's exploration behavior through `BuilderConfig`:
 As a test engineer, I want to configure the state machine builder to automatically generate all reachable states of my application from a set of user actions, so that I can create comprehensive test coverage without manually enumerating every scenario.
 
 ### Story 2: Library User
-As a developer using the library, I want to define custom rules by implementing a simple interface (isAvailable, execute), so that I can model my domain-specific state transitions without learning complex APIs.
+As a developer using the library, I want to define custom rules by implementing the IRule interface (IsAvailable, Execute), so that I can model my domain-specific state transitions and ensure my Execute method returns new immutable states.
 
 ### Story 3: System Analyst
 As a system analyst, I want to export the generated state machine to GraphML or DOT format, so that I can visualize and analyze the system behavior using tools like yEd or Graphviz.
@@ -42,6 +42,9 @@ As a business analyst without programming expertise, I want to define state mach
 
 ### Story 6: Developer - Configuration Validation
 As a developer using the library, I want the builder to validate my configuration settings and initial state before attempting to build the state machine, so that I receive clear error messages about invalid configurations rather than unexpected runtime behavior or infinite loops.
+
+### Story 7: Developer - Sharing Custom Rules
+As a developer who has implemented domain-specific custom rules, I want to package my rules as a separate assembly or NuGet package, so that other developers can reuse my rules in their own state machine projects and combine them with their own custom or declarative rules.
 
 ## User Stories in Gherkin Format
 
@@ -310,16 +313,24 @@ Scenario: Load rules from a definition file
 40. State variable references in expressions must be case-sensitive exact name matches
 41. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
 
+### Custom Rule Implementation
+
+47. Custom rule implementations must not modify the input state in the Execute method
+48. The Execute method must return a new State object, leaving the original state unchanged (immutability)
+49. Custom rules must be implementable in external assemblies that reference the StateMaker namespace
+50. Custom rules packaged in external assemblies must work identically to rules defined in the main application
+51. The system must support loading and using custom rules from referenced NuGet packages or DLLs
+
 ### Logging and Diagnostics
 
-42. The system must provide a logging mechanism with three severity levels:
+52. The system must provide a logging mechanism with three severity levels:
     - INFO: General information about state machine building progress
     - DEBUG: Detailed information for in-depth investigation
     - ERROR: Error conditions
-43. The default logging level must be INFO and ERROR (DEBUG disabled by default)
-44. The logging system must support extensible loggers to allow custom destinations
-45. The default logger must output to the console
-46. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
+53. The default logging level must be INFO and ERROR (DEBUG disabled by default)
+54. The logging system must support extensible loggers to allow custom destinations
+55. The default logger must output to the console
+56. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
 
 ## Non-Goals (Out of Scope)
 
@@ -353,6 +364,15 @@ The following are explicitly **not** included in the initial version (may be con
 - Use breadth-first search (BFS) for state exploration (recommended for finding shortest paths)
 - All available rules are evaluated for each state (no priority mechanism in initial version)
 - Rules match any state where their condition evaluates to true
+
+### Custom Rule Implementation Best Practices
+- **State Immutability:** Execute methods must create new State objects rather than modifying input states
+- **Variable Checking:** IsAvailable should check for variable existence before accessing values to avoid exceptions
+- **Return Values:** IsAvailable should return false (not throw) when a state doesn't meet rule conditions
+- **Null Handling:** Custom rules should handle null or missing state variables gracefully
+- **Packaging:** Custom rules can be packaged in separate assemblies/NuGet packages for reuse
+- **Namespace Reference:** External rule assemblies must reference the StateMaker namespace
+- **Combining Rules:** Custom rules from external packages can be mixed with local custom rules and declarative rules in a single Build call
 
 ### Configuration Options
 The `BuilderConfig` class should include:
@@ -474,6 +494,11 @@ The project produces a **standalone library/tool** (not a service):
     - Configuration validation (valid and invalid combinations)
     - Initial state validation (null state handling)
     - Error message clarity for validation failures
+    - Custom rule IsAvailable method returning correct boolean values
+    - Custom rule Execute method creating new states (immutability)
+    - Custom rule Execute method not modifying input state
+    - Custom rules from external assemblies/packages
+    - Combining custom rules from multiple sources (local + external + declarative)
 
 ## Success Metrics
 
@@ -490,6 +515,9 @@ The project produces a **standalone library/tool** (not a service):
 11. **CI/CD Reliability:** 100% of commits that pass local tests also pass CI pipeline; no flaky tests
 12. **Build Success Rate:** >95% of builds succeed without manual intervention
 13. **Logging Functionality:** All three log levels (INFO, DEBUG, ERROR) work correctly with default console output
+14. **State Immutability:** Custom rule Execute methods never modify input states; all tests verify new state objects are returned
+15. **Custom Rule Reusability:** Custom rules packaged as external assemblies can be referenced and used without modification
+16. **Rule Composition:** Developers can successfully combine custom rules from multiple sources (local, external packages, declarative) in a single state machine build
 
 ## Open Questions
 
