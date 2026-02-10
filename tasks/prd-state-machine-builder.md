@@ -4,7 +4,7 @@
 
 The State Machine Builder is a C#/.NET library that generates all possible states and transitions of a finite state machine from an initial state and a set of transformation rules. The tool explores the state space systematically, creating a complete state machine definition that can be used for various purposes including software testing, workflow modeling, and system analysis.
 
-**Problem it solves:** Manually defining all possible states and transitions in a complex system is time-consuming, error-prone, and difficult to maintain. This tool automates the discovery of states by applying rules iteratively, ensuring completeness and correctness.
+**Problem it solves:** Manually defining all possible states and transitions in a complex system is time-consuming, error-prone, and difficult to maintain. This tool automates the discovery of states by applying rules iteratively, to help establish completeness and correctness.
 
 **Goal:** Provide a general-purpose, extensible library that automatically builds finite state machines from declarative rule definitions, with configurable exploration strategies and export capabilities.
 
@@ -28,13 +28,13 @@ As a test engineer, I want to automatically generate all possible states of my a
 As a developer using the library, I want to define custom rules by implementing a simple interface (isAvailable, execute), so that I can model my domain-specific state transitions without learning complex APIs.
 
 ### Story 3: System Analyst
-As a system analyst, I want to export the generated state machine to GraphML or DOT format, so that I can visualize and analyze the system behavior using standard tools like yEd or Graphviz.
+As a system analyst, I want to export the generated state machine to GraphML or DOT format, so that I can visualize and analyze the system behavior using tools like yEd or Graphviz.
 
 ### Story 4: Developer
 As a developer, I want to configure depth and state count limits, so that I can control the exploration process and prevent my application from running out of memory on large or potentially infinite state spaces.
 
 ### Story 5: Business Analyst
-As a business analyst without programming expertise, I want to define state machine rules using a declarative format (via API or file), so that I can model workflows and processes without writing C# code.
+As a business analyst without programming expertise, I want to define state machine rules using a declarative format via file so that I can model workflows and processes without writing C# code.
 
 ## User Stories in Gherkin Format
 
@@ -171,43 +171,65 @@ Scenario: Load rules from a definition file
     - Availability condition (boolean expression evaluated against state variables)
     - Variable transformations (mapping of variable names to new values or expressions)
 25. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
-26. The system must support boolean expressions for conditions using standard operators:
+26. The system must support boolean expressions for conditions using standard operators (initial version):
     - Equality: `==`, `!=`
     - Comparison: `<`, `>`, `<=`, `>=`
     - Logical: `&&`, `||`, `!`
     - Example: `"Age >= 18 && Status == 'Active'"`
-27. The system must support transformation expressions that can:
+27. The system must support transformation expressions that can (initial version):
     - Set variables to literal values: `Status = "Approved"`
     - Reference current state variables: `Count = Count + 1`
-    - Use basic arithmetic: `+`, `-`, `*`, `/`
+    - Use basic arithmetic: `+`, `-`, `*`, `/`, and parenthetical expressions
 28. The system must provide a file loader that reads rule definitions from an external file
-29. The file format must be structured and human-readable (JSON, YAML, or XML)
-30. The file loader must validate rule definitions and provide clear error messages for invalid syntax
+29. The file format must be JSON only (structured and human-readable)
+30. The file loader must validate rule definitions at execution time and provide clear error messages for invalid syntax
 31. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
+32. State variable references in expressions must be case-sensitive exact name matches
+33. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
+
+### Logging and Diagnostics
+
+34. The system must provide a logging mechanism with three severity levels:
+    - INFO: General information about state machine building progress
+    - DEBUG: Detailed information for in-depth investigation
+    - ERROR: Error conditions
+35. The default logging level must be INFO and ERROR (DEBUG disabled by default)
+36. The logging system must support extensible loggers to allow custom destinations
+37. The default logger must output to the console
+38. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
 
 ## Non-Goals (Out of Scope)
 
-The following are explicitly **not** included in the initial version:
+The following are explicitly **not** included in the initial version (may be considered for future releases):
 
 1. **Built-in Visualization UI:** No graphical rendering within the library itself (export formats allow external visualization)
 2. **Rule Conflict Resolution:** No automatic handling of conflicting rules; developers must ensure rules are deterministic
-3. **Parallel Rule Application:** Rules are applied sequentially; no concurrent state generation
-4. **State Machine Execution Engine:** The library builds state machines but does not execute or simulate them
-5. **Undo/Redo of State Transitions:** The builder is a forward-only exploration
-6. **Incremental Building:** Each `Build()` call starts fresh; no support for adding rules to an existing state machine
-7. **Multi-language Support:** Initial version is C#/.NET only (may expand in future versions)
-8. **Advanced Export Formats:** Formats like SCXML, Petri nets are not included initially
+3. **Rule Priority Mechanism:** All available rules are evaluated; no priority ordering (future consideration)
+4. **Parallel Rule Application:** Rules are applied sequentially; no concurrent state generation
+5. **State Machine Execution Engine:** The library builds state machines but does not execute or simulate them
+6. **Undo/Redo of State Transitions:** The builder is a forward-only exploration
+7. **Incremental Building:** Each `Build()` call starts fresh; no support for adding rules to an existing state machine
+8. **Multi-language Support:** Initial version is C#/.NET only (may expand in future versions)
+9. **Advanced Export Formats:** Formats like SCXML, Petri nets are not included initially
+10. **YAML/XML File Formats:** JSON only for declarative rules; YAML and XML not supported
+11. **Complex State Variable Types:** Only primitive types (strings, integers, booleans, floats) supported initially
+12. **Asynchronous Rule Execution:** All rule execution is synchronous in the initial version
+13. **Transition Metadata:** Transitions do not store additional data (timestamps, execution order, etc.)
+14. **Advanced Expression Functions:** Complex functions (ToUpper(), Math.Max(), etc.) not included in initial expression evaluator
+15. **Automatic Release Deployment:** Releases require manual approval (not triggered automatically)
 
 ## Design Considerations
 
 ### State Representation
-- States should use a flexible key-value structure (e.g., `Dictionary<string, object>`) to support various domain models
-- Consider implementing `IEquatable<State>` and overriding `GetHashCode()` for efficient state comparison and deduplication
-- State IDs could be hash-based or sequential (e.g., "S0", "S1", "S2")
+- States use a flexible key-value structure (`Dictionary<string, object>`) to support various domain models
+- State variables support primitive types only: `string`, `int`, `bool`, `float/double`
+- Implement `IEquatable<State>` and override `GetHashCode()` for efficient state comparison
+- State IDs can be hash-based or sequential (e.g., "S0", "S1", "S2")
 
 ### Rule Application Strategy
-- Use breadth-first search (BFS) or depth-first search (DFS) for state exploration (BFS recommended for finding shortest paths)
-- Allow configuration to choose exploration strategy in `BuilderConfig`
+- Use breadth-first search (BFS) for state exploration (recommended for finding shortest paths)
+- All available rules are evaluated for each state (no priority mechanism in initial version)
+- Rules match any state where their condition evaluates to true
 
 ### Configuration Options
 The `BuilderConfig` class should include:
@@ -215,12 +237,10 @@ The `BuilderConfig` class should include:
 - `MaxStates` (int, nullable): Maximum number of states
 - `ExplorationStrategy` (enum: BFS, DFS)
 - `GenerateStateIds` (Func<State, string>): Custom ID generator (optional)
+- `LogLevel` (enum: INFO, DEBUG, ERROR): Logging verbosity
 
 ### Declarative Rule File Format
-For declarative rule definitions loaded from files, consider:
-- **JSON Format:** Most common, built-in .NET support via System.Text.Json
-- **YAML Format:** More human-readable, requires third-party library (YamlDotNet)
-- **XML Format:** Verbose but schema-validatable
+**JSON Format Only:** Built-in .NET support via System.Text.Json
 
 Example JSON structure:
 ```json
@@ -239,10 +259,17 @@ Example JSON structure:
 ```
 
 ### Expression Evaluation
-- Use a lightweight expression evaluator for boolean conditions and transformations
-- Consider libraries like NCalc, DynamicExpresso, or CSharpCodeProvider for expression parsing
+**Phased Complexity Approach:**
+- **Phase 1 (Initial):** Simple comparison operators (`==`, `!=`, `<`, `>`, `<=`, `>=`) and logical operators (`&&`, `||`, `!`)
+- **Phase 2:** Basic arithmetic (`+`, `-`, `*`, `/`) and parenthetical expressions
+- **Phase 3 (Future):** Complex functions (`ToUpper()`, `Math.Max()`, string manipulation, etc.)
+
+**Implementation:**
+- Use a lightweight expression evaluator library (NCalc, DynamicExpresso, or similar)
 - Ensure expressions are sandboxed and cannot execute arbitrary code
-- Support variable references using simple syntax (e.g., variable names without quotes)
+- Variable references use exact case-sensitive name matching
+- Expressions are validated at execution time, not definition time
+- Support both code-based and declarative rules in the same state machine
 
 ## Development & Release Process
 
@@ -265,13 +292,14 @@ The project follows **trunk-based development** practices with continuous integr
 The project produces a **standalone library/tool** (not a service):
 
 1. **Release Strategy:**
-   - Binaries are released after every successful build on the main branch
+   - Releases require **manual approval** (not automatic on every merge)
    - By default, every change is treated as a **minor version release** (semantic versioning)
    - Version increments can be explicitly specified when needed (e.g., major or patch)
 
 2. **Versioning:**
    - Follow semantic versioning (MAJOR.MINOR.PATCH)
    - Initial product versions shall be **< 1.0.0** (e.g., 0.1.0, 0.2.0) until stable
+   - Pre-release versions tagged as **beta** (e.g., 0.1.0-beta, 0.2.0-beta)
    - Version 1.0.0 will be released when explicitly specified (feature-complete and stable)
 
 3. **Release Artifacts:**
@@ -284,17 +312,23 @@ The project produces a **standalone library/tool** (not a service):
 1. **Target Framework:** .NET 6.0 or later (LTS version) for broad compatibility
 2. **Dependencies:**
    - Core library: Minimal external dependencies
-   - `System.Text.Json` for JSON export and declarative rule file parsing
+   - `System.Text.Json` for JSON export and declarative rule file parsing (built-in)
    - Expression evaluator library (e.g., NCalc, DynamicExpresso) for declarative rule conditions and transformations
-   - Optional: YAML parser (YamlDotNet) if YAML format is supported
+   - No YAML or XML parsers required (JSON only)
 3. **Performance:** Use `HashSet<State>` for O(1) duplicate detection; ensure `State.GetHashCode()` is efficient
 4. **Memory Management:** Large state spaces could consume significant memory; limits in `BuilderConfig` are critical
 5. **Extensibility Pattern:** Interface-based design (`IRule`, `IStateMachineBuilder`) allows mocking and testing
 6. **Export Libraries:** Consider using third-party libraries for GraphML/DOT generation or implement minimal spec compliance
 7. **Namespace:** `StateMaker` (matches the assembly/repository name)
 8. **Security:** Expression evaluation must be sandboxed to prevent code injection attacks in declarative rules
-9. **CI/CD Pipeline:** GitHub Actions or similar for automated testing, quality checks, and releases
-10. **Testing:** Unit tests should cover:
+9. **Backward Compatibility:** Library must support state machines serialized from older versions
+10. **CI/CD Pipeline:**
+    - Platform: **GitHub Actions** (required)
+    - Code coverage tool: Free option without licensing costs (e.g., Coverlet)
+    - Static analysis: SonarQube (if free tier available), otherwise free alternatives (Roslyn analyzers)
+    - Coverage threshold: **80% minimum**
+    - Quality metrics: Default recommendations from chosen toolset
+11. **Testing:** Unit tests should cover:
     - State equality and hashing
     - Rule application logic
     - Cycle detection
@@ -303,6 +337,8 @@ The project produces a **standalone library/tool** (not a service):
     - Declarative rule parsing and execution
     - Expression evaluation correctness
     - File loading error handling
+    - Logging functionality at all levels
+    - Mixed rule scenarios (code-based + declarative)
 
 ## Success Metrics
 
@@ -312,36 +348,14 @@ The project produces a **standalone library/tool** (not a service):
 4. **Usability (Code-based):** Developers can implement a custom rule and build a state machine in under 30 lines of code
 5. **Usability (Declarative):** Non-programmers can define a simple rule (condition + transformation) in under 5 minutes
 6. **Export Validity:** Exported files are valid and can be opened in target tools (yEd, Graphviz, JSON parsers)
-7. **Test Coverage:** Core library achieves >90% code coverage
+7. **Test Coverage:** Core library achieves ≥80% code coverage
 8. **API Clarity:** Junior developers can understand and use the library with minimal documentation
 9. **Declarative Rule Parity:** Declarative rules produce identical state machines as equivalent code-based rules
 10. **File Loading Reliability:** Rule definition files with valid syntax load successfully 100% of the time with clear error messages for invalid files
 11. **CI/CD Reliability:** 100% of commits that pass local tests also pass CI pipeline; no flaky tests
 12. **Build Success Rate:** >95% of builds succeed without manual intervention
-13. **Release Cadence:** Automated releases occur within 10 minutes of merging to trunk
+13. **Logging Functionality:** All three log levels (INFO, DEBUG, ERROR) work correctly with default console output
 
 ## Open Questions
 
-### Core Library
-1. **State Variable Types:** Should `State` support only primitives, or also complex objects? How to handle equality for complex types?
-2. **Rule Priority:** If multiple rules are available for a state, should there be a priority mechanism, or are all applied?
-3. **Transition Metadata:** Should transitions store additional data (e.g., timestamps, execution order)?
-4. **Async Rules:** Should the `IRule.Execute()` method support asynchronous operations?
-5. **Partial State Matching:** Should rules support wildcard matching (e.g., "applies to any state where X > 5")?
-6. **Logging/Diagnostics:** What level of logging should be built in for debugging state generation?
-7. **Version Compatibility:** How should the library handle serialized state machines from older versions?
-
-### Declarative Features
-8. **Declarative File Format:** Should the initial version support JSON only, or also YAML/XML? What's the priority?
-9. **Expression Language Complexity:** How complex should expressions be? Should they support functions (e.g., `ToUpper()`, `Math.Max()`)?
-10. **Declarative Rule Validation:** Should the library validate expressions at definition time or only at execution time?
-11. **Mixed Rules:** Can a state machine be built with both code-based and declarative rules simultaneously?
-12. **Expression Variable Scoping:** How should declarative expressions reference state variables? Case-sensitive? String interpolation?
-
-### CI/CD & Tooling
-13. **CI Platform:** Should we use GitHub Actions, Azure Pipelines, or another CI/CD platform?
-14. **Code Coverage Tool:** What tool should be used for code coverage analysis (Coverlet, dotCover, etc.)?
-15. **Quality Gates:** What are the minimum thresholds for code coverage (80%? 90%?) and code quality metrics?
-16. **Static Analysis Tools:** Which static analysis tools should be used (SonarQube, ReSharper, Roslyn analyzers)?
-17. **Release Automation:** Should releases be triggered automatically on every merge, or require manual approval?
-18. **Pre-release Versions:** How should pre-release versions be tagged (alpha, beta, rc)?
+All initial questions have been answered and incorporated into the PRD. New questions will be added as they arise during implementation.
