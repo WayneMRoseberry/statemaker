@@ -35,6 +35,28 @@ jobs:
           path: ./test-results
           retention-days: 30
 
+      - name: Check coverage threshold
+        run: |
+          python3 -c "
+          import xml.etree.ElementTree as ET
+          import glob, sys
+          files = glob.glob('./test-results/**/coverage.cobertura.xml', recursive=True)
+          if not files:
+              print('::error::No coverage file found')
+              sys.exit(1)
+          tree = ET.parse(files[0])
+          line_rate = float(tree.getroot().get('line-rate', 0))
+          branch_rate = float(tree.getroot().get('branch-rate', 0))
+          line_pct = line_rate * 100
+          branch_pct = branch_rate * 100
+          print(f'Line coverage:   {line_pct:.1f}%')
+          print(f'Branch coverage: {branch_pct:.1f}%')
+          if line_pct < 80:
+              print(f'::error::Line coverage {line_pct:.1f}% is below the 80% minimum threshold')
+              sys.exit(1)
+          print('Coverage threshold met.')
+          "
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         if: always()
