@@ -49,13 +49,13 @@ Update the file after completing each sub-task, not just after completing an ent
 
 ## Tasks
 
-- [ ] 1.0 Set up CI/CD pipeline with GitHub Actions
+- [x] 1.0 Set up CI/CD pipeline with GitHub Actions
   - [x] 1.1 Create `.github/workflows/ci.yml` with trigger on pull requests and pushes to main
   - [x] 1.2 Configure workflow to restore, build, and run `dotnet test` for all test projects
   - [x] 1.3 Add Coverlet for code coverage collection (`dotnet test --collect:"XPlat Code Coverage"`)
   - [x] 1.4 Configure 80% minimum coverage threshold and fail the build if not met
   - [x] 1.5 Add Roslyn analyzers for static code analysis
-  - [ ] 1.6 Configure GitHub branch protection rules to require passing CI checks before merge
+  - [x] 1.6 Configure GitHub branch protection rules to require passing CI checks before merge
 
 - [ ] 2.0 Set up project structure and core data structures (State, IRule, StateMachine, BuilderConfig, Transition)
   - [ ] 2.1 Create solution file and `src/StateMaker/StateMaker.csproj` targeting .NET 6.0+ with `StateMaker` namespace
