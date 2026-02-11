@@ -98,4 +98,59 @@ public class StateTests
         Assert.False(state.Variables.ContainsKey("name"));
         Assert.Equal(30, state.Variables["age"]);
     }
+
+    [Fact]
+    public void Clone_ReturnsNewInstance()
+    {
+        var state = new State();
+        state.Variables["name"] = "Alice";
+
+        var clone = state.Clone();
+
+        Assert.NotSame(state, clone);
+    }
+
+    [Fact]
+    public void Clone_CopiesAllVariables()
+    {
+        var state = new State();
+        state.Variables["name"] = "Alice";
+        state.Variables["age"] = 30;
+        state.Variables["active"] = true;
+
+        var clone = state.Clone();
+
+        Assert.Equal(3, clone.Variables.Count);
+        Assert.Equal("Alice", clone.Variables["name"]);
+        Assert.Equal(30, clone.Variables["age"]);
+        Assert.True((bool)clone.Variables["active"]);
+    }
+
+    [Fact]
+    public void Clone_ModifyingCloneDoesNotAffectOriginal()
+    {
+        var state = new State();
+        state.Variables["name"] = "Alice";
+        state.Variables["count"] = 1;
+
+        var clone = state.Clone();
+        clone.Variables["name"] = "Bob";
+        clone.Variables["count"] = 99;
+        clone.Variables["extra"] = true;
+
+        Assert.Equal("Alice", state.Variables["name"]);
+        Assert.Equal(1, state.Variables["count"]);
+        Assert.Equal(2, state.Variables.Count);
+    }
+
+    [Fact]
+    public void Clone_EmptyState()
+    {
+        var state = new State();
+
+        var clone = state.Clone();
+
+        Assert.NotSame(state, clone);
+        Assert.Empty(clone.Variables);
+    }
 }

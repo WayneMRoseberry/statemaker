@@ -45,7 +45,13 @@ Example:
 
 Update the file after completing each sub-task, not just after completing an entire parent task.
 
-**TDD Approach:** This project follows Test-Driven Development. When starting any new task or behavior change, write the unit tests **first** — before writing the implementation code. Follow the Red-Green-Refactor cycle: write a failing test that defines the expected behavior, write the minimum code to make it pass, then refactor. All tests must pass before moving on to the next sub-task.
+**TDD Approach:** This project follows Test-Driven Development. When starting any new task or behavior change, follow the Red-Green-Refactor cycle:
+
+1. **Red (failing test):** Write the unit tests first, then create a **stub implementation** of the method under test (e.g., returning a default value, throwing `NotImplementedException`, or providing an obviously incomplete body). Run the tests and confirm they **fail due to insufficient functionality** — not merely due to a missing method or compilation error. This step validates that the tests are actually verifying meaningful behavior.
+2. **Green (make it pass):** Write the minimum correct implementation to make all tests pass.
+3. **Refactor:** Clean up the implementation while keeping all tests green.
+
+All tests must pass before moving on to the next sub-task.
 
 ## Tasks
 
@@ -61,7 +67,7 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 2.1 Create solution file and `src/StateMaker/StateMaker.csproj` targeting .NET 6.0+ with `StateMaker` namespace
   - [x] 2.2 Create test project `src/StateMaker.Tests/StateMaker.Tests.csproj` referencing the main project
   - [x] 2.3 Implement `State` class with `Dictionary<string, object>` Variables property (primitives only: string, int, bool, float/double)
-  - [ ] 2.4 Implement `State.Clone()` method that creates a deep copy of the state
+  - [x] 2.4 Implement `State.Clone()` method that creates a deep copy of the state
   - [ ] 2.5 Implement `IEquatable<State>` on State: `Equals()` compares all variable keys and values, `GetHashCode()` uses sorted keys for deterministic hashing
   - [ ] 2.6 Write unit tests for State: equality, hashing, Clone immutability, variable types, edge cases (empty state, null values)
   - [ ] 2.7 Define `IRule` interface with `bool IsAvailable(State state)` and `State Execute(State state)` methods
