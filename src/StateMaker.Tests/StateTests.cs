@@ -331,4 +331,44 @@ public class StateTests
         Assert.Contains(b, set);
         Assert.Single(set);
     }
+
+    [Fact]
+    public void Equals_SameReference_ReturnsTrue()
+    {
+        var state = new State();
+        state.Variables["x"] = 1;
+
+        Assert.True(state.Equals(state));
+    }
+
+    [Fact]
+    public void Clone_ModifyingOriginalDoesNotAffectClone()
+    {
+        var state = new State();
+        state.Variables["name"] = "Alice";
+        state.Variables["count"] = 1;
+
+        var clone = state.Clone();
+        state.Variables["name"] = "Bob";
+        state.Variables["count"] = 99;
+        state.Variables["extra"] = true;
+
+        Assert.Equal("Alice", clone.Variables["name"]);
+        Assert.Equal(1, clone.Variables["count"]);
+        Assert.Equal(2, clone.Variables.Count);
+    }
+
+    [Fact]
+    public void Clone_ProducesEqualState()
+    {
+        var state = new State();
+        state.Variables["name"] = "Alice";
+        state.Variables["age"] = 30;
+        state.Variables["active"] = true;
+
+        var clone = state.Clone();
+
+        Assert.Equal(state, clone);
+        Assert.Equal(state.GetHashCode(), clone.GetHashCode());
+    }
 }
