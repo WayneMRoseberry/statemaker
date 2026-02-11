@@ -54,7 +54,7 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 1.2 Configure workflow to restore, build, and run `dotnet test` for all test projects
   - [x] 1.3 Add Coverlet for code coverage collection (`dotnet test --collect:"XPlat Code Coverage"`)
   - [x] 1.4 Configure 80% minimum coverage threshold and fail the build if not met
-  - [ ] 1.5 Add Roslyn analyzers for static code analysis
+  - [x] 1.5 Add Roslyn analyzers for static code analysis
   - [ ] 1.6 Configure GitHub branch protection rules to require passing CI checks before merge
 
 - [ ] 2.0 Set up project structure and core data structures (State, IRule, StateMachine, BuilderConfig, Transition)
