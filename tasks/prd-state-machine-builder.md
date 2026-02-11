@@ -222,22 +222,27 @@ Scenario: Set state count limit to cap total states
 ```gherkin
 Feature: Define rules without writing code
 
-Scenario: Define a rule using declarative API
+Scenario: Business analyst authors a rule using declarative JSON file
   Given I am a business analyst without programming skills
   And I want to create a rule named "ApproveOrder"
-  When I use the declarative API to define:
-    | Property      | Value                           |
-    | Conditions    | OrderStatus == "Pending"        |
-    | Transformation| OrderStatus = "Approved"        |
-  Then the rule is created and available for state machine building
+  When I create a JSON file with a rules array
+  And I add a rule entry with name "ApproveOrder"
+  And I set the condition to "OrderStatus == 'Pending'"
+  And I set the transformation to "OrderStatus" = "Approved"
+  And I provide the JSON file to a developer
+  Then the developer loads the file using RuleFileLoader
+  And the loader returns an array of IRule instances
+  And the developer can build a state machine using my rules
   And I did not need to write any C# code
 
-Scenario: Load rules from a definition file
-  Given I am a business analyst with a rule definition file
+Scenario: Developer loads business analyst's rule file and builds state machine
+  Given a business analyst has authored a JSON rule definition file
   And the file contains multiple rule definitions with conditions and transformations
-  When I load the definition file using the library
-  Then all rules are parsed and created successfully
-  And I can build a state machine using these rules
+  When a developer passes the file path to the RuleFileLoader
+  Then the loader returns an IRule array with one entry per rule defined in the file
+  And each returned rule has the name specified in the JSON
+  And the developer passes the returned rules to builder.Build along with an initial state and config
+  And the builder produces a state machine using those rules
 ```
 
 ## Functional Requirements
