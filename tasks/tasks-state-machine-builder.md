@@ -60,7 +60,7 @@ Update the file after completing each sub-task, not just after completing an ent
 - [ ] 2.0 Set up project structure and core data structures (State, IRule, StateMachine, BuilderConfig, Transition)
   - [x] 2.1 Create solution file and `src/StateMaker/StateMaker.csproj` targeting .NET 6.0+ with `StateMaker` namespace
   - [x] 2.2 Create test project `src/StateMaker.Tests/StateMaker.Tests.csproj` referencing the main project
-  - [ ] 2.3 Implement `State` class with `Dictionary<string, object>` Variables property (primitives only: string, int, bool, float/double)
+  - [x] 2.3 Implement `State` class with `Dictionary<string, object>` Variables property (primitives only: string, int, bool, float/double)
   - [ ] 2.4 Implement `State.Clone()` method that creates a deep copy of the state
   - [ ] 2.5 Implement `IEquatable<State>` on State: `Equals()` compares all variable keys and values, `GetHashCode()` uses sorted keys for deterministic hashing
   - [ ] 2.6 Write unit tests for State: equality, hashing, Clone immutability, variable types, edge cases (empty state, null values)
