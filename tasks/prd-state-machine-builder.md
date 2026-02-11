@@ -119,6 +119,16 @@ Scenario: Generate test states from user actions
 ```gherkin
 Feature: Define custom state transition rules
 
+Scenario: Developer creates an initial state programmatically
+  Given I am a developer who needs to define an initial application state
+  And I have imported the StateMaker namespace
+  When I create a new State object
+  And I add variable "OrderStatus" with value "Pending"
+  And I add variable "Amount" with value 500
+  And I add variable "IsApproved" with value false
+  Then the state contains three variables with the specified values
+  And the state can be passed to builder.Build as the initial state
+
 Scenario: Implement a custom rule class
   Given I am a developer who needs to model domain-specific transitions
   And I have imported the StateMaker namespace
@@ -222,27 +232,29 @@ Scenario: Set state count limit to cap total states
 ```gherkin
 Feature: Define rules without writing code
 
-Scenario: Business analyst authors a rule using declarative JSON file
+Scenario: Business analyst authors rules and initial state using declarative JSON file
   Given I am a business analyst without programming skills
-  And I want to create a rule named "ApproveOrder"
-  When I create a JSON file with a rules array
-  And I add a rule entry with name "ApproveOrder"
+  And I want to define an initial state and a rule named "ApproveOrder"
+  When I create a JSON file with an initialState object
+  And I define the initial state with variable "OrderStatus" = "Pending" and "Amount" = 500
+  And I add a rules array with a rule entry named "ApproveOrder"
   And I set the condition to "OrderStatus == 'Pending'"
   And I set the transformation to "OrderStatus" = "Approved"
   And I provide the JSON file to a developer
-  Then the developer loads the file using RuleFileLoader
-  And the loader returns an array of IRule instances
-  And the developer can build a state machine using my rules
+  Then the developer loads the file using the file loader
+  And the loader returns both the initial state and an array of IRule instances
+  And the developer can build a state machine using the initial state and rules from my file
   And I did not need to write any C# code
 
-Scenario: Developer loads business analyst's rule file and builds state machine
-  Given a business analyst has authored a JSON rule definition file
-  And the file contains multiple rule definitions with conditions and transformations
-  When a developer passes the file path to the RuleFileLoader
-  Then the loader returns an IRule array with one entry per rule defined in the file
+Scenario: Developer loads business analyst's definition file and builds state machine
+  Given a business analyst has authored a JSON definition file
+  And the file contains an initial state and multiple rule definitions
+  When a developer passes the file path to the file loader
+  Then the loader returns a State object matching the initial state defined in the JSON
+  And the loader returns an IRule array with one entry per rule defined in the file
   And each returned rule has the name specified in the JSON
-  And the developer passes the returned rules to builder.Build along with an initial state and config
-  And the builder produces a state machine using those rules
+  And the developer passes the returned state, rules, and a config to builder.Build
+  And the builder produces a state machine using the loaded initial state and rules
 ```
 
 ## Functional Requirements
@@ -250,103 +262,107 @@ Scenario: Developer loads business analyst's rule file and builds state machine
 ### Core Data Structures
 
 1. The system must provide a `State` class that stores a set of variables with their values
-2. The `State` class must implement equality comparison to determine if two states are equivalent (same variables with same values)
-3. The system must provide a `Rule` interface with two methods:
+2. The `State` class must allow programmatic construction by providing variable names and their values
+3. The `State` class must implement equality comparison to determine if two states are equivalent (same variables with same values)
+4. The system must provide a `Rule` interface with two methods:
    - `bool IsAvailable(State state)` - returns true if the rule can be applied to the given state
    - `State Execute(State state)` - returns a new state resulting from applying the rule
-4. The system must provide a `StateMachine` class with the following properties:
+5. The system must provide a `StateMachine` class with the following properties:
    - `Dictionary<string, State> States` - all discovered states, keyed by unique ID
    - `string StartingStateId` - the ID of the initial state
    - `List<Transition> Transitions` - list of state transitions with source ID, target ID, and rule name
-5. The system must provide a `BuilderConfig` class for configuration settings
+6. The system must provide a `BuilderConfig` class for configuration settings
 
 ### State Machine Builder
 
-6. The system must provide a `StateMachineBuilder` class implementing an `IStateMachineBuilder` interface
-7. The builder must implement a `Build(State initialState, Rule[] rules, BuilderConfig config)` method that requires a configuration parameter
-8. The builder must start from the initial state and iteratively apply all available rules
-9. For each new state generated, the builder must check if an equivalent state already exists
-10. If an equivalent state exists, the builder must create a transition to the existing state and **stop exploring that path** (cycle prevention)
-11. If the state is new, the builder must add it to the state machine and continue exploration
-12. The builder must respect the depth limit specified in `BuilderConfig.MaxDepth` if set (maximum levels of transitions from initial state)
-13. The builder must respect the state count limit specified in `BuilderConfig.MaxStates` if set (maximum total states)
-14. The builder must stop exploration when either limit is reached, if configured
-15. If both `MaxDepth` and `MaxStates` are null (not set), the builder performs **exhaustive exploration** generating all reachable states
-16. The builder must assign unique IDs to each state
+7. The system must provide a `StateMachineBuilder` class implementing an `IStateMachineBuilder` interface
+8. The builder must implement a `Build(State initialState, Rule[] rules, BuilderConfig config)` method that requires a configuration parameter
+9. The builder must start from the initial state and iteratively apply all available rules
+10. For each new state generated, the builder must check if an equivalent state already exists
+11. If an equivalent state exists, the builder must create a transition to the existing state and **stop exploring that path** (cycle prevention)
+12. If the state is new, the builder must add it to the state machine and continue exploration
+13. The builder must respect the depth limit specified in `BuilderConfig.MaxDepth` if set (maximum levels of transitions from initial state)
+14. The builder must respect the state count limit specified in `BuilderConfig.MaxStates` if set (maximum total states)
+15. The builder must stop exploration when either limit is reached, if configured
+16. If both `MaxDepth` and `MaxStates` are null (not set), the builder performs **exhaustive exploration** generating all reachable states
+17. The builder must assign unique IDs to each state
 
 ### Configuration Validation
 
-17. The builder must validate that the initial state parameter is not null before beginning exploration
-18. If the initial state is null, the builder must throw an `ArgumentNullException` with the message "No initial state provided"
-19. The builder must validate the configuration settings before beginning exploration
-20. Valid configuration combinations are:
+18. The builder must validate that the initial state parameter is not null before beginning exploration
+19. If the initial state is null, the builder must throw an `ArgumentNullException` with the message "No initial state provided"
+20. The builder must validate the configuration settings before beginning exploration
+21. Valid configuration combinations are:
     - **Exhaustive mode:** Both `MaxDepth` and `MaxStates` are null
     - **State-limited mode:** `MaxStates` is set (with or without `MaxDepth`)
     - **Dual-limited mode:** Both `MaxDepth` and `MaxStates` are set
-21. Invalid configuration combinations that must result in an error:
+22. Invalid configuration combinations that must result in an error:
     - **Depth-only mode:** `MaxDepth` is set but `MaxStates` is null (invalid - requires state limit)
     - **No limits configured:** Both `MaxDepth` and `MaxStates` are null AND exhaustive mode is not explicitly enabled
-22. When an invalid configuration is detected, the builder must throw an `InvalidOperationException` with the message "Invalid configuration: {specific reason}"
-23. The error message must clearly indicate which configuration requirement was violated
+23. When an invalid configuration is detected, the builder must throw an `InvalidOperationException` with the message "Invalid configuration: {specific reason}"
+24. The error message must clearly indicate which configuration requirement was violated
 
 ### Export and Import Capabilities
 
-24. The system must provide an export mechanism to serialize the state machine to JSON format
-25. The system must provide an export mechanism to generate GraphML format for tools like yEd
-26. The system must provide an export mechanism to generate DOT format for Graphviz
-27. Each export format must include all states, transitions, and rule names
-28. The system must provide an import mechanism to deserialize a state machine from JSON format
-29. The imported state machine must preserve all states, transitions, state IDs, and rule names from the original
-30. An imported state machine must be exportable to any supported format (JSON, GraphML, DOT) without loss of information
+25. The system must provide an export mechanism to serialize the state machine to JSON format
+26. The system must provide an export mechanism to generate GraphML format for tools like yEd
+27. The system must provide an export mechanism to generate DOT format for Graphviz
+28. Each export format must include all states, transitions, and rule names
+29. The system must provide an import mechanism to deserialize a state machine from JSON format
+30. The imported state machine must preserve all states, transitions, state IDs, and rule names from the original
+31. An imported state machine must be exportable to any supported format (JSON, GraphML, DOT) without loss of information
 
 ### Namespace and Extensibility
 
-31. All interfaces (`IRule`, `IStateMachineBuilder`) and core classes (`State`, `StateMachine`, `BuilderConfig`, `Transition`) must be in the `StateMaker` namespace
-32. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
-33. Rule names should be automatically derived from the rule class name (or configurable)
+32. All interfaces (`IRule`, `IStateMachineBuilder`) and core classes (`State`, `StateMachine`, `BuilderConfig`, `Transition`) must be in the `StateMaker` namespace
+33. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
+34. Rule names should be automatically derived from the rule class name (or configurable)
 
 ### Declarative Rule Definition
 
-34. The system must provide a declarative rule definition mechanism that does not require writing custom C# classes
-35. A declarative rule definition must include:
+35. The system must provide a declarative rule definition mechanism that does not require writing custom C# classes
+36. A declarative rule definition must include:
     - Rule name (string identifier)
     - Availability condition (boolean expression evaluated against state variables)
     - Variable transformations (mapping of variable names to new values or expressions)
-36. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
-37. The system must support boolean expressions for conditions using standard operators (initial version):
+37. The system must provide an API method to create declarative rules programmatically (e.g., `DefineRule(name, condition, transformations)`)
+38. The system must support boolean expressions for conditions using standard operators (initial version):
     - Equality: `==`, `!=`
     - Comparison: `<`, `>`, `<=`, `>=`
     - Logical: `&&`, `||`, `!`
     - Example: `"Age >= 18 && Status == 'Active'"`
-38. The system must support transformation expressions that can (initial version):
+39. The system must support transformation expressions that can (initial version):
     - Set variables to literal values: `Status = "Approved"`
     - Reference current state variables: `Count = Count + 1`
     - Use basic arithmetic: `+`, `-`, `*`, `/`, and parenthetical expressions
-39. The system must provide a file loader that reads rule definitions from an external file
-40. The file format must be JSON only (structured and human-readable)
-41. The file loader must validate rule definitions at execution time and provide clear error messages for invalid syntax
-42. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
-43. State variable references in expressions must be case-sensitive exact name matches
-44. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
+40. The system must provide a file loader that reads definition files from an external JSON file
+41. The JSON definition file must support an optional `initialState` object that defines the initial state variables and values
+42. When an `initialState` is present in the JSON file, the file loader must return a `State` object constructed from its contents
+43. When an `initialState` is absent from the JSON file, the developer must provide an initial state programmatically
+44. The file format must be JSON only (structured and human-readable)
+45. The file loader must validate definitions at execution time and provide clear error messages for invalid syntax
+46. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
+47. State variable references in expressions must be case-sensitive exact name matches
+48. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
 
 ### Custom Rule Implementation
 
-45. Custom rule implementations must not modify the input state in the Execute method
-46. The Execute method must return a new State object, leaving the original state unchanged (immutability)
-47. Custom rules must be implementable in external assemblies that reference the StateMaker namespace
-48. Custom rules packaged in external assemblies must work identically to rules defined in the main application
-49. The system must support loading and using custom rules from referenced NuGet packages or DLLs
+49. Custom rule implementations must not modify the input state in the Execute method
+50. The Execute method must return a new State object, leaving the original state unchanged (immutability)
+51. Custom rules must be implementable in external assemblies that reference the StateMaker namespace
+52. Custom rules packaged in external assemblies must work identically to rules defined in the main application
+53. The system must support loading and using custom rules from referenced NuGet packages or DLLs
 
 ### Logging and Diagnostics
 
-50. The system must provide a logging mechanism with three severity levels:
+54. The system must provide a logging mechanism with three severity levels:
     - INFO: General information about state machine building progress
     - DEBUG: Detailed information for in-depth investigation
     - ERROR: Error conditions
-51. The default logging level must be INFO and ERROR (DEBUG disabled by default)
-52. The logging system must support extensible loggers to allow custom destinations
-53. The default logger must output to the console
-54. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
+55. The default logging level must be INFO and ERROR (DEBUG disabled by default)
+56. The logging system must support extensible loggers to allow custom destinations
+57. The default logger must output to the console
+58. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
 
 ## Non-Goals (Out of Scope)
 
@@ -407,24 +423,34 @@ The `BuilderConfig` class should include:
 - **Depth-Only Mode:** `MaxDepth` is set but `MaxStates` is null - **INVALID** (depth limit alone is not sufficient; must include state limit to prevent unbounded exploration)
 - **No Configuration:** Both limits are null without explicit exhaustive mode indication - **INVALID** (ambiguous intent)
 
-### Declarative Rule File Format
+### Declarative Definition File Format
 **JSON Format Only:** Built-in .NET support via System.Text.Json
+
+The JSON file can contain both an initial state definition and rule definitions:
 
 Example JSON structure:
 ```json
 {
+  "initialState": {
+    "OrderStatus": "Pending",
+    "Amount": 500,
+    "IsApproved": false
+  },
   "rules": [
     {
       "name": "ApproveOrder",
       "condition": "OrderStatus == 'Pending' && Amount < 1000",
       "transformations": {
         "OrderStatus": "Approved",
-        "ApprovedDate": "$now"
+        "IsApproved": true
       }
     }
   ]
 }
 ```
+
+- The `initialState` object is optional. If omitted, the developer must provide an initial state programmatically.
+- The `rules` array is required and must contain at least one rule definition.
 
 ### Expression Evaluation
 **Phased Complexity Approach:**
