@@ -58,8 +58,8 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 1.6 Configure GitHub branch protection rules to require passing CI checks before merge
 
 - [ ] 2.0 Set up project structure and core data structures (State, IRule, StateMachine, BuilderConfig, Transition)
-  - [ ] 2.1 Create solution file and `src/StateMaker/StateMaker.csproj` targeting .NET 6.0+ with `StateMaker` namespace
-  - [ ] 2.2 Create test project `src/StateMaker.Tests/StateMaker.Tests.csproj` referencing the main project
+  - [x] 2.1 Create solution file and `src/StateMaker/StateMaker.csproj` targeting .NET 6.0+ with `StateMaker` namespace
+  - [x] 2.2 Create test project `src/StateMaker.Tests/StateMaker.Tests.csproj` referencing the main project
   - [ ] 2.3 Implement `State` class with `Dictionary<string, object>` Variables property (primitives only: string, int, bool, float/double)
   - [ ] 2.4 Implement `State.Clone()` method that creates a deep copy of the state
   - [ ] 2.5 Implement `IEquatable<State>` on State: `Equals()` compares all variable keys and values, `GetHashCode()` uses sorted keys for deterministic hashing
