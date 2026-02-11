@@ -164,7 +164,7 @@ Scenario: Use custom rules with the builder
   Then the builder uses my custom rules to generate the state machine
   And my custom rule logic determines the state transitions
 
-Scenario: Developer calls custom rule from declarative state machine definition
+Scenario: Developer combines custom and declarative rules in code
   Given I have implemented a custom rule class (e.g., ComplexValidationRule)
   And I have a declarative rule definition file with multiple declarative rules
   When I load the declarative rules from the file
@@ -174,6 +174,17 @@ Scenario: Developer calls custom rule from declarative state machine definition
   Then the builder uses both declarative and custom rules together
   And the state machine includes transitions from both rule types
   And the custom rule executes alongside the declarative rules
+
+Scenario: Reference a custom rule class from a JSON definition file
+  Given a developer has created a custom rule class "ComplexValidationRule" in assembly "MyRules.dll"
+  And a business analyst wants to use that custom rule alongside declarative rules
+  When the business analyst adds a custom rule entry to the JSON definition file
+  And the entry specifies the type as "custom", the className, and the assembly
+  And a developer passes the JSON file to the file loader
+  Then the loader creates an instance of ComplexValidationRule via reflection
+  And the loader creates DeclarativeRule instances for the declarative entries
+  And the loader returns all rules as a single IRule array
+  And the developer can build a state machine using the combined rules from the file
 
 Scenario: Share custom rules as a reusable library
   Given I have implemented custom rule classes for my domain
@@ -344,25 +355,28 @@ Scenario: Developer loads business analyst's definition file and builds state ma
 46. Declarative rules must implement the same `IRule` interface as code-based rules, ensuring they work identically in the builder
 47. State variable references in expressions must be case-sensitive exact name matches
 48. A declarative state machine definition must support mixed rules (both declarative and programmatically-defined rules)
+49. The JSON definition file must support referencing custom rule classes by specifying `type: "custom"`, `className`, and `assembly`
+50. The file loader must instantiate custom rule classes via reflection using a parameterless constructor
+51. Custom rules referenced in JSON must implement the `IRule` interface; the file loader must validate this and provide a clear error if the class does not implement `IRule`
 
 ### Custom Rule Implementation
 
-49. Custom rule implementations must not modify the input state in the Execute method
-50. The Execute method must return a new State object, leaving the original state unchanged (immutability)
-51. Custom rules must be implementable in external assemblies that reference the StateMaker namespace
-52. Custom rules packaged in external assemblies must work identically to rules defined in the main application
-53. The system must support loading and using custom rules from referenced NuGet packages or DLLs
+52. Custom rule implementations must not modify the input state in the Execute method
+53. The Execute method must return a new State object, leaving the original state unchanged (immutability)
+54. Custom rules must be implementable in external assemblies that reference the StateMaker namespace
+55. Custom rules packaged in external assemblies must work identically to rules defined in the main application
+56. The system must support loading and using custom rules from referenced NuGet packages or DLLs
 
 ### Logging and Diagnostics
 
-54. The system must provide a logging mechanism with three severity levels:
+57. The system must provide a logging mechanism with three severity levels:
     - INFO: General information about state machine building progress
     - DEBUG: Detailed information for in-depth investigation
     - ERROR: Error conditions
-55. The default logging level must be INFO and ERROR (DEBUG disabled by default)
-56. The logging system must support extensible loggers to allow custom destinations
-57. The default logger must output to the console
-58. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
+58. The default logging level must be INFO and ERROR (DEBUG disabled by default)
+59. The logging system must support extensible loggers to allow custom destinations
+60. The default logger must output to the console
+61. State variables must support only primitive types in the initial version (strings, integers, booleans, floats)
 
 ## Non-Goals (Out of Scope)
 
@@ -444,6 +458,11 @@ Example JSON structure:
         "OrderStatus": "Approved",
         "IsApproved": true
       }
+    },
+    {
+      "type": "custom",
+      "className": "MyNamespace.ComplexValidationRule",
+      "assembly": "MyRules.dll"
     }
   ]
 }
@@ -451,6 +470,8 @@ Example JSON structure:
 
 - The `initialState` object is optional. If omitted, the developer must provide an initial state programmatically.
 - The `rules` array is required and must contain at least one rule definition.
+- Rules without a `type` field (or `type: "declarative"`) are treated as declarative rules requiring `condition` and `transformations`.
+- Rules with `type: "custom"` reference a C# class by `className` and `assembly`. The file loader instantiates the class via reflection. The class must implement `IRule` and have a parameterless constructor.
 
 ### Expression Evaluation
 **Phased Complexity Approach:**
@@ -553,6 +574,10 @@ The project produces a **standalone library/tool** (not a service):
     - Keep documentation synchronized with code changes during PRs
     - Current architecture documents:
       - `/docs/architecture/declarative-rules.md` - Declarative rule building architecture
+      - `/docs/architecture/builder-architecture.md` - Builder workflow, exploration strategies, cycle detection
+      - `/docs/architecture/expression-evaluation.md` - Expression evaluator, operators, security
+      - `/docs/architecture/state-immutability.md` - Immutability patterns, testing, common mistakes
+      - `/docs/architecture/export-formats.md` - JSON, DOT, GraphML format specifications
     - See `/docs/README.md` for documentation standards and contribution guidelines
 
 ## Success Metrics

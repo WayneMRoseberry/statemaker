@@ -11,13 +11,11 @@ This directory contains developer documentation for the StateMaker library - a C
 Technical architecture documents explaining how the system is designed and how components work together.
 
 **Available Documents:**
-- [**Declarative Rules Architecture**](./architecture/declarative-rules.md) - Explains how declarative rule building works, including the use of polymorphism, expression evaluation, and the integration between custom and declarative rules.
-
-**Planned Documents:**
-- Builder Architecture - How the state machine builder explores state space
-- Expression Evaluation - Details on expression evaluator integration
-- State Immutability - Design patterns for immutable state handling
-- Export Formats - GraphML, DOT, and JSON export implementations
+- [**Declarative Rules Architecture**](./architecture/declarative-rules.md) - How declarative rule building works, including polymorphism, expression evaluation, and integration between custom and declarative rules
+- [**Builder Architecture**](./architecture/builder-architecture.md) - How the state machine builder explores state space, including validation, BFS/DFS strategies, cycle detection, and logging
+- [**Expression Evaluation**](./architecture/expression-evaluation.md) - Expression evaluator integration, supported operators, variable resolution, security sandboxing, and phased implementation plan
+- [**State Immutability**](./architecture/state-immutability.md) - Why immutability matters, the Clone pattern, common mistakes, testing patterns, and correct equality implementation
+- [**Export Formats**](./architecture/export-formats.md) - JSON, DOT, and GraphML export/import specifications, state and transition representation, visualization options, and format comparison
 
 ### API Documentation (`/api`)
 *Coming soon* - Auto-generated API documentation from XML comments
