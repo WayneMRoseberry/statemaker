@@ -68,7 +68,7 @@ All tests must pass before moving on to the next sub-task.
   - [x] 2.2 Create test project `src/StateMaker.Tests/StateMaker.Tests.csproj` referencing the main project
   - [x] 2.3 Implement `State` class with `Dictionary<string, object>` Variables property (primitives only: string, int, bool, float/double)
   - [x] 2.4 Implement `State.Clone()` method that creates a deep copy of the state
-  - [ ] 2.5 Implement `IEquatable<State>` on State: `Equals()` compares all variable keys and values, `GetHashCode()` uses sorted keys for deterministic hashing
+  - [x] 2.5 Implement `IEquatable<State>` on State: `Equals()` compares all variable keys and values, `GetHashCode()` uses sorted keys for deterministic hashing
   - [ ] 2.6 Write unit tests for State: equality, hashing, Clone immutability, variable types, edge cases (empty state, null values)
   - [ ] 2.7 Define `IRule` interface with `bool IsAvailable(State state)` and `State Execute(State state)` methods
   - [ ] 2.8 Implement `Transition` class with `SourceStateId`, `TargetStateId`, and `RuleName` properties

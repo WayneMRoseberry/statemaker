@@ -153,4 +153,182 @@ public class StateTests
         Assert.NotSame(state, clone);
         Assert.Empty(clone.Variables);
     }
+
+    [Fact]
+    public void Equals_SameVariables_ReturnsTrue()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+        a.Variables["age"] = 30;
+
+        var b = new State();
+        b.Variables["name"] = "Alice";
+        b.Variables["age"] = 30;
+
+        Assert.True(a.Equals(b));
+        Assert.True(b.Equals(a));
+    }
+
+    [Fact]
+    public void Equals_SameVariablesDifferentCase_ReturnsFalse()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+        a.Variables["age"] = 30;
+
+        var b = new State();
+        b.Variables["Name"] = "Alice";
+        b.Variables["age"] = 30;
+
+        Assert.False(a.Equals(b));
+        Assert.False(b.Equals(a));
+    }
+
+    [Fact]
+    public void Equals_NullValuedVariables_ReturnsTrue()
+    {
+        var a = new State();
+        a.Variables["name"] = null;
+        a.Variables["age"] = 30;
+
+        var b = new State();
+        b.Variables["name"] = null;
+        b.Variables["age"] = 30;
+
+        Assert.True(a.Equals(b));
+        Assert.True(b.Equals(a));
+    }
+
+    [Fact]
+    public void Equals_DifferentValues_ReturnsFalse()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+
+        var b = new State();
+        b.Variables["name"] = "Bob";
+
+        Assert.False(a.Equals(b));
+    }
+
+    [Fact]
+    public void Equals_DifferentKeys_ReturnsFalse()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+
+        var b = new State();
+        b.Variables["username"] = "Alice";
+
+        Assert.False(a.Equals(b));
+    }
+
+    [Fact]
+    public void Equals_DifferentCount_ReturnsFalse()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+        a.Variables["age"] = 30;
+
+        var b = new State();
+        b.Variables["name"] = "Alice";
+
+        Assert.False(a.Equals(b));
+    }
+
+    [Fact]
+    public void Equals_BothEmpty_ReturnsTrue()
+    {
+        var a = new State();
+        var b = new State();
+
+        Assert.True(a.Equals(b));
+    }
+
+    [Fact]
+    public void Equals_Null_ReturnsFalse()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+
+        Assert.False(a.Equals(null));
+    }
+
+    [Fact]
+    public void Equals_ObjectOverload_WorksCorrectly()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+
+        var b = new State();
+        b.Variables["x"] = 1;
+
+        Assert.True(a.Equals((object)b));
+        Assert.False(a.Equals("not a state"));
+    }
+
+    [Fact]
+    public void GetHashCode_EqualStates_SameHash()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+        a.Variables["age"] = 30;
+
+        var b = new State();
+        b.Variables["age"] = 30;
+        b.Variables["name"] = "Alice";
+
+        Assert.Equal(a.GetHashCode(), b.GetHashCode());
+    }
+
+    [Fact]
+    public void GetHashCode_EqualStatesNullValues_SameHash()
+    {
+        var a = new State();
+        a.Variables["name"] = null;
+        a.Variables["age"] = 30;
+
+        var b = new State();
+        b.Variables["age"] = 30;
+        b.Variables["name"] = null;
+
+        Assert.Equal(a.GetHashCode(), b.GetHashCode());
+    }
+
+
+    [Fact]
+    public void GetHashCode_DifferentStates_DifferentHash()
+    {
+        var a = new State();
+        a.Variables["name"] = "Alice";
+
+        var b = new State();
+        b.Variables["name"] = "Bob";
+
+        Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
+    }
+
+    [Fact]
+    public void GetHashCode_EmptyStates_SameHash()
+    {
+        var a = new State();
+        var b = new State();
+
+        Assert.Equal(a.GetHashCode(), b.GetHashCode());
+    }
+
+    [Fact]
+    public void Equals_WorksInHashSet()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+
+        var b = new State();
+        b.Variables["x"] = 1;
+
+        var set = new HashSet<State> { a };
+
+        Assert.Contains(b, set);
+        Assert.Single(set);
+    }
 }
