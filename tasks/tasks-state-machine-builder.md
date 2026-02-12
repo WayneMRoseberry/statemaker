@@ -1,13 +1,16 @@
 ## Relevant Files
 
 - `src/StateMaker/State.cs` - Core State class with Dictionary<string, object> variables, Clone(), equality, and hashing
-- `src/StateMaker/State.test.cs` - Unit tests for State equality, hashing, Clone, and variable types
+- `src/StateMaker.Tests/StateTests.cs` - Unit tests for State equality, hashing, Clone, and variable types
 - `src/StateMaker/IRule.cs` - IRule interface defining IsAvailable and Execute methods
 - `src/StateMaker/IRule.test.cs` - Unit tests for IRule contract verification
-- `src/StateMaker/StateMachine.cs` - StateMachine class with States dictionary, StartingStateId, and Transitions list
+- `src/StateMaker/StateMachine.cs` - StateMachine class with IReadOnlyDictionary States, AddState/RemoveState methods, StartingStateId validation, and Transitions list
 - `src/StateMaker/Transition.cs` - Transition class with SourceStateId, TargetStateId, and RuleName
-- `src/StateMaker/BuilderConfig.cs` - BuilderConfig class with MaxDepth, MaxStates, ExplorationStrategy, LogLevel
-- `src/StateMaker/BuilderConfig.test.cs` - Unit tests for BuilderConfig defaults and validation
+- `src/StateMaker/StateDoesNotExistException.cs` - Custom exception thrown when StartingStateId references a non-existent state
+- `src/StateMaker.Tests/StateMachineTests.cs` - Unit tests for StateMachine: AddState, RemoveState, StartingStateId validation, States read-only
+- `src/StateMaker.Tests/TransitionTests.cs` - Unit tests for Transition properties and construction
+- `src/StateMaker/BuilderConfig.cs` - BuilderConfig class with MaxDepth, MaxStates, ExplorationStrategy (BREADTHFIRSTSEARCH/DEPTHFIRSTSEARCH), LogLevel
+- `src/StateMaker.Tests/BuilderConfigTests.cs` - Unit tests for BuilderConfig defaults and validation
 - `src/StateMaker/IStateMachineBuilder.cs` - IStateMachineBuilder interface
 - `src/StateMaker/StateMachineBuilder.cs` - StateMachineBuilder implementing BFS/DFS exploration, cycle detection, limits
 - `src/StateMaker/StateMachineBuilder.test.cs` - Unit tests for builder: exploration, cycles, limits, validation
@@ -63,7 +66,7 @@ All tests must pass before moving on to the next sub-task.
   - [x] 1.5 Add Roslyn analyzers for static code analysis
   - [x] 1.6 Configure GitHub branch protection rules to require passing CI checks before merge
 
-- [ ] 2.0 Set up project structure and core data structures (State, IRule, StateMachine, BuilderConfig, Transition)
+- [x] 2.0 Set up project structure and core data structures (State, IRule, StateMachine, BuilderConfig, Transition)
   - [x] 2.1 Create solution file and `src/StateMaker/StateMaker.csproj` targeting .NET 6.0+ with `StateMaker` namespace
   - [x] 2.2 Create test project `src/StateMaker.Tests/StateMaker.Tests.csproj` referencing the main project
   - [x] 2.3 Implement `State` class with `Dictionary<string, object>` Variables property (primitives only: string, int, bool, float/double)
@@ -72,9 +75,9 @@ All tests must pass before moving on to the next sub-task.
   - [x] 2.6 Write unit tests for State: equality, hashing, Clone immutability, variable types, edge cases (empty state, null values)
   - [x] 2.7 Define `IRule` interface with `bool IsAvailable(State state)` and `State Execute(State state)` methods
   - [x] 2.8 Implement `Transition` class with `SourceStateId`, `TargetStateId`, and `RuleName` properties
-  - [ ] 2.9 Implement `StateMachine` class with `Dictionary<string, State> States`, `string StartingStateId`, and `List<Transition> Transitions`
-  - [ ] 2.10 Implement `BuilderConfig` class with `MaxDepth` (int?), `MaxStates` (int?), `ExplorationStrategy` (enum: BFS, DFS), and `LogLevel` (enum: INFO, DEBUG, ERROR)
-  - [ ] 2.11 Write unit tests for BuilderConfig default values and Transition properties
+  - [x] 2.9 Implement `StateMachine` class with `Dictionary<string, State> States`, `string StartingStateId`, and `List<Transition> Transitions`
+  - [x] 2.10 Implement `BuilderConfig` class with `MaxDepth` (int?), `MaxStates` (int?), `ExplorationStrategy` (enum: BFS, DFS), and `LogLevel` (enum: INFO, DEBUG, ERROR)
+  - [x] 2.11 Write unit tests for BuilderConfig default values and Transition properties
 
 - [ ] 3.0 Implement StateMachineBuilder with BFS/DFS exploration and cycle detection
   - [ ] 3.1 Define `IStateMachineBuilder` interface with `StateMachine Build(State initialState, IRule[] rules, BuilderConfig config)` method

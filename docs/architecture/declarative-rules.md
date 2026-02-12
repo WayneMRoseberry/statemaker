@@ -205,12 +205,19 @@ public class StateMachineBuilder : IStateMachineBuilder
         BuilderConfig config)
     {
         var stateMachine = new StateMachine();
-        var queue = new Queue<State>();
-        queue.Enqueue(initialState);
+        var visited = new HashSet<State>();
+        var queue = new Queue<(string id, State state)>();
+        int stateCounter = 0;
+
+        string initialId = $"S{stateCounter++}";
+        stateMachine.AddState(initialId, initialState);
+        stateMachine.StartingStateId = initialId;
+        visited.Add(initialState);
+        queue.Enqueue((initialId, initialState));
 
         while (queue.Count > 0)
         {
-            var currentState = queue.Dequeue();
+            var (currentId, currentState) = queue.Dequeue();
 
             // Apply ALL rules regardless of type
             foreach (var rule in rules)
@@ -219,10 +226,12 @@ public class StateMachineBuilder : IStateMachineBuilder
                 {
                     var newState = rule.Execute(currentState);  // Polymorphism
 
-                    if (!stateMachine.ContainsEquivalentState(newState))
+                    if (!visited.Contains(newState))
                     {
-                        stateMachine.AddState(newState);
-                        queue.Enqueue(newState);
+                        string newId = $"S{stateCounter++}";
+                        stateMachine.AddState(newId, newState);
+                        visited.Add(newState);
+                        queue.Enqueue((newId, newState));
                     }
                 }
             }

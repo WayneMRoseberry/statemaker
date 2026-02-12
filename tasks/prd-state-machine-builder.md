@@ -278,9 +278,11 @@ Scenario: Developer loads business analyst's definition file and builds state ma
 4. The system must provide a `Rule` interface with two methods:
    - `bool IsAvailable(State state)` - returns true if the rule can be applied to the given state
    - `State Execute(State state)` - returns a new state resulting from applying the rule
-5. The system must provide a `StateMachine` class with the following properties:
-   - `Dictionary<string, State> States` - all discovered states, keyed by unique ID
-   - `string StartingStateId` - the ID of the initial state
+5. The system must provide a `StateMachine` class with the following properties and methods:
+   - `IReadOnlyDictionary<string, State> States` - all discovered states, keyed by unique ID (read-only; mutations via `AddState`/`RemoveState` methods)
+   - `void AddState(string stateId, State state)` - adds a state to the state machine
+   - `bool RemoveState(string stateId)` - removes a state; clears `StartingStateId` if it matches the removed state
+   - `string? StartingStateId` - the ID of the initial state; setter validates the state exists and throws `StateDoesNotExistException` if not (setting to `null` is allowed)
    - `List<Transition> Transitions` - list of state transitions with source ID, target ID, and rule name
 6. The system must provide a `BuilderConfig` class for configuration settings
 
@@ -424,7 +426,7 @@ The following are explicitly **not** included in the initial version (may be con
 The `BuilderConfig` class should include:
 - `MaxDepth` (int, nullable): Maximum depth of exploration. If null, no depth limit
 - `MaxStates` (int, nullable): Maximum number of states. If null, no state count limit
-- `ExplorationStrategy` (enum: BFS, DFS)
+- `ExplorationStrategy` (enum: BREADTHFIRSTSEARCH, DEPTHFIRSTSEARCH)
 - `GenerateStateIds` (Func<State, string>): Custom ID generator (optional)
 - `LogLevel` (enum: INFO, DEBUG, ERROR): Logging verbosity
 

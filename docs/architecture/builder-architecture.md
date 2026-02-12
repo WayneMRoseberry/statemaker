@@ -120,9 +120,12 @@ S0 → S1 → S4 → S8 (dead end, backtrack)
 ```csharp
 public class StateMachine
 {
-    public Dictionary<string, State> States { get; }
-    public string StartingStateId { get; }
+    public IReadOnlyDictionary<string, State> States { get; }
+    public string? StartingStateId { get; set; }  // Validates state exists; throws StateDoesNotExistException
     public List<Transition> Transitions { get; }
+
+    public void AddState(string stateId, State state);
+    public bool RemoveState(string stateId);  // Clears StartingStateId if it matches
 }
 ```
 
@@ -144,8 +147,7 @@ public class BuilderConfig
 {
     public int? MaxDepth { get; set; }
     public int? MaxStates { get; set; }
-    public ExplorationStrategy Strategy { get; set; }  // BFS or DFS
-    public Func<State, string> GenerateStateIds { get; set; }
+    public ExplorationStrategy ExplorationStrategy { get; set; }  // BREADTHFIRSTSEARCH or DEPTHFIRSTSEARCH
     public LogLevel LogLevel { get; set; }
 }
 ```
