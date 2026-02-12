@@ -2,7 +2,7 @@ namespace StateMaker;
 
 public class State : IEquatable<State>
 {
-    public Dictionary<string, object> Variables { get; } = new();
+    public Dictionary<string, object?> Variables { get; } = new();
 
     public State Clone()
     {
