@@ -70,8 +70,8 @@ All tests must pass before moving on to the next sub-task.
   - [x] 2.4 Implement `State.Clone()` method that creates a deep copy of the state
   - [x] 2.5 Implement `IEquatable<State>` on State: `Equals()` compares all variable keys and values, `GetHashCode()` uses sorted keys for deterministic hashing
   - [x] 2.6 Write unit tests for State: equality, hashing, Clone immutability, variable types, edge cases (empty state, null values)
-  - [ ] 2.7 Define `IRule` interface with `bool IsAvailable(State state)` and `State Execute(State state)` methods
-  - [ ] 2.8 Implement `Transition` class with `SourceStateId`, `TargetStateId`, and `RuleName` properties
+  - [x] 2.7 Define `IRule` interface with `bool IsAvailable(State state)` and `State Execute(State state)` methods
+  - [x] 2.8 Implement `Transition` class with `SourceStateId`, `TargetStateId`, and `RuleName` properties
   - [ ] 2.9 Implement `StateMachine` class with `Dictionary<string, State> States`, `string StartingStateId`, and `List<Transition> Transitions`
   - [ ] 2.10 Implement `BuilderConfig` class with `MaxDepth` (int?), `MaxStates` (int?), `ExplorationStrategy` (enum: BFS, DFS), and `LogLevel` (enum: INFO, DEBUG, ERROR)
   - [ ] 2.11 Write unit tests for BuilderConfig default values and Transition properties
