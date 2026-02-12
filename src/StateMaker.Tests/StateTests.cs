@@ -35,7 +35,7 @@ public class StateTests
         var state = new State();
         state.Variables["active"] = true;
 
-        Assert.True((bool)state.Variables["active"]);
+        Assert.True((bool)state.Variables["active"]!);
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class StateTests
         Assert.Equal(4, state.Variables.Count);
         Assert.Equal("Bob", state.Variables["name"]);
         Assert.Equal(30, state.Variables["age"]);
-        Assert.False((bool)state.Variables["active"]);
+        Assert.False((bool)state.Variables["active"]!);
         Assert.Equal(95.5, state.Variables["score"]);
     }
 
@@ -123,7 +123,7 @@ public class StateTests
         Assert.Equal(3, clone.Variables.Count);
         Assert.Equal("Alice", clone.Variables["name"]);
         Assert.Equal(30, clone.Variables["age"]);
-        Assert.True((bool)clone.Variables["active"]);
+        Assert.True((bool)clone.Variables["active"]!);
     }
 
     [Fact]
