@@ -84,9 +84,9 @@ All tests must pass before moving on to the next sub-task.
   - [x] 3.2 Implement `StateMachineBuilder` class with BFS exploration: use a queue of states, apply all available rules to each state
   - [x] 3.3 Implement cycle detection using `HashSet<State>` — skip exploration when an equivalent state already exists, but still record the transition
   - [x] 3.4 Implement sequential state ID generation (S0, S1, S2, ...)
-  - [ ] 3.5 Implement `MaxDepth` limit: track depth per state and stop exploring paths beyond the configured depth
-  - [ ] 3.6 Implement `MaxStates` limit: stop adding new states once the limit is reached
-  - [ ] 3.7 Implement DFS exploration strategy as an alternative to BFS (selected via `BuilderConfig.ExplorationStrategy`)
+  - [x] 3.5 Implement `MaxDepth` limit: track depth per state and stop exploring paths beyond the configured depth
+  - [x] 3.6 Implement `MaxStates` limit: stop adding new states once the limit is reached
+  - [x] 3.7 Implement DFS exploration strategy as an alternative to BFS (selected via `BuilderConfig.ExplorationStrategy`)
   - [x] 3.8 Derive rule names automatically from the rule class name (or allow configurable names)
   - [ ] 3.9 Write unit tests: simple linear state chain, branching states, cycle detection, depth limit respected, state count limit respected, BFS vs DFS ordering
   - [ ] 3.10 Write unit tests: no rules available (returns single-state machine), all rules always available, rules that produce duplicate states

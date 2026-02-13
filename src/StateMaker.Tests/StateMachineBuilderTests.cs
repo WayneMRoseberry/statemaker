@@ -128,4 +128,155 @@ public class StateMachineBuilderTests
             t.SourceStateId == result.StartingStateId &&
             t.TargetStateId == secondStateEntry.Key);
     }
+
+    [Fact]
+    public void Build_MaxDepth_StopsExplorationBeyondConfiguredDepth()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[] { new TestRule(
+            _ => true,
+            s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxDepth = 2 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(3, result.States.Count);
+        Assert.Contains(result.States.Values, s => (int)s.Variables["counter"]! == 0);
+        Assert.Contains(result.States.Values, s => (int)s.Variables["counter"]! == 1);
+        Assert.Contains(result.States.Values, s => (int)s.Variables["counter"]! == 2);
+    }
+
+    [Fact]
+    public void Build_MaxStates_StopsAddingStatesAtLimit()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[] { new TestRule(
+            _ => true,
+            s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 3 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(3, result.States.Count);
+    }
+
+    [Fact]
+    public void Build_DFS_ExploresDepthFirstOrder()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; }),
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 10; return c; })
+        };
+        var config = new BuilderConfig
+        {
+            ExplorationStrategy = ExplorationStrategy.DEPTHFIRSTSEARCH,
+            MaxStates = 5
+        };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(5, result.States.Count);
+        var stateValues = result.States.Values.Select(s => (int)s.Variables["counter"]!).OrderBy(v => v).ToArray();
+        int[] expectedDfs = { 0, 1, 10, 11, 20 };
+        Assert.Equal(expectedDfs, stateValues);
+    }
+
+    [Fact]
+    public void Build_BFS_ExploresBreadthFirstOrder()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; }),
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 10; return c; })
+        };
+        var config = new BuilderConfig
+        {
+            ExplorationStrategy = ExplorationStrategy.BREADTHFIRSTSEARCH,
+            MaxStates = 5
+        };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(5, result.States.Count);
+        var stateValues = result.States.Values.Select(s => (int)s.Variables["counter"]!).OrderBy(v => v).ToArray();
+        int[] expectedBfs = { 0, 1, 2, 10, 11 };
+        Assert.Equal(expectedBfs, stateValues);
+    }
+
+    [Fact]
+    public void Build_nullInitialState_ThrowsArgumentNullException()
+    {
+        var builder = new StateMachineBuilder();
+        var rules = new IRule[] { new TestRule(_ => true, s => s.Clone()) };
+        var config = new BuilderConfig();
+
+        var ex = Assert.Throws<ArgumentNullException>(() => builder.Build(null!, rules, config));
+        Assert.Equal("initialState", ex.ParamName);
+    }
+
+    [Fact]
+    public void Build_nullRulesArray_ThrowsArgumentNullException()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        var config = new BuilderConfig();
+
+        var ex = Assert.Throws<ArgumentNullException>(() => builder.Build(initialState, null!, config));
+        Assert.Equal("rules", ex.ParamName);
+    }
+
+    [Fact]
+    public void Build_nullBuildConfig_ThrowsArgumentNullException()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        var rules = new IRule[] { new TestRule(_ => true, s => s.Clone()) };
+
+        var ex = Assert.Throws<ArgumentNullException>(() => builder.Build(initialState, rules, null!));
+        Assert.Equal("config", ex.ParamName);
+    }
+
+    [Fact]
+    public void Build_RulesArrayWithNullRuleInIt()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; }),
+            null!
+        };
+        var config = new BuilderConfig
+        {
+            ExplorationStrategy = ExplorationStrategy.BREADTHFIRSTSEARCH,
+            MaxStates = 5
+        };
+
+        var ex = Assert.Throws<ArgumentNullException>(() => builder.Build(initialState, rules, config));
+        Assert.Equal("rules[1]", ex.ParamName);
+    }
 }
