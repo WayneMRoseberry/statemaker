@@ -126,4 +126,80 @@ public class StateMachineTests
 
         Assert.IsAssignableFrom<IReadOnlyDictionary<string, State>>(machine.States);
     }
+
+    [Fact]
+    public void IsValidMachine_SingleStateWithStartingStateId_ReturnsTrue()
+    {
+        var machine = new StateMachine();
+        machine.AddState("S0", new State());
+        machine.StartingStateId = "S0";
+
+        Assert.True(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void IsValidMachine_TwoStatesWithTransition_ReturnsTrue()
+    {
+        var machine = new StateMachine();
+        machine.AddState("S0", new State());
+        machine.AddState("S1", new State());
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S0", "S1", "Rule1"));
+
+        Assert.True(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void IsValidMachine_CycleTransitions_ReturnsTrue()
+    {
+        var machine = new StateMachine();
+        machine.AddState("S0", new State());
+        machine.AddState("S1", new State());
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S0", "S1", "Rule1"));
+        machine.Transitions.Add(new Transition("S1", "S0", "Rule1"));
+
+        Assert.True(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void IsValidMachine_NoStates_ReturnsFalse()
+    {
+        var machine = new StateMachine();
+
+        Assert.False(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void IsValidMachine_NullStartingStateId_ReturnsFalse()
+    {
+        var machine = new StateMachine();
+        machine.AddState("S0", new State());
+
+        Assert.False(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void IsValidMachine_TransitionSourceStateDoesNotExist_ReturnsFalse()
+    {
+        var machine = new StateMachine();
+        machine.AddState("S0", new State());
+        machine.AddState("S1", new State());
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S99", "S1", "Rule1"));
+
+        Assert.False(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void IsValidMachine_TransitionTargetStateDoesNotExist_ReturnsFalse()
+    {
+        var machine = new StateMachine();
+        machine.AddState("S0", new State());
+        machine.AddState("S1", new State());
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S0", "S99", "Rule1"));
+
+        Assert.False(machine.IsValidMachine());
+    }
 }

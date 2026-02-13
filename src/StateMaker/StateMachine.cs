@@ -27,6 +27,24 @@ public class StateMachine
         _states[stateId] = state;
     }
 
+    public bool IsValidMachine()
+    {
+        if (_states.Count == 0)
+            return false;
+
+        if (_startingStateId is null)
+            return false;
+
+        foreach (var transition in Transitions)
+        {
+            if (!_states.ContainsKey(transition.SourceStateId) ||
+                !_states.ContainsKey(transition.TargetStateId))
+                return false;
+        }
+
+        return true;
+    }
+
     public bool RemoveState(string stateId)
     {
         var removed = _states.Remove(stateId);
