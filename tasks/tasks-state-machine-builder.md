@@ -90,6 +90,20 @@ All tests must pass before moving on to the next sub-task.
   - [x] 3.8 Derive rule names automatically from the rule class name (or allow configurable names)
   - [x] 3.9 Write unit tests: simple linear state chain, branching states, cycle detection, depth limit respected, state count limit respected, BFS vs DFS ordering
   - [x] 3.10 Write unit tests: no rules available (returns single-state machine), all rules always available, rules that produce duplicate states
+  - [ ] 3.11 Write tests with rules designed to produce specific state machine shapes: single state (no transitions fire), chains of varying length, and simple cycles
+  - [ ] 3.12 Write tests with rules designed to produce complex cycle shapes: cycles of varying depth and start points, cycles within cycles, and cycles with optional exits
+  - [ ] 3.13 Write tests with rules designed to produce branching shapes: varying peer count, depth, breadth, sub-branches as trees, connected sub-branches, and fully connected branches
+  - [ ] 3.14 Write tests with rules designed to produce reconnecting branches (diamond/converging paths) and fully connected graphs with varying node counts
+  - [ ] 3.15 Write tests with rules designed to produce hybrid shapes combining multiple topologies (chains + cycles, branches + cycles, multiple shape neighborhoods)
+  - [ ] 3.16 Write tests verifying exploration strategy equivalence: same initial state, rules, and config must produce the same state machine (same states and transitions) under both BFS and DFS
+  - [ ] 3.17 Write tests for rule behavior edge cases: rules that always generate unique states (unbounded growth), rules that return malformed or unexpected states
+  - [ ] 3.18 Write tests for rule behavior edge cases: rules whose `IsAvailable` or `Execute` methods throw exceptions, and rules whose methods hang or take excessively long
+  - [ ] 3.19 Write tests for rule behavior edge cases: rules that mutate the input state passed to `Execute` (violating immutability), verifying the builder handles or detects this
+  - [ ] 3.20 Write tests for resilience: null rules array, null elements within rules array, null config, and building from configurations with contradictory or nonsensical limits (e.g., MaxStates=0, MaxDepth=-1)
+  - [ ] 3.21 Implement a test case generator tool that programmatically combines initial state shapes (no variables, one of each data type, multiple variables, 1..N), config combinations (MaxStates x MaxDepth pairwise from null/0/-1/1/2/3/10), and rule variations (sets variable, adds variable, increments, empty) to produce build definition files
+  - [ ] 3.22 Implement a test battery executor tool that runs a set of build definitions through the builder and applies oracle checks: no crash/exception, no infinite loop (heuristic timeout), MaxStates and MaxDepth limits respected in output
+  - [ ] 3.23 Implement oracle checks in the test battery executor for performance validation: time-to-size ratio within expected bounds, and expected state machine shape matching for tractable cases
+  - [ ] 3.24 Implement a reverse rule generator tool that takes a target state machine shape as input and generates one or more sets of rules that would build it, including variations (extra non-triggering rules, different rule orderings) that should not alter the expected output
 
 - [ ] 4.0 Implement configuration validation
   - [ ] 4.1 Add null check for initial state — throw `ArgumentNullException` with message "No initial state provided"
