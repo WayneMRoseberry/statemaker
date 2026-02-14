@@ -17,6 +17,24 @@ public class StateMachineBuilderTests
         public State Execute(State state) => _execute(state);
     }
 
+    private sealed class NamedTestRule : IRule
+    {
+        private readonly string _name;
+        private readonly Func<State, bool> _isAvailable;
+        private readonly Func<State, State> _execute;
+
+        public NamedTestRule(string name, Func<State, bool> isAvailable, Func<State, State> execute)
+        {
+            _name = name;
+            _isAvailable = isAvailable;
+            _execute = execute;
+        }
+
+        public bool IsAvailable(State state) => _isAvailable(state);
+        public State Execute(State state) => _execute(state);
+        public string GetName() => _name;
+    }
+
     [Fact]
     public void Build_ReturnsStateMachine()
     {
@@ -467,5 +485,104 @@ public class StateMachineBuilderTests
         var targetId = result.States.First(kvp => kvp.Key != result.StartingStateId).Key;
         Assert.Equal(4, result.Transitions.Count);
         Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void GetName_DefaultImplementation_ReturnsTypeName()
+    {
+        IRule rule = new TestRule(_ => false, s => s.Clone());
+
+        Assert.Equal("TestRule", rule.GetName());
+    }
+
+    [Fact]
+    public void GetName_CustomOverride_ReturnsCustomName()
+    {
+        IRule rule = new NamedTestRule("MyCustomName", _ => false, s => s.Clone());
+
+        Assert.Equal("MyCustomName", rule.GetName());
+    }
+
+    [Fact]
+    public void Build_TransitionRuleName_UsesGetNameNotTypeName()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["status"] = "start";
+        var rules = new IRule[]
+        {
+            new NamedTestRule("ApproveOrder",
+                s => (string)s.Variables["status"]! == "start",
+                s => { var c = s.Clone(); c.Variables["status"] = "approved"; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.Transitions);
+        Assert.Equal("ApproveOrder", result.Transitions[0].RuleName);
+    }
+
+    [Fact]
+    public void Build_TransitionRuleName_DefaultGetName_UsesTypeName()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["status"] = "start";
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => (string)s.Variables["status"]! == "start",
+                s => { var c = s.Clone(); c.Variables["status"] = "done"; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.Transitions);
+        Assert.Equal("TestRule", result.Transitions[0].RuleName);
+    }
+
+    [Fact]
+    public void Build_MixedRules_TransitionsUseRespectiveGetNames()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => (int)s.Variables["x"]! == 0,
+                s => { var c = s.Clone(); c.Variables["x"] = 1; return c; }),
+            new NamedTestRule("IncrementByTen",
+                s => (int)s.Variables["x"]! == 0,
+                s => { var c = s.Clone(); c.Variables["x"] = 10; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.Transitions.Count);
+        Assert.Contains(result.Transitions, t => t.RuleName == "TestRule");
+        Assert.Contains(result.Transitions, t => t.RuleName == "IncrementByTen");
+    }
+
+    [Fact]
+    public void Build_CycleTransition_UsesGetNameForRuleName()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["toggle"] = true;
+        var rules = new IRule[]
+        {
+            new NamedTestRule("ToggleRule", _ => true,
+                s => { var c = s.Clone(); c.Variables["toggle"] = !(bool)c.Variables["toggle"]!; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.Transitions.Count);
+        Assert.All(result.Transitions, t => Assert.Equal("ToggleRule", t.RuleName));
     }
 }
