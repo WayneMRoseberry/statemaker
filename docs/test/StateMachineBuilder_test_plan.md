@@ -71,6 +71,10 @@ Total number of combinations is 7^2 = 49
 | 3 | 3 |
 | 10 | 10 |
 
+**exploration_options**
+Breadth_First
+Depth_First
+
 
 **rule_variations**
 - empty
@@ -101,7 +105,7 @@ The following creates a massive number of cases. The oracles will be challenging
 - is performance worse than size of eventual machine -> this is in some cases exponential
 - are max limits respected
 ```
-Combine (**initial_state_changes** x **depth_combinations** x **4_rule_combinations**)
+Combine (initial_state_changes x depth_combinations x 4_rule_combinations)
 = 8 * 49 * 1296 => 508032
 ```
 - Creating the combinations programmatically should be simple.
@@ -110,6 +114,10 @@ Combine (**initial_state_changes** x **depth_combinations** x **4_rule_combinati
 - abort or crash oracles are implicitly easy - can it run to end without any of those happening?
 - performance is challenging, but a graph of time take to size of machine should show similar slopes
 - infinite loop detection can use a heuristic threshold limit that we check later against performance curves
+- same inputs should generate same state machine run both breadth_first and depth_first
+
+TOOL: Create a tool which can start from **initial_state_changes**, **depth_combinations**, and **4_rule_combinations** and combine them together to create build machine definition files.
+TOOL: Write something which will execute a battery of state machine build definitions and apply the oracles described above.
 
 ### state machine shapes
 What happens when rules try to build different kinds of state machine shapes?
@@ -174,11 +182,12 @@ stateDiagram-v2
    S4 --> S1
    S4 --> S2
    S4 --> S3
-``` 
+```
+```
    - every node to every other node
    - every node may eventually lead to every other node
    - number of nodes
-  
+```
 - hybrid shapes
 ```mermaid
 stateDiagram-v2
@@ -188,14 +197,22 @@ stateDiagram-v2
     S4 --> S5
     S5 --> S6
     S6 --> S4
-``` 
+```
+```
+  - graphs with 2,3,N shapes - one of each
+  - one of every shape and shape modification in same graph
+  - same graph shapes appear multiple times 2, 3, etc.
+  - connected and cycle shapes with branches off to trees or other connections and cycle neighborhoods
+```
+ 
 #### Generating state machines based on rules
-**Cover each of the state machine shapes at least once**
-
 **Are there different ways to build the same state machine?**
 - create a definition that builds a certain shape
     - add rules which will not trigger
     - change rule order
+
+TOOL: Create a tool which takes a state machine as input and generates one or more sets of rules that would build it.
+Same tool could adjust the rules in ways that are different rules but not alter expected output.
 
 **What kinds of rule behaviors in isAvailable and Execute can throw off the build?**
 - always a unique state generated combined with no stop condition on isAvailable
@@ -205,10 +222,11 @@ stateDiagram-v2
 - edit the state given to Execute
 
 **How resilient is the state machine build to error states?**
+- what is an invalid build definition state?
+- what is an invalid rule?
+- what is an invalid state machine?
 
-**What happens when rules describe an invalid build?**
-
-**What happens based on different configuration options?**
-**How does exploration strategy affect building?**
+Make rules that would build invalid machines.
+Build from invalid definitions.
 
 _(to be populated)_
