@@ -49,6 +49,16 @@
 6. **Output**: Returns a `StateMachine` that satisfies `IsValidMachine() == true`.
 
 ## Test Sections
+### Rule and Initial State shapes
+This needs some details figured out. The relationships are complex. Rules do not always trigger right away. Sometimes the wind up going back to earlier states, sometimes not. Different rules may have different relationships to different state variables, etc.
+
+| Initial State | Execute output | isAvailable | Rule count |
+| ----------- | ----------- |  ----------- | ----------- | 
+| no variables | changes initial state value | matches on initial state | 0 |
+| one variable | creats new state variable  and sets value | matches on later state | 1 |
+| two variables|  | matches no state | 2 |
+| |  |  | 4 |
+
 ### state machine shapes
 What happens when rules try to build different kinds of state machine shapes?
 #### state machine shapes
@@ -94,7 +104,7 @@ stateDiagram-v2
     S1 --> S3
     S3 --> S4
     S4 --> S2
-    S4 --> S5
+    S2 --> S5
 ```
     - depth from origin to reconnect
     - branches along the way to reconnect
@@ -105,7 +115,7 @@ stateDiagram-v2
     S2 --> S3
     S1 --> S4
     S4 --> S5
-    S6 --> S6
+    S5 --> S6
     S6 --> S4
 ``` 
 #### Generating state machines based on rules
