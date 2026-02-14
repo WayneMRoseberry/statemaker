@@ -21,11 +21,12 @@ namespace StateMaker
     {
         bool IsAvailable(State state);
         State Execute(State state);
+        string GetName();  // Default returns GetType().Name; override for custom name
     }
 }
 ```
 
-This simple two-method interface is the foundation for both custom and declarative rules.
+This three-method interface is the foundation for both custom and declarative rules. The `GetName()` method provides the rule name used in transitions; by default it returns the type name, but implementers can override it.
 
 ### 2. Custom Code-Based Rules
 
@@ -51,6 +52,12 @@ public class AddOptionRule : IRule
         var optionList = newState.Variables["OptionList"] as List<string>;
         optionList.Add("NewOption");
         return newState;
+    }
+
+    public string GetName()
+    {
+        // Default: return type name. Override for a custom name.
+        return GetType().Name;
     }
 }
 ```
@@ -106,6 +113,12 @@ namespace StateMaker
             }
 
             return newState;
+        }
+
+        public string GetName()
+        {
+            // Returns the declarative rule's configured name
+            return _name;
         }
     }
 }
@@ -268,7 +281,7 @@ var stateMachine = builder.Build(initialState, allRules, config);
 ## Design Principles
 
 ### 1. Interface Segregation
-- `IRule` contains only two essential methods
+- `IRule` contains only three essential methods (`IsAvailable`, `Execute`, `GetName`)
 - Simple contract makes both custom and declarative implementations straightforward
 
 ### 2. Polymorphism

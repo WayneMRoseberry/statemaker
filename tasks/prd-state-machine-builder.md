@@ -136,6 +136,7 @@ Scenario: Implement a custom rule class
   And I implement the IsAvailable(State state) method to check if the rule applies
   And I implement the Execute(State state) method to return the new state
   Then I have a custom rule class ready to use
+  And I implement the GetName() method to return the name of the rule if I want it to be different than the default matching the type name of the rule object.
 
 Scenario: Developer implements custom rule AddOption.IsAvailable so that the rule will fire when "OptionList <> Empty"
   Given I am implementing the AddOption rule class
@@ -275,9 +276,10 @@ Scenario: Developer loads business analyst's definition file and builds state ma
 1. The system must provide a `State` class that stores a set of variables with their values
 2. The `State` class must allow programmatic construction by providing variable names and their values
 3. The `State` class must implement equality comparison to determine if two states are equivalent (same variables with same values)
-4. The system must provide a `Rule` interface with two methods:
+4. The system must provide a `Rule` interface with three methods:
    - `bool IsAvailable(State state)` - returns true if the rule can be applied to the given state
    - `State Execute(State state)` - returns a new state resulting from applying the rule
+   - `string GetName()` - returns the name of the rule; the default implementation returns the type name of the rule object, but implementers can override this to provide a custom name
 5. The system must provide a `StateMachine` class with the following properties and methods:
    - `IReadOnlyDictionary<string, State> States` - all discovered states, keyed by unique ID (read-only; mutations via `AddState`/`RemoveState` methods)
    - `void AddState(string stateId, State state)` - adds a state to the state machine
@@ -329,7 +331,7 @@ Scenario: Developer loads business analyst's definition file and builds state ma
 
 32. All interfaces (`IRule`, `IStateMachineBuilder`) and core classes (`State`, `StateMachine`, `BuilderConfig`, `Transition`) must be in the `StateMaker` namespace
 33. The namespace must be designed to allow external assemblies to reference it and implement custom `IRule` implementations
-34. Rule names should be automatically derived from the rule class name (or configurable)
+34. Rule names must be obtained by calling `IRule.GetName()`; the default implementation returns the rule's type name, and implementers may override it to provide a custom name
 
 ### Declarative Rule Definition
 
