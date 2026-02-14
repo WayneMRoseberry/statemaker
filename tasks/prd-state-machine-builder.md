@@ -567,7 +567,41 @@ The project produces a **standalone library/tool** (not a service):
     - Custom rule Execute method not modifying input state
     - Custom rules from external assemblies/packages
     - Combining custom rules from multiple sources (local + external + declarative)
-12. **Documentation:**
+    - **Combinatorial/pairwise testing of builder inputs:**
+      - Pairwise combinations of initial state shapes (no variables, one of each data type, multiple variables, 1..N variables)
+      - Pairwise combinations of `MaxStates` and `MaxDepth` settings (null, 0, -1, 1, 2, 3, 10) producing ~49 config combinations
+      - Pairwise combinations of 0–4 rules drawn from a set of rule variations (always available + sets variable, adds new variable, increments variables, empty/no-op), producing up to 1296 rule combinations
+      - Full cross-product of initial state shapes × config combinations × rule combinations for comprehensive coverage
+    - **State machine shape verification:** Rules designed to produce specific graph topologies:
+      - Single state (no transitions fire or all transitions cycle back)
+      - Chains of varying length (linear sequences of states)
+      - Cycles of varying depth, start points, and complexity (cycles within cycles, cycles with optional exits)
+      - Branches with varying peer count, depth, breadth, and sub-branch connectivity (trees, connected sub-branches, fully connected branches)
+      - Branches that reconnect without cycles (diamond/converging paths at varying depth)
+      - Fully connected graphs (every node reachable from every other node, varying node count)
+      - Hybrid shapes combining multiple topologies (chains + cycles, branches + cycles, multiple shape neighborhoods in one graph)
+    - **Exploration strategy equivalence:** Same initial state, rules, and config must produce the same state machine under both BFS and DFS (same states and transitions, possibly different ID assignments)
+    - **Rule behavior edge cases:**
+      - Rules that always generate unique states (unbounded growth without stop condition on `IsAvailable`)
+      - Rules that return malformed or unexpected states
+      - Rules whose `IsAvailable` or `Execute` methods throw exceptions
+      - Rules whose methods hang or take excessively long
+      - Rules that mutate the input state passed to `Execute` (violating immutability)
+    - **Resilience and error handling:**
+      - Invalid build definitions (null rules array, null elements in rules array, null config)
+      - Rules designed to produce invalid state machines
+      - Building from configurations with contradictory or nonsensical limits
+    - **Oracle strategies for large-scale test batteries:**
+      - Expected state machine shape matching (verified for tractable cases)
+      - No crash or unhandled exception during build
+      - No infinite loop (heuristic timeout threshold, validated against performance baselines)
+      - Performance proportional to resulting machine size (time-to-size ratio within expected bounds)
+      - `MaxStates` and `MaxDepth` limits strictly respected in output
+12. **Testing tools and infrastructure:**
+    - A **test case generator** tool that combines initial state shapes, config combinations, and rule combinations to produce build definition files programmatically
+    - A **test battery executor** tool that runs a set of build definitions and applies the oracle checks described above (shape match, no crash, no infinite loop, performance, limit enforcement)
+    - A **reverse rule generator** tool that takes a target state machine shape as input and generates one or more sets of rules that would build it, including variations (extra non-triggering rules, different rule orderings) that should not alter the expected output
+13. **Documentation:**
     - Developer documentation is maintained in the `/docs` directory
     - Architecture documents in `/docs/architecture/` explain design decisions and component interactions
     - When implementing features, update relevant architecture documents to reflect actual implementation
