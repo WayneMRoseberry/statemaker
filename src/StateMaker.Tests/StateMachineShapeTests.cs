@@ -112,6 +112,51 @@ public class StateMachineShapeTests
         }
     }
 
+    private sealed class FuncRule : IRule
+    {
+        private readonly Func<State, bool> _isAvailable;
+        private readonly Func<State, State> _execute;
+
+        public FuncRule(Func<State, bool> isAvailable, Func<State, State> execute)
+        {
+            _isAvailable = isAvailable;
+            _execute = execute;
+        }
+
+        public bool IsAvailable(State state) => _isAvailable(state);
+        public State Execute(State state) => _execute(state);
+    }
+
+    private sealed class ChainThenCycleRule : IRule
+    {
+        private readonly string _variable;
+        private readonly int _chainLength;
+        private readonly int _cycleLength;
+
+        public ChainThenCycleRule(string variable, int chainLength, int cycleLength)
+        {
+            _variable = variable;
+            _chainLength = chainLength;
+            _cycleLength = cycleLength;
+        }
+
+        public bool IsAvailable(State state) =>
+            state.Variables.ContainsKey(_variable) &&
+            (int)state.Variables[_variable]! >= 0 &&
+            (int)state.Variables[_variable]! < _chainLength + _cycleLength;
+
+        public State Execute(State state)
+        {
+            var clone = state.Clone();
+            int value = (int)clone.Variables[_variable]!;
+            if (value < _chainLength + _cycleLength - 1)
+                clone.Variables[_variable] = value + 1;
+            else
+                clone.Variables[_variable] = _chainLength;
+            return clone;
+        }
+    }
+
     #region Helper Methods
 
     private static void AssertChainShape(StateMachine machine, int chainLength)
@@ -176,6 +221,68 @@ public class StateMachineShapeTests
         int backEdgeCount = machine.Transitions.Count(t => t.TargetStateId == machine.StartingStateId);
         Assert.Equal(1, backEdgeCount);
     }
+
+    private static void AssertChainThenCycleShape(StateMachine machine, int chainLength, int cycleLength)
+    {
+        Assert.Equal(chainLength + cycleLength, machine.States.Count);
+        Assert.Equal(chainLength + cycleLength, machine.Transitions.Count);
+        Assert.True(machine.IsValidMachine());
+
+        // Initial state has outDegree == 1, inDegree == 0
+        int startOut = machine.Transitions.Count(t => t.SourceStateId == machine.StartingStateId);
+        int startIn = machine.Transitions.Count(t => t.TargetStateId == machine.StartingStateId);
+        Assert.Equal(1, startOut);
+        Assert.Equal(0, startIn);
+
+        // No transition targets the initial state (back-edge goes to cycle entry, not S0)
+        Assert.DoesNotContain(machine.Transitions, t => t.TargetStateId == machine.StartingStateId);
+
+        // Exactly one state has inDegree == 2 (the cycle entry state)
+        var stateIds = machine.States.Keys.ToList();
+        int inDegree2Count = stateIds.Count(id =>
+            machine.Transitions.Count(t => t.TargetStateId == id) == 2);
+        Assert.Equal(1, inDegree2Count);
+    }
+
+    private static void AssertAllStatesReachable(StateMachine machine)
+    {
+        var visited = new HashSet<string>();
+        var queue = new Queue<string>();
+        queue.Enqueue(machine.StartingStateId!);
+        visited.Add(machine.StartingStateId!);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            foreach (var transition in machine.Transitions.Where(t => t.SourceStateId == current))
+            {
+                if (visited.Add(transition.TargetStateId))
+                    queue.Enqueue(transition.TargetStateId);
+            }
+        }
+
+        Assert.Equal(machine.States.Count, visited.Count);
+    }
+
+    private static FuncRule CycleInRange(int rangeStart, int cycleLen) => new(
+        s => s.Variables.ContainsKey("step") &&
+             (int)s.Variables["step"]! >= rangeStart &&
+             (int)s.Variables["step"]! < rangeStart + cycleLen,
+        s =>
+        {
+            var c = s.Clone();
+            c.Variables["step"] = rangeStart + ((int)c.Variables["step"]! - rangeStart + 1) % cycleLen;
+            return c;
+        });
+
+    private static FuncRule TransitionAt(int fromValue, int toValue) => new(
+        s => s.Variables.ContainsKey("step") && (int)s.Variables["step"]! == fromValue,
+        s =>
+        {
+            var c = s.Clone();
+            c.Variables["step"] = toValue;
+            return c;
+        });
 
     #endregion
 
@@ -351,6 +458,286 @@ public class StateMachineShapeTests
         StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
 
         AssertCycleShape(result, cycleLength);
+    }
+
+    #endregion
+
+    #region Complex Cycle — Chain Then Cycle
+
+    [Theory]
+    [InlineData(1, 2)]
+    [InlineData(2, 2)]
+    [InlineData(3, 3)]
+    [InlineData(5, 2)]
+    [InlineData(1, 5)]
+    public void ChainThenCycle_ProducesExpectedShape(int chainLength, int cycleLength)
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[] { new ChainThenCycleRule("step", chainLength, cycleLength) };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertChainThenCycleShape(result, chainLength, cycleLength);
+        AssertAllStatesReachable(result);
+    }
+
+    #endregion
+
+    #region Complex Cycle — Start Points
+
+    [Theory]
+    [InlineData(1, 2)]
+    [InlineData(2, 2)]
+    [InlineData(3, 2)]
+    public void CycleStartPoint_BackEdgeTargetsNonStartState(int chainLength, int cycleLength)
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[] { new ChainThenCycleRule("step", chainLength, cycleLength) };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // The back-edge should NOT target the starting state
+        Assert.DoesNotContain(result.Transitions, t => t.TargetStateId == result.StartingStateId);
+
+        // The back-edge target has inDegree == 2
+        var backEdgeTargets = result.States.Keys
+            .Where(id => result.Transitions.Count(t => t.TargetStateId == id) == 2)
+            .ToList();
+        Assert.Single(backEdgeTargets);
+
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Complex Cycle — Nested Cycles
+
+    [Fact]
+    public void NestedCycle_TwoAdjacentCyclesSharingState()
+    {
+        // Outer cycle: 0→1→0, branch from 1 to inner cycle: 100→101→100
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 2),
+            TransitionAt(1, 100),
+            CycleInRange(100, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(4, result.States.Count);
+        Assert.Equal(5, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void NestedCycle_SequentialCyclesChainToCycleAExitToCycleB()
+    {
+        // Chain 0→1, cycle A: 1→2→1, exit from 2 to cycle B: 100→101→100
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new ChainThenCycleRule("step", 1, 2),
+            TransitionAt(2, 100),
+            CycleInRange(100, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(5, result.States.Count);
+        Assert.Equal(6, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void NestedCycle_TwoIndependentCyclesFromBranchPoint()
+    {
+        // S0 branches to cycle A (10→11→10) and cycle B (20→21→20)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            CycleInRange(10, 2),
+            CycleInRange(20, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(5, result.States.Count);
+        Assert.Equal(6, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void NestedCycle_OuterCycle3InnerCycle2()
+    {
+        // Outer cycle: 0→1→2→0, branch from 1 to inner: 100→101→100
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(1, 100),
+            CycleInRange(100, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(5, result.States.Count);
+        Assert.Equal(6, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void NestedCycle_OuterCycle2InnerCycle3()
+    {
+        // Outer cycle: 0→1→0, branch from 0 to inner: 100→101→102→100
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 2),
+            TransitionAt(0, 100),
+            CycleInRange(100, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(5, result.States.Count);
+        Assert.Equal(6, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Complex Cycle — Optional Exits
+
+    [Fact]
+    public void CycleWithExit_Cycle2OneExitLength1()
+    {
+        // Cycle: 0→1→0, exit from 0 to 100
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 2),
+            TransitionAt(0, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(3, result.States.Count);
+        Assert.Equal(3, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void CycleWithExit_Cycle3OneExitLength1()
+    {
+        // Cycle: 0→1→2→0, exit from 1 to 100
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(1, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(4, result.States.Count);
+        Assert.Equal(4, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void CycleWithExit_Cycle3ExitChainLength3()
+    {
+        // Cycle: 0→1→2→0, exit from 1 to chain: 100→101→102
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(1, 100),
+            TransitionAt(100, 101),
+            TransitionAt(101, 102),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(6, result.States.Count);
+        Assert.Equal(6, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void CycleWithExit_Cycle2ExitsFromEveryState()
+    {
+        // Cycle: 0→1→0, exits: 0→100, 1→200
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 2),
+            TransitionAt(0, 100),
+            TransitionAt(1, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(4, result.States.Count);
+        Assert.Equal(4, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void CycleWithExit_Cycle3TwoExitsFromSameState()
+    {
+        // Cycle: 0→1→2→0, exits from 1: 1→100, 1→200
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(1, 100),
+            TransitionAt(1, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(5, result.States.Count);
+        Assert.Equal(5, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
     }
 
     #endregion
