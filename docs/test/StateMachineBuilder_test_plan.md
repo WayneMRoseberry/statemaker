@@ -4,142 +4,37 @@
 
 `StateMachineBuilder` is the core engine of the StateMaker library. It takes an initial state, an array of rules, and a configuration object, then explores the state space by repeatedly applying rules to discovered states. The result is a `StateMachine` containing all reachable states and the transitions between them.
 
-## Method Under Test
-
-```csharp
-public class StateMachineBuilder : IStateMachineBuilder
-{
-    public StateMachine Build(State initialState, IRule[] rules, BuilderConfig config);
-}
-```
-
-### Interface
-
-```csharp
-public interface IStateMachineBuilder
-{
-    StateMachine Build(State initialState, IRule[] rules, BuilderConfig config);
-}
-```
+## StateMachine.Build
 
 ## Data Structures
-
 ### State
-
-Represents a single state in the state machine. Contains a dictionary of named variables with primitive values.
-
-```csharp
-public class State : IEquatable<State>
-{
-    public Dictionary<string, object?> Variables { get; }
-
-    public State Clone();
-    public bool Equals(State? other);
-    public override bool Equals(object? obj);
-    public override int GetHashCode();
-}
-```
-
 - `Variables`: Key-value pairs holding the state data. Supports primitive types: `string`, `int`, `bool`, `float`/`double`, and `null`.
 - `Clone()`: Creates a shallow copy of the state with the same variable keys and values.
 - Equality is value-based: two states are equal if they have the same keys with the same values.
 - `GetHashCode()` uses sorted keys for deterministic hashing.
-
 ### IRule
-
-Defines the contract for a rule that can be applied to a state to produce a new state.
-
-```csharp
-public interface IRule
-{
-    bool IsAvailable(State state);
-    State Execute(State state);
-}
-```
-
 - `IsAvailable(State)`: Returns `true` if the rule can be applied to the given state.
 - `Execute(State)`: Applies the rule to produce a new state. Should not mutate the input state.
-
 ### BuilderConfig
-
-Configuration options that control how the builder explores the state space.
-
-```csharp
-public class BuilderConfig
-{
-    public int? MaxDepth { get; set; }
-    public int? MaxStates { get; set; }
-    public ExplorationStrategy ExplorationStrategy { get; set; }
-    public LogLevel LogLevel { get; set; }
-}
-```
-
 - `MaxDepth` (default `null`): Maximum exploration depth from the initial state. States at this depth are added but not explored further. `null` means no depth limit.
 - `MaxStates` (default `null`): Maximum number of states in the result. Once reached, no new states are added. `null` means no state count limit.
 - `ExplorationStrategy` (default `BREADTHFIRSTSEARCH`): Controls the order in which states are explored.
 - `LogLevel` (default `INFO`): Controls logging verbosity.
-
 ### ExplorationStrategy
-
-```csharp
-public enum ExplorationStrategy
-{
-    BREADTHFIRSTSEARCH,
-    DEPTHFIRSTSEARCH
-}
-```
-
 - `BREADTHFIRSTSEARCH`: Explores states level by level (queue-based).
 - `DEPTHFIRSTSEARCH`: Explores one branch fully before backtracking (stack-based).
-
 ### StateMachine
-
-The output of the builder. Contains the discovered states, transitions between them, and the starting state identifier.
-
-```csharp
-public class StateMachine
-{
-    public IReadOnlyDictionary<string, State> States { get; }
-    public string? StartingStateId { get; set; }
-    public List<Transition> Transitions { get; }
-
-    public void AddState(string stateId, State state);
-    public bool RemoveState(string stateId);
-    public bool IsValidMachine();
-}
-```
-
 - `States`: Read-only dictionary mapping state IDs (e.g., "S0", "S1") to `State` objects.
 - `StartingStateId`: The ID of the initial state. Setting this to a non-existent state ID throws `StateDoesNotExistException`.
 - `Transitions`: List of all transitions discovered during exploration.
 - `AddState(stateId, state)`: Adds a state to the internal dictionary.
 - `RemoveState(stateId)`: Removes a state; clears `StartingStateId` if it matches.
 - `IsValidMachine()`: Returns `true` if the machine has at least one state, a non-null `StartingStateId`, and all transitions reference existing states.
-
 ### Transition
-
-Represents a directed edge between two states, labeled with the rule that produced it.
-
-```csharp
-public class Transition
-{
-    public string SourceStateId { get; }
-    public string TargetStateId { get; }
-    public string RuleName { get; }
-}
-```
-
 - `SourceStateId`: The state the rule was applied to.
 - `TargetStateId`: The state produced by the rule.
 - `RuleName`: Derived from the rule's class name (`rule.GetType().Name`).
-
 ### StateDoesNotExistException
-
-```csharp
-public class StateDoesNotExistException : Exception
-```
-
-Thrown when `StartingStateId` is set to a state ID that does not exist in the `States` dictionary.
 
 ## Builder Behavior Summary
 
@@ -154,5 +49,85 @@ Thrown when `StartingStateId` is set to a state ID that does not exist in the `S
 6. **Output**: Returns a `StateMachine` that satisfies `IsValidMachine() == true`.
 
 ## Test Sections
+### state machine shapes
+What happens when rules try to build different kinds of state machine shapes?
+#### state machine shapes
+- singlestate
+    - single state of different types
+- chains
+```mermaid
+stateDiagram-v2
+    S1 --> S2
+    S2 --> S3
+```
+    - chains of different length
+- cycles
+```mermaid
+stateDiagram-v2
+    S1 --> S2
+    S2 --> S3
+    S3 --> S1
+```
+    - cycles of different depth
+    - cycles that start at different points in the graph
+    - cycles with complex shapes before returning back to origin
+    - cycles within cycles
+    - cycles with optional exits
+- branches
+```mermaid
+stateDiagram-v2
+    S1 --> S2
+    S1 --> S3
+    S3 --> S4
+```
+
+    - number of peers at a branch
+    - depth of branching
+    - breadth of branching
+    - sub-branches that are trees
+    - sub-branches that are connected
+    - fully connected branches
+- branches that reconnect without cycles
+```mermaid
+stateDiagram-v2
+    S1 --> S2
+    S1 --> S3
+    S3 --> S4
+    S4 --> S2
+    S4 --> S5
+```
+    - depth from origin to reconnect
+    - branches along the way to reconnect
+- hybrid shapes
+```mermaid
+stateDiagram-v2
+    S1 --> S2
+    S2 --> S3
+    S1 --> S4
+    S4 --> S5
+    S6 --> S6
+    S6 --> S4
+``` 
+#### Generating state machines based on rules
+**Cover each of the state machine shapes at least once**
+
+**Are there different ways to build the same state machine?**
+- create a definition that builds a certain shape
+    - add rules which will not trigger
+    - change rule order
+
+**What kinds of rule behaviors in isAvailable and Execute can throw off the build?**
+- always a unique state generated combined with no stop condition on isAvailable
+- returning a bad state (what is that?)
+- throwing
+- internally hung
+- edit the state given to Execute
+
+**How resilient is the state machine build to error states?**
+
+**What happens when rules describe an invalid build?**
+
+**What happens based on different configuration options?**
+**How does exploration strategy affect building?**
 
 _(to be populated)_
