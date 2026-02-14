@@ -52,12 +52,64 @@
 ### Rule and Initial State shapes
 This needs some details figured out. The relationships are complex. Rules do not always trigger right away. Sometimes the wind up going back to earlier states, sometimes not. Different rules may have different relationships to different state variables, etc.
 
-| Initial State | Execute output | isAvailable | Rule count |
+**initial_state_shapes**
+- no state variables
+- one of each data type
+- variable1=value, variable1=value1  <== rule combinations pretend not to know about value, but will set value1
+- 1, 2, 3... N state variables
+
+**depth_combinations**
+Pairwise combination of these settings
+Total number of combinations is 7^2 = 49
+| MaxStates | MaxDepth |
+| ----------- | ----------- |
+| null | null |
+| 0 | 0 |
+| -1 | -1 |
+| 1 | 1 |
+| 2 | 2 |
+| 3 | 3 |
+| 10 | 10 |
+
+
+**rule_variations**
+- empty
+- {isAvailable=>true;variable1=>value1}
+- {isAvailable=>true;variable1=>value2}
+- {isAvailable=>true;variable2=>value2}
+- {isAvailable=>true;new_variable=>value1}
+- {isAvailable=>true;for_each_variable=>value + 1}
+
+**4_rule_combinations**
+Pairwise combination to make sets of 0-4 rules
+Total number of combinations is 6^4 = 1296 rule combinations
+| Rule1 | Rule2 | Rule3 | Rule4 |
 | ----------- | ----------- |  ----------- | ----------- | 
-| no variables | changes initial state value | matches on initial state | 0 |
-| one variable | creats new state variable  and sets value | matches on later state | 1 |
-| two variables|  | matches no state | 2 |
-| |  |  | 4 |
+| {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} |
+| {isAvailable=>true;variable1=>value2} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} |
+| {isAvailable=>true;variable2=>value2} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} |
+| {isAvailable=>true;new_variable=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} |
+| {isAvailable=>true;for_each_variable=>value + 1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} |
+| {isAvailable=>true;new_variable=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} | {isAvailable=>true;variable1=>value1} |
+| empty | empty | empty | empty |
+
+**combinations to make cases**
+The following creates a massive number of cases. The oracles will be challenging:
+- matches expected state machine shape -> how do we know what will be for so many?
+- does not crash or otherwise throw
+- does not enter infinite loop
+- is performance worse than size of eventual machine -> this is in some cases exponential
+- are max limits respected
+```
+Combine (**initial_state_changes** x **depth_combinations** x **4_rule_combinations**)
+= 8 * 49 * 1296 => 508032
+```
+- Creating the combinations programmatically should be simple.
+- Generating expected state machine oracle will be difficult.
+- limit check oracles will be programmatically easy
+- abort or crash oracles are implicitly easy - can it run to end without any of those happening?
+- performance is challenging, but a graph of time take to size of machine should show similar slopes
+- infinite loop detection can use a heuristic threshold limit that we check later against performance curves
 
 ### state machine shapes
 What happens when rules try to build different kinds of state machine shapes?
@@ -90,7 +142,6 @@ stateDiagram-v2
     S1 --> S3
     S3 --> S4
 ```
-
     - number of peers at a branch
     - depth of branching
     - breadth of branching
@@ -108,6 +159,26 @@ stateDiagram-v2
 ```
     - depth from origin to reconnect
     - branches along the way to reconnect
+- connected
+```mermaid
+stateDiagram-v2
+   S1 --> S2
+   S1 --> S3
+   S1 --> S4
+   S2 --> S1
+   S2 --> S4
+   S2 --> S3
+   S3 --> S1
+   S3 --> S2
+   S3 --> S4
+   S4 --> S1
+   S4 --> S2
+   S4 --> S3
+``` 
+   - every node to every other node
+   - every node may eventually lead to every other node
+   - number of nodes
+  
 - hybrid shapes
 ```mermaid
 stateDiagram-v2
