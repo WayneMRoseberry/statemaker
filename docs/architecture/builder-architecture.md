@@ -57,13 +57,13 @@ Explore:
 
         if visited contains equivalent state:
           // Cycle detected - create transition to existing state
-          add Transition(currentState → existingState, rule.Name)
+          add Transition(currentState → existingState, rule.GetName())
         else:
           // New state discovered
           assign unique ID to newState
           add newState to StateMachine
           add newState to visited set
-          add Transition(currentState → newState, rule.Name)
+          add Transition(currentState → newState, rule.GetName())
 
           if limits not reached:
             add newState to exploration queue
