@@ -43,7 +43,7 @@ public class StateMachineBuilder : IStateMachineBuilder
                 if (rule.IsAvailable(currentState))
                 {
                     var newState = rule.Execute(currentState);
-                    string ruleName = rule.GetType().Name;
+                    string ruleName = rule.GetName();
 
                     if (visited.Contains(newState))
                     {
