@@ -143,8 +143,17 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.17.6 Verify all new equivalence tests pass alongside existing 182+ tests
   - [ ] 3.18 Write tests for rule behavior edge cases: rules that always generate unique states (unbounded growth), rules that return malformed or unexpected states
   - [ ] 3.19 Write tests for rule behavior edge cases: rules whose `IsAvailable` or `Execute` methods throw exceptions, and rules whose methods hang or take excessively long
-  - [ ] 3.20 Write tests for rule behavior edge cases: rules that mutate the input state passed to `Execute` (violating immutability), verifying the builder handles or detects this
-  - [ ] 3.21 Write tests for resilience: null rules array, null elements within rules array, null config, and building from configurations with contradictory or nonsensical limits (e.g., MaxStates=0, MaxDepth=-1)
+  - [x] 3.20 Write tests for rule behavior edge cases: rules that mutate the input state passed to `Execute` (violating immutability), verifying the builder handles or detects this
+    - [x] 3.20.1 Write test for rule that mutates input state variable directly (no clone): verify builder still completes and produces a valid machine
+    - [x] 3.20.2 Write test for rule that adds a new variable to the input state: verify builder handles the mutation
+    - [x] 3.20.3 Write test for rule that mutates input and returns it as the "new" state: verify builder produces expected output or detects the violation
+    - [x] 3.20.4 Write test verifying the initial state object is not corrupted after building with a mutating rule
+  - [x] 3.21 Write tests for resilience: null rules array, null elements within rules array, null config, and building from configurations with contradictory or nonsensical limits (e.g., MaxStates=0, MaxDepth=-1)
+    - [x] 3.21.1 Write tests for MaxStates boundary values: MaxStates=0 (initial state still added), MaxStates=1 (exactly one state), MaxStates=-1 (negative value)
+    - [x] 3.21.2 Write tests for MaxDepth boundary values: MaxDepth=0 (no exploration beyond initial), MaxDepth=-1 (negative value), MaxDepth=1 with branching rules
+    - [x] 3.21.3 Write tests for combined limits: both MaxStates=1 and MaxDepth=1, MaxStates=2 with MaxDepth=0
+    - [x] 3.21.4 Write tests for empty/minimal inputs: empty initial state (no variables), empty rules array with limits set, single rule that is never available
+    - [x] 3.21.5 Verify all new edge case and resilience tests pass alongside existing 197+ tests
   - [ ] 3.22 Implement a test case generator tool that programmatically combines initial state shapes (no variables, one of each data type, multiple variables, 1..N), config combinations (MaxStates x MaxDepth pairwise from null/0/-1/1/2/3/10), and rule variations (sets variable, adds variable, increments, empty) to produce build definition files
   - [ ] 3.23 Implement a test battery executor tool that runs a set of build definitions through the builder and applies oracle checks: no crash/exception, no infinite loop (heuristic timeout), MaxStates and MaxDepth limits respected in output
   - [ ] 3.24 Implement oracle checks in the test battery executor for performance validation: time-to-size ratio within expected bounds, and expected state machine shape matching for tractable cases

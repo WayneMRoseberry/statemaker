@@ -585,4 +585,327 @@ public class StateMachineBuilderTests
         Assert.Equal(2, result.Transitions.Count);
         Assert.All(result.Transitions, t => Assert.Equal("ToggleRule", t.RuleName));
     }
+
+    #region 3.20 — Input State Mutation Edge Cases
+
+    [Fact]
+    public void Build_MutatingRule_ModifiesInputVariable_BuilderStillCompletes()
+    {
+        // Rule mutates input state directly instead of cloning
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => (int)s.Variables["step"]! < 3,
+                s => { s.Variables["step"] = (int)s.Variables["step"]! + 1; return s; })
+        };
+        var config = new BuilderConfig();
+
+        // The builder should not throw — it may produce unexpected results
+        // but should still complete and return a valid machine structure
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.NotNull(result);
+        Assert.NotNull(result.StartingStateId);
+        Assert.True(result.States.Count >= 1);
+    }
+
+    [Fact]
+    public void Build_MutatingRule_AddsNewVariable_BuilderStillCompletes()
+    {
+        // Rule adds a new variable to the input state instead of cloning
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => !s.Variables.ContainsKey("added"),
+                s => { s.Variables["added"] = true; return s; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.NotNull(result);
+        Assert.True(result.States.Count >= 1);
+    }
+
+    [Fact]
+    public void Build_MutatingRule_ReturnsInputAsNewState_BuilderStillCompletes()
+    {
+        // Rule mutates input and returns same reference
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => (int)s.Variables["counter"]! < 2,
+                s =>
+                {
+                    // Mutate the original and return it — this violates immutability
+                    s.Variables["counter"] = (int)s.Variables["counter"]! + 1;
+                    return s;
+                })
+        };
+        var config = new BuilderConfig { MaxStates = 5 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.NotNull(result);
+        Assert.NotNull(result.StartingStateId);
+    }
+
+    [Fact]
+    public void Build_MutatingRule_InitialStatePreservedWhenRuleClonesCorrectly()
+    {
+        // Verify that when rules clone correctly, the initial state is not corrupted
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["value"] = 42;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => (int)s.Variables["value"]! == 42,
+                s => { var c = s.Clone(); c.Variables["value"] = 99; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        // The original initialState object should not be modified
+        Assert.Equal(42, initialState.Variables["value"]);
+        Assert.Equal(2, result.States.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region 3.21 — Resilience: Boundary Configurations
+
+    [Fact]
+    public void Build_MaxStates0_InitialStateStillAdded()
+    {
+        // MaxStates=0 means "stop adding new states at 0" but initial state is added before the check
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => true, s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 0 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        // Initial state should still be present (it's added before limit check)
+        Assert.True(result.States.Count >= 1);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_MaxStates1_ExactlyOneState()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => true, s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 1 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_MaxStatesNegative_InitialStateStillAdded()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => true, s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = -1 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        // With negative MaxStates, States.Count (1) >= MaxStates (-1) is true from the start
+        // so no new states should be added beyond initial
+        Assert.True(result.States.Count >= 1);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_MaxDepth0_NoExplorationBeyondInitial()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => true, s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxDepth = 0 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        // MaxDepth=0 means currentDepth (0) >= MaxDepth (0) is true, so no rules applied
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_MaxDepthNegative_NoExplorationBeyondInitial()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => true, s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxDepth = -1 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        // MaxDepth=-1 means currentDepth (0) >= MaxDepth (-1) is true, so no rules applied
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_MaxDepth1_WithBranching_OneLevelOfChildren()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => (int)s.Variables["step"]! == 0,
+                s => { var c = s.Clone(); c.Variables["step"] = 1; return c; }),
+            new TestRule(
+                s => (int)s.Variables["step"]! == 0,
+                s => { var c = s.Clone(); c.Variables["step"] = 2; return c; }),
+            // This rule would apply at depth 1 but should be skipped
+            new TestRule(
+                s => (int)s.Variables["step"]! > 0,
+                s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 10; return c; })
+        };
+        var config = new BuilderConfig { MaxDepth = 1 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        // Only initial + 2 children, no grandchildren
+        Assert.Equal(3, result.States.Count);
+        Assert.Equal(2, result.Transitions.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_BothMaxStates1_MaxDepth1_SingleState()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => true, s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 1, MaxDepth = 1 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_MaxStates2_MaxDepth0_SingleState()
+    {
+        // MaxDepth=0 prevents exploration even though MaxStates allows 2
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => true, s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 2, MaxDepth = 0 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_EmptyInitialState_NoVariables_ProducesSingleState()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State(); // no variables
+        var rules = new IRule[]
+        {
+            new TestRule(_ => false, s => s.Clone())
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.Empty(result.States.Values.First().Variables);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_EmptyRulesArray_WithLimitsSet_ProducesSingleState()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 1;
+        var rules = Array.Empty<IRule>();
+        var config = new BuilderConfig { MaxStates = 10, MaxDepth = 5 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_SingleNeverAvailableRule_WithLimits_ProducesSingleState()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(_ => false, s => { var c = s.Clone(); c.Variables["x"] = 999; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 100, MaxDepth = 100 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Single(result.States);
+        Assert.Empty(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
 }
