@@ -284,6 +284,55 @@ public class StateMachineShapeTests
             return c;
         });
 
+    private static FuncRule AppendPathRule(string suffix, int maxPathLength) => new(
+        s => s.Variables.ContainsKey("path") && ((string)s.Variables["path"]!).Length < maxPathLength,
+        s =>
+        {
+            var c = s.Clone();
+            c.Variables["path"] = (string)c.Variables["path"]! + suffix;
+            return c;
+        });
+
+    private static FuncRule LevelTransition(int fromLevel, int toLevel, int toValue) => new(
+        s => s.Variables.ContainsKey("level") && (int)s.Variables["level"]! == fromLevel,
+        s =>
+        {
+            var c = s.Clone();
+            c.Variables["level"] = toLevel;
+            c.Variables["value"] = toValue;
+            return c;
+        });
+
+    private static void AssertTreeShape(StateMachine machine, int expectedStates, int expectedTransitions)
+    {
+        Assert.Equal(expectedStates, machine.States.Count);
+        Assert.Equal(expectedTransitions, machine.Transitions.Count);
+        AssertAllStatesReachable(machine);
+        Assert.True(machine.IsValidMachine());
+    }
+
+    private static void AssertNoCycles(StateMachine machine)
+    {
+        var visited = new HashSet<string>();
+        var inStack = new HashSet<string>();
+
+        void CheckNoCycle(string stateId)
+        {
+            visited.Add(stateId);
+            inStack.Add(stateId);
+            foreach (var t in machine.Transitions.Where(t => t.SourceStateId == stateId))
+            {
+                if (inStack.Contains(t.TargetStateId))
+                    Assert.Fail($"Cycle detected: transition from {t.SourceStateId} to {t.TargetStateId}");
+                if (!visited.Contains(t.TargetStateId))
+                    CheckNoCycle(t.TargetStateId);
+            }
+            inStack.Remove(stateId);
+        }
+
+        CheckNoCycle(machine.StartingStateId!);
+    }
+
     #endregion
 
     #region Single State Shape Tests
@@ -736,6 +785,385 @@ public class StateMachineShapeTests
 
         Assert.Equal(5, result.States.Count);
         Assert.Equal(5, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Branch — Varying Peer Count
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(5)]
+    [InlineData(10)]
+    public void Branch_VaryingPeerCount_ProducesCorrectFanOut(int peerCount)
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = Enumerable.Range(1, peerCount)
+            .Select(i => (IRule)TransitionAt(0, i))
+            .ToArray();
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertTreeShape(result, peerCount + 1, peerCount);
+        AssertNoCycles(result);
+
+        // Root has outDegree == peerCount
+        int rootOutDegree = result.Transitions.Count(t => t.SourceStateId == result.StartingStateId);
+        Assert.Equal(peerCount, rootOutDegree);
+
+        // All children: outDegree == 0, inDegree == 1
+        foreach (var stateId in result.States.Keys.Where(id => id != result.StartingStateId))
+        {
+            Assert.Equal(0, result.Transitions.Count(t => t.SourceStateId == stateId));
+            Assert.Equal(1, result.Transitions.Count(t => t.TargetStateId == stateId));
+        }
+    }
+
+    #endregion
+
+    #region Branch — Complete Binary Trees (Depth)
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void Branch_CompleteBinaryTree_ProducesCorrectDepth(int depth)
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["path"] = "";
+        var rules = new IRule[] { AppendPathRule("L", depth), AppendPathRule("R", depth) };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        int expectedStates = (1 << (depth + 1)) - 1; // 2^(depth+1) - 1
+        int expectedTransitions = expectedStates - 1;
+        AssertTreeShape(result, expectedStates, expectedTransitions);
+        AssertNoCycles(result);
+
+        // Root has outDegree == 2, inDegree == 0
+        Assert.Equal(2, result.Transitions.Count(t => t.SourceStateId == result.StartingStateId));
+        Assert.Equal(0, result.Transitions.Count(t => t.TargetStateId == result.StartingStateId));
+
+        // No state has inDegree > 1 (no convergence in a tree)
+        foreach (var stateId in result.States.Keys)
+        {
+            int inDegree = result.Transitions.Count(t => t.TargetStateId == stateId);
+            Assert.True(inDegree <= 1, $"State {stateId} has inDegree {inDegree}, expected <= 1");
+        }
+    }
+
+    #endregion
+
+    #region Branch — Varying Breadth
+
+    [Theory]
+    [InlineData(3, 2)]  // 1+3+9 = 13 states
+    [InlineData(2, 3)]  // 1+2+4+8 = 15 states
+    [InlineData(4, 2)]  // 1+4+16 = 21 states
+    public void Branch_UniformTree_ProducesCorrectBreadthAndDepth(int breadth, int depth)
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["path"] = "";
+        var rules = Enumerable.Range(0, breadth)
+            .Select(i => (IRule)AppendPathRule(i.ToString(), depth))
+            .ToArray();
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        int expectedStates = 0;
+        for (int d = 0; d <= depth; d++)
+            expectedStates += (int)Math.Pow(breadth, d);
+        int expectedTransitions = expectedStates - 1;
+
+        AssertTreeShape(result, expectedStates, expectedTransitions);
+        AssertNoCycles(result);
+
+        // Root has outDegree == breadth
+        int rootOutDegree = result.Transitions.Count(t => t.SourceStateId == result.StartingStateId);
+        Assert.Equal(breadth, rootOutDegree);
+
+        // No convergence
+        foreach (var stateId in result.States.Keys)
+        {
+            int inDegree = result.Transitions.Count(t => t.TargetStateId == stateId);
+            Assert.True(inDegree <= 1, $"State {stateId} has inDegree {inDegree}, expected <= 1");
+        }
+    }
+
+    #endregion
+
+    #region Branch — Sub-branches as Trees
+
+    [Fact]
+    public void SubBranch_TwoIndependentChainsOfLength2()
+    {
+        // Root -> chain A (100->101->102), chain B (200->201->202)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 100), TransitionAt(0, 200),
+            TransitionAt(100, 101), TransitionAt(101, 102),
+            TransitionAt(200, 201), TransitionAt(201, 202),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertTreeShape(result, 7, 6);
+        AssertNoCycles(result);
+
+        // Root outDegree == 2
+        Assert.Equal(2, result.Transitions.Count(t => t.SourceStateId == result.StartingStateId));
+    }
+
+    [Fact]
+    public void SubBranch_TwoIndependentChainsOfDifferentLengths()
+    {
+        // Root -> chain A length 2 (100->101->102), chain B length 3 (200->201->202->203)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 100), TransitionAt(0, 200),
+            TransitionAt(100, 101), TransitionAt(101, 102),
+            TransitionAt(200, 201), TransitionAt(201, 202), TransitionAt(202, 203),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertTreeShape(result, 8, 7);
+        AssertNoCycles(result);
+    }
+
+    [Fact]
+    public void SubBranch_ThreeIndependentChainsOfLength1()
+    {
+        // Root -> 3 branches, each with 1 additional step
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 100), TransitionAt(0, 200), TransitionAt(0, 300),
+            TransitionAt(100, 101), TransitionAt(200, 201), TransitionAt(300, 301),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertTreeShape(result, 7, 6);
+        AssertNoCycles(result);
+        Assert.Equal(3, result.Transitions.Count(t => t.SourceStateId == result.StartingStateId));
+    }
+
+    [Fact]
+    public void SubBranch_TwoBinarySubTreesOfDepth1()
+    {
+        // Root -> branch A (100 -> 110, 120), branch B (200 -> 210, 220)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 100), TransitionAt(0, 200),
+            TransitionAt(100, 110), TransitionAt(100, 120),
+            TransitionAt(200, 210), TransitionAt(200, 220),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertTreeShape(result, 7, 6);
+        AssertNoCycles(result);
+
+        // Each sub-root has outDegree == 2
+        var subRoots = result.Transitions
+            .Where(t => t.SourceStateId == result.StartingStateId)
+            .Select(t => t.TargetStateId)
+            .ToList();
+        Assert.Equal(2, subRoots.Count);
+        foreach (var subRoot in subRoots)
+        {
+            Assert.Equal(2, result.Transitions.Count(t => t.SourceStateId == subRoot));
+        }
+    }
+
+    #endregion
+
+    #region Branch — Connected Sub-branches
+
+    [Fact]
+    public void ConnectedBranch_TwoRulesProduceSameChild()
+    {
+        // Two rules from root both produce {step: 1} -> deduplicated to 1 child
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new FuncRule(
+                s => (int)s.Variables["step"]! == 0,
+                s => { var c = s.Clone(); c.Variables["step"] = 1; return c; }),
+            new FuncRule(
+                s => (int)s.Variables["step"]! == 0,
+                s => { var c = s.Clone(); c.Variables["step"] = 1; return c; }),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(2, result.States.Count);
+        Assert.Equal(2, result.Transitions.Count);
+        // Both transitions target the same state
+        var targets = result.Transitions.Select(t => t.TargetStateId).Distinct().ToList();
+        Assert.Single(targets);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void ConnectedBranch_ThreeBranchesTwoProduceSameChild()
+    {
+        // 3 rules from root: two produce {step: 1}, one produces {step: 2}
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 1),
+            new FuncRule(
+                s => (int)s.Variables["step"]! == 0,
+                s => { var c = s.Clone(); c.Variables["step"] = 1; return c; }),
+            TransitionAt(0, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(3, result.States.Count);
+        Assert.Equal(3, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void ConnectedBranch_ChildrenProduceSameGrandchild()
+    {
+        // Root -> child A (step=10), child B (step=20)
+        // Child A -> grandchild (step=100), Child B -> grandchild (step=100) — deduplicated
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(4, result.States.Count);
+        Assert.Equal(4, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // The grandchild state has inDegree == 2
+        var grandchildId = result.Transitions
+            .GroupBy(t => t.TargetStateId)
+            .First(g => g.Count() == 2)
+            .Key;
+        Assert.Equal(2, result.Transitions.Count(t => t.TargetStateId == grandchildId));
+    }
+
+    #endregion
+
+    #region Branch — Fully Connected Branches
+
+    [Fact]
+    public void FullyConnected_2x2_FiveStates6Transitions()
+    {
+        // Root -> 2 L1 states, each L1 -> 2 L2 states (shared)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["level"] = 0;
+        initialState.Variables["value"] = 0;
+        var rules = new IRule[]
+        {
+            LevelTransition(0, 1, 10),
+            LevelTransition(0, 1, 20),
+            LevelTransition(1, 2, 100),
+            LevelTransition(1, 2, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(5, result.States.Count);
+        Assert.Equal(6, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Root outDegree == 2
+        Assert.Equal(2, result.Transitions.Count(t => t.SourceStateId == result.StartingStateId));
+
+        // L2 states have inDegree == 2 (reached from both L1 states)
+        var l2States = result.States.Keys
+            .Where(id => result.Transitions.Count(t => t.TargetStateId == id) == 2)
+            .ToList();
+        Assert.Equal(2, l2States.Count);
+    }
+
+    [Fact]
+    public void FullyConnected_2x3_SixStates8Transitions()
+    {
+        // Root -> 2 L1 states, each L1 -> 3 L2 states (shared)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["level"] = 0;
+        initialState.Variables["value"] = 0;
+        var rules = new IRule[]
+        {
+            LevelTransition(0, 1, 10),
+            LevelTransition(0, 1, 20),
+            LevelTransition(1, 2, 100),
+            LevelTransition(1, 2, 200),
+            LevelTransition(1, 2, 300),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(6, result.States.Count);
+        Assert.Equal(8, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void FullyConnected_3x2_SixStates9Transitions()
+    {
+        // Root -> 3 L1 states, each L1 -> 2 L2 states (shared)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["level"] = 0;
+        initialState.Variables["value"] = 0;
+        var rules = new IRule[]
+        {
+            LevelTransition(0, 1, 10),
+            LevelTransition(0, 1, 20),
+            LevelTransition(0, 1, 30),
+            LevelTransition(1, 2, 100),
+            LevelTransition(1, 2, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(6, result.States.Count);
+        Assert.Equal(9, result.Transitions.Count);
         AssertAllStatesReachable(result);
         Assert.True(result.IsValidMachine());
     }

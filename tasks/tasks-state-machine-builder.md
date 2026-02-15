@@ -108,7 +108,17 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.13.6 Write nested cycle (cycles within cycles) tests: two adjacent cycles sharing a common state, sequential cycles (chain to cycle A with exit to cycle B), two independent cycles from a branch point, outer cycle length 3 with inner cycle length 2, outer cycle length 2 with inner cycle length 3
     - [x] 3.13.7 Write cycle-with-optional-exits tests: cycle of length 2 with one exit branch, cycle of length 3 with one exit branch, cycle of length 3 with exit chain of length 3, cycle of length 2 with exits from every cycle state, cycle of length 3 with two exits from same state
     - [x] 3.13.8 Verify all new complex cycle tests pass alongside existing 112+ tests, ensure at least 3 distinct variations per complex cycle category
-  - [ ] 3.14 Write tests with rules designed to produce branching shapes: varying peer count, depth, breadth, sub-branches as trees, connected sub-branches, and fully connected branches
+  - [x] 3.14 Write tests with rules designed to produce branching shapes: varying peer count, depth, breadth, sub-branches as trees, connected sub-branches, and fully connected branches
+    - [x] 3.14.1 Add helper rule classes for branching: multi-variable branch rules using `FuncRule` compositions that set different variable values to create distinct child states from the same parent
+    - [x] 3.14.2 Implement `AssertTreeShape` helper method that validates tree topology: expected state count, expected transition count, all states reachable, `IsValidMachine()` returns true
+    - [x] 3.14.3 Implement `AssertNoCycles` helper method that validates no back-edges exist in the graph (no transition targets an ancestor in any path from root)
+    - [x] 3.14.4 Write parameterized varying peer count tests using `[Theory]` with fan-out values (2, 3, 5, 10): root branches to N terminal children, verify root outDegree == N, all children outDegree == 0 and inDegree == 1
+    - [x] 3.14.5 Write parameterized depth tests for complete binary trees using `[Theory]` with depths (1, 2, 3): verify state count == 2^(depth+1) - 1, transition count == 2^(depth+1) - 2, tree structure with no convergence
+    - [x] 3.14.6 Write parameterized breadth tests for trees with varying fan-out per level: (breadth=3, depth=2) producing 1+3+9=13 states, (breadth=2, depth=3) producing 15 states, (breadth=4, depth=2) producing 21 states
+    - [x] 3.14.7 Write sub-branches as trees tests: root branches to independent sub-chains of varying lengths (2 chains of length 2, 2 chains of lengths 2 and 3, 3 chains of length 1, 2 binary sub-trees of depth 1)
+    - [x] 3.14.8 Write connected sub-branches tests: two branches producing the same child state via deduplication, three branches where two produce the same child, root branches to children that each produce the same grandchild
+    - [x] 3.14.9 Write fully connected branches tests: 2×2 level connectivity (5 states, 6 transitions), 2×3 connectivity (6 states, 8 transitions), 3×2 connectivity (6 states, 9 transitions)
+    - [x] 3.14.10 Verify all new branching shape tests pass alongside existing tests, ensure at least 3 distinct variations per branching category
   - [ ] 3.15 Write tests with rules designed to produce reconnecting branches (diamond/converging paths) and fully connected graphs with varying node counts
   - [ ] 3.16 Write tests with rules designed to produce hybrid shapes combining multiple topologies (chains + cycles, branches + cycles, multiple shape neighborhoods)
   - [ ] 3.17 Write tests verifying exploration strategy equivalence: same initial state, rules, and config must produce the same state machine (same states and transitions) under both BFS and DFS
