@@ -872,7 +872,7 @@ public class StateMachineShapeTests
         var initialState = new State();
         initialState.Variables["path"] = "";
         var rules = Enumerable.Range(0, breadth)
-            .Select(i => (IRule)AppendPathRule(i.ToString(), depth))
+            .Select(i => (IRule)AppendPathRule(i.ToString(System.Globalization.CultureInfo.InvariantCulture), depth))
             .ToArray();
 
         StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
