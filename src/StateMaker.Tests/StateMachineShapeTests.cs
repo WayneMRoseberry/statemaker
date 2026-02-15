@@ -1551,4 +1551,465 @@ public class StateMachineShapeTests
     }
 
     #endregion
+
+    #region Hybrid — Chain + Cycle
+
+    [Fact]
+    public void Hybrid_ChainBranchesToTerminalAndCycle()
+    {
+        // Chain: 0->1, branch from 1: terminal path (1->100) and cycle (1->10->11->10)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(1, 100),
+            TransitionAt(1, 10),
+            CycleInRange(10, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(5, result.States.Count);   // S0, S1, S100, S10, S11
+        Assert.Equal(5, result.Transitions.Count); // 0->1, 1->100, 1->10, 10->11, 11->10
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Terminal state (step=100) has outDegree == 0
+        var terminalStates = result.States.Keys
+            .Where(id => result.Transitions.All(t => t.SourceStateId != id))
+            .ToList();
+        Assert.Single(terminalStates);
+    }
+
+    [Fact]
+    public void Hybrid_TwoChainThenCycleSegmentsFromRoot()
+    {
+        // Root branches to two independent chain-then-cycle segments
+        // Branch A: 0->10->11->12->11 (chain 1, cycle 2)
+        // Branch B: 0->20->21->22->23->21 (chain 1, cycle 3)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            // Branch A: chain to 10, then cycle 11->12->11
+            TransitionAt(10, 11),
+            CycleInRange(11, 2),
+            // Branch B: chain to 20, then cycle 21->22->23->21
+            TransitionAt(20, 21),
+            CycleInRange(21, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S10, S11, S12, S20, S21, S22, S23 = 8
+        Assert.Equal(8, result.States.Count);
+        // Transitions: 0->10, 0->20, 10->11, 11->12, 12->11, 20->21, 21->22, 22->23, 23->21 = 9
+        Assert.Equal(9, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_ChainToSelfLoop()
+    {
+        // Chain: 0->1->2, then self-loop at 2 (via clone-like behavior producing same state)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(1, 2),
+            CycleInRange(2, 1), // cycle of length 1 = self-loop
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(3, result.States.Count);
+        Assert.Equal(3, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Hybrid — Branch + Cycle
+
+    [Fact]
+    public void Hybrid_RootBranchesToTerminalChainAndCycle()
+    {
+        // Root -> chain (100->101->102) and cycle (10->11->12->10)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 100),
+            TransitionAt(100, 101),
+            TransitionAt(101, 102),
+            TransitionAt(0, 10),
+            CycleInRange(10, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S100, S101, S102, S10, S11, S12 = 7
+        Assert.Equal(7, result.States.Count);
+        // Transitions: 0->100, 100->101, 101->102, 0->10, 10->11, 11->12, 12->10 = 7
+        Assert.Equal(7, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_RootBranchesToTwoIndependentCycles()
+    {
+        // Root -> cycle A (10->11->10, length 2) and cycle B (20->21->22->20, length 3)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            CycleInRange(10, 2),
+            CycleInRange(20, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S10, S11, S20, S21, S22 = 6
+        Assert.Equal(6, result.States.Count);
+        // Transitions: 0->10, 0->20, 10->11, 11->10, 20->21, 21->22, 22->20 = 7
+        Assert.Equal(7, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_DiamondConvergenceThenCycle()
+    {
+        // Diamond: 0->10, 0->20, 10->100, 20->100
+        // Convergence point 100 enters cycle: 100->101->102->100
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+            CycleInRange(100, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S10, S20, S100, S101, S102 = 6
+        Assert.Equal(6, result.States.Count);
+        // Transitions: 0->10, 0->20, 10->100, 20->100, 100->101, 101->102, 102->100 = 7
+        Assert.Equal(7, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // State 100 has inDegree >= 2 (from diamond) + back-edge = 3
+        var convergenceId = result.States.Keys
+            .Single(id => result.Transitions.Count(t => t.TargetStateId == id) == 3);
+        Assert.NotNull(convergenceId);
+    }
+
+    [Fact]
+    public void Hybrid_TreeWithCycleLeaves()
+    {
+        // Binary tree depth 1: root -> left (10), root -> right (20)
+        // Left enters cycle: 10->11->10
+        // Right enters cycle: 20->21->22->20
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            CycleInRange(10, 2),
+            CycleInRange(20, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S10, S11, S20, S21, S22 = 6
+        Assert.Equal(6, result.States.Count);
+        // Transitions: 0->10, 0->20, 10->11, 11->10, 20->21, 21->22, 22->20 = 7
+        Assert.Equal(7, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Hybrid — Multiple Shape Neighborhoods
+
+    [Fact]
+    public void Hybrid_ChainToBranchToCycle_ThreePhase()
+    {
+        // Phase 1 (chain): 0->1->2
+        // Phase 2 (branch): 2->10, 2->20
+        // Phase 3 (cycles): 10->11->10, 20->21->22->20
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(1, 2),
+            TransitionAt(2, 10),
+            TransitionAt(2, 20),
+            CycleInRange(10, 2),
+            CycleInRange(20, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S1, S2, S10, S11, S20, S21, S22 = 8
+        Assert.Equal(8, result.States.Count);
+        // Transitions: 0->1, 1->2, 2->10, 2->20, 10->11, 11->10, 20->21, 21->22, 22->20 = 9
+        Assert.Equal(9, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_DiamondWithCyclicBranchAndChainBranch()
+    {
+        // Diamond-like: 0->10 (chain branch), 0->20 (cyclic branch)
+        // Chain branch: 10->100->101 (terminal)
+        // Cyclic branch: 20->30->31->30 (enters cycle)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(100, 101),
+            TransitionAt(20, 30),
+            CycleInRange(30, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S10, S100, S101, S20, S30, S31 = 7
+        Assert.Equal(7, result.States.Count);
+        // Transitions: 0->10, 0->20, 10->100, 100->101, 20->30, 30->31, 31->30 = 7
+        Assert.Equal(7, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_FullyConnectedSubgraphFromChain()
+    {
+        // Chain: 0->1->2, then 2 enters a fully connected 3-node subgraph
+        // FC subgraph: nodes 10, 11, 12 with all 6 transitions
+        // Entry: 2->10 (step=2 transitions to step=10)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(1, 2),
+            TransitionAt(2, 10),
+            // Fully connected among 10, 11, 12 using modular offsets (mod 3, base 10)
+            new FuncRule(
+                s => s.Variables.ContainsKey("step") && (int)s.Variables["step"]! >= 10 && (int)s.Variables["step"]! <= 12,
+                s => { var c = s.Clone(); c.Variables["step"] = 10 + ((int)c.Variables["step"]! - 10 + 1) % 3; return c; }),
+            new FuncRule(
+                s => s.Variables.ContainsKey("step") && (int)s.Variables["step"]! >= 10 && (int)s.Variables["step"]! <= 12,
+                s => { var c = s.Clone(); c.Variables["step"] = 10 + ((int)c.Variables["step"]! - 10 + 2) % 3; return c; }),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S1, S2, S10, S11, S12 = 6
+        Assert.Equal(6, result.States.Count);
+        // Transitions: 0->1, 1->2, 2->10, plus 6 FC transitions = 9
+        Assert.Equal(9, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_TwoDiamondsConnectedByChainWithCycleAtEnd()
+    {
+        // Diamond 1: 0->10, 0->20, 10->100, 20->100
+        // Chain: 100->200
+        // Diamond 2: 200->210, 200->220, 210->300, 220->300
+        // Cycle at end: 300->301->302->300
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            // Diamond 1
+            TransitionAt(0, 10), TransitionAt(0, 20),
+            TransitionAt(10, 100), TransitionAt(20, 100),
+            // Chain
+            TransitionAt(100, 200),
+            // Diamond 2
+            TransitionAt(200, 210), TransitionAt(200, 220),
+            TransitionAt(210, 300), TransitionAt(220, 300),
+            // Cycle
+            CycleInRange(300, 3),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S10, S20, S100, S200, S210, S220, S300, S301, S302 = 10
+        Assert.Equal(10, result.States.Count);
+        // Transitions: 4 (diamond1) + 1 (chain) + 4 (diamond2) + 3 (cycle) = 12
+        Assert.Equal(12, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Hybrid — Complex Compositions
+
+    [Fact]
+    public void Hybrid_BranchWithDifferentTopologyPerArm()
+    {
+        // Root branches to 3 arms:
+        // Arm A: chain (10->11->12, terminal)
+        // Arm B: cycle (20->21->20)
+        // Arm C: diamond (30->40, 30->50, 40->60, 50->60)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            // Three branches from root
+            TransitionAt(0, 10), TransitionAt(0, 20), TransitionAt(0, 30),
+            // Arm A: chain
+            TransitionAt(10, 11), TransitionAt(11, 12),
+            // Arm B: cycle
+            CycleInRange(20, 2),
+            // Arm C: diamond
+            TransitionAt(30, 40), TransitionAt(30, 50),
+            TransitionAt(40, 60), TransitionAt(50, 60),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S10, S11, S12, S20, S21, S30, S40, S50, S60 = 10
+        Assert.Equal(10, result.States.Count);
+        // Transitions: 3 (root) + 2 (chain) + 2 (cycle) + 4 (diamond) = 11
+        Assert.Equal(11, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Verify terminal exists (arm A endpoint)
+        var terminalStates = result.States.Keys
+            .Where(id => result.Transitions.All(t => t.SourceStateId != id))
+            .ToList();
+        Assert.Equal(2, terminalStates.Count); // S12 and S60
+    }
+
+    [Fact]
+    public void Hybrid_ChainToDiamondToCycleThenTerminal()
+    {
+        // Chain: 0->1
+        // Diamond: 1->10, 1->20, 10->100, 20->100
+        // Cycle: 100->101->102->100
+        // Exit from cycle: 101->200 (terminal)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(1, 10), TransitionAt(1, 20),
+            TransitionAt(10, 100), TransitionAt(20, 100),
+            CycleInRange(100, 3),
+            TransitionAt(101, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S1, S10, S20, S100, S101, S102, S200 = 8
+        Assert.Equal(8, result.States.Count);
+        // Transitions: 1 (chain) + 4 (diamond) + 3 (cycle) + 1 (exit) = 9
+        Assert.Equal(9, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_OuterCycleWithInnerBranchContainingSubCycle()
+    {
+        // Outer cycle: 0->1->2->0
+        // Branch from 1: 1->10
+        // From 10: branch to chain (10->100, terminal) and sub-cycle (10->20->21->20)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(1, 10),
+            TransitionAt(10, 100),
+            TransitionAt(10, 20),
+            CycleInRange(20, 2),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S1, S2, S10, S100, S20, S21 = 7
+        Assert.Equal(7, result.States.Count);
+        // Transitions: 3 (outer cycle) + 1 (branch to 10) + 1 (10->100) + 1 (10->20) + 2 (inner cycle) = 8
+        Assert.Equal(8, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Hybrid_CycleWithDiamondExit()
+    {
+        // Cycle: 0->1->2->0
+        // Exit from 2: diamond shape 2->30, 2->40, 30->50, 40->50
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(2, 30),
+            TransitionAt(2, 40),
+            TransitionAt(30, 50),
+            TransitionAt(40, 50),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        // States: S0, S1, S2, S30, S40, S50 = 6
+        Assert.Equal(6, result.States.Count);
+        // Transitions: 3 (cycle) + 4 (diamond from exit) = 7
+        Assert.Equal(7, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Convergence point (step=50) has inDegree == 2
+        var convergence = result.States.Keys
+            .Single(id => result.Transitions.Count(t => t.TargetStateId == id) == 2);
+        Assert.NotNull(convergence);
+    }
+
+    #endregion
 }
