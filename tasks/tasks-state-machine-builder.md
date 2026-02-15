@@ -128,7 +128,12 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.15.6 Write nested diamond tests: one branch is a sub-diamond converging at the outer convergence point, both branches contain sub-diamonds converging at the same final state
     - [x] 3.15.7 Write parameterized fully connected graph tests using `[Theory]` with node counts (2, 3, 4, 5): verify K states, K*(K-1) transitions, every state has outDegree == inDegree == K-1
     - [x] 3.15.8 Verify all new reconnecting branch and fully connected graph tests pass alongside existing 150+ tests, ensure at least 3 distinct variations per category
-  - [ ] 3.16 Write tests with rules designed to produce hybrid shapes combining multiple topologies (chains + cycles, branches + cycles, multiple shape neighborhoods)
+  - [x] 3.16 Write tests with rules designed to produce hybrid shapes combining multiple topologies (chains + cycles, branches + cycles, multiple shape neighborhoods)
+    - [x] 3.16.1 Write chain + cycle hybrid tests: chain that branches to a terminal path and a cycle, two independent chain-then-cycle segments from a common root
+    - [x] 3.16.2 Write branch + cycle hybrid tests: root branches to a terminal chain and a cycle, root branches to two independent cycles of different lengths, diamond convergence point entering a cycle
+    - [x] 3.16.3 Write multiple shape neighborhood tests: chain -> branch -> cycle (three-phase topology), diamond with one cyclic branch and one chain branch, fully connected sub-graph reachable from a chain prefix
+    - [x] 3.16.4 Write complex hybrid composition tests: branch where each arm has a different topology (chain, cycle, diamond), chain -> diamond -> cycle -> terminal, nested outer cycle with inner branch containing a sub-cycle
+    - [x] 3.16.5 Verify all new hybrid shape tests pass alongside existing 167+ tests, ensure at least 3 distinct variations per hybrid category
   - [ ] 3.17 Write tests verifying exploration strategy equivalence: same initial state, rules, and config must produce the same state machine (same states and transitions) under both BFS and DFS
   - [ ] 3.18 Write tests for rule behavior edge cases: rules that always generate unique states (unbounded growth), rules that return malformed or unexpected states
   - [ ] 3.19 Write tests for rule behavior edge cases: rules whose `IsAvailable` or `Execute` methods throw exceptions, and rules whose methods hang or take excessively long
