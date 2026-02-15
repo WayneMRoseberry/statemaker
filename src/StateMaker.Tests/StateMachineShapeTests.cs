@@ -333,6 +333,46 @@ public class StateMachineShapeTests
         CheckNoCycle(machine.StartingStateId!);
     }
 
+    private static void AssertDiamondShape(StateMachine machine, int branchCount, int expectedStates, int expectedTransitions)
+    {
+        Assert.Equal(expectedStates, machine.States.Count);
+        Assert.Equal(expectedTransitions, machine.Transitions.Count);
+        AssertAllStatesReachable(machine);
+        Assert.True(machine.IsValidMachine());
+
+        // At least one convergence point with inDegree >= branchCount
+        var convergencePoints = machine.States.Keys
+            .Where(id => machine.Transitions.Count(t => t.TargetStateId == id) >= branchCount)
+            .ToList();
+        Assert.NotEmpty(convergencePoints);
+    }
+
+    private static void AssertFullyConnectedGraph(StateMachine machine, int nodeCount)
+    {
+        Assert.Equal(nodeCount, machine.States.Count);
+        Assert.Equal(nodeCount * (nodeCount - 1), machine.Transitions.Count);
+        AssertAllStatesReachable(machine);
+        Assert.True(machine.IsValidMachine());
+
+        // Every state has outDegree == K-1 and inDegree == K-1
+        foreach (var stateId in machine.States.Keys)
+        {
+            int outDegree = machine.Transitions.Count(t => t.SourceStateId == stateId);
+            int inDegree = machine.Transitions.Count(t => t.TargetStateId == stateId);
+            Assert.Equal(nodeCount - 1, outDegree);
+            Assert.Equal(nodeCount - 1, inDegree);
+        }
+    }
+
+    private static FuncRule ModularOffsetRule(int offset, int modulus) => new(
+        s => s.Variables.ContainsKey("step"),
+        s =>
+        {
+            var c = s.Clone();
+            c.Variables["step"] = ((int)c.Variables["step"]! + offset) % modulus;
+            return c;
+        });
+
     #endregion
 
     #region Single State Shape Tests
@@ -1166,6 +1206,348 @@ public class StateMachineShapeTests
         Assert.Equal(9, result.Transitions.Count);
         AssertAllStatesReachable(result);
         Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Reconnecting — Simple Diamond
+
+    [Fact]
+    public void Diamond_Classic2Branch_4States4Transitions()
+    {
+        // S0 -> S1, S0 -> S2, S1 -> S3, S2 -> S3
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertDiamondShape(result, 2, 4, 4);
+
+        // Root outDegree == 2
+        Assert.Equal(2, result.Transitions.Count(t => t.SourceStateId == result.StartingStateId));
+
+        // Convergence point has inDegree == 2
+        var convergence = result.States.Keys
+            .Single(id => result.Transitions.Count(t => t.TargetStateId == id) == 2);
+        Assert.Equal(0, result.Transitions.Count(t => t.SourceStateId == convergence));
+    }
+
+    [Fact]
+    public void Diamond_WithChainPrefix_5States5Transitions()
+    {
+        // Chain: S0 -> S1, then diamond: S1 -> S2, S1 -> S3, S2 -> S4, S3 -> S4
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(1, 10),
+            TransitionAt(1, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertDiamondShape(result, 2, 5, 5);
+    }
+
+    [Fact]
+    public void Diamond_WithChainSuffix_5States5Transitions()
+    {
+        // Diamond: S0 -> S1, S0 -> S2, S1 -> S3, S2 -> S3, then chain: S3 -> S4
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+            TransitionAt(100, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertDiamondShape(result, 2, 5, 5);
+    }
+
+    [Fact]
+    public void Diamond_Deep2StepBranches_6States6Transitions()
+    {
+        // S0 -> S1 -> S3 -> S5, S0 -> S2 -> S4 -> S5
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 11),
+            TransitionAt(20, 21),
+            TransitionAt(11, 100),
+            TransitionAt(21, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertDiamondShape(result, 2, 6, 6);
+    }
+
+    #endregion
+
+    #region Reconnecting — Wide Convergence
+
+    [Theory]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    public void Diamond_WideConvergence_NBranchesToSameDescendant(int branchCount)
+    {
+        // Root -> N children (values 10,20,...), all children -> convergence (value 100)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new List<IRule>();
+        for (int i = 0; i < branchCount; i++)
+        {
+            int childValue = (i + 1) * 10;
+            rules.Add(TransitionAt(0, childValue));
+            rules.Add(TransitionAt(childValue, 100));
+        }
+
+        StateMachine result = builder.Build(initialState, rules.ToArray(), new BuilderConfig());
+
+        int expectedStates = branchCount + 2; // root + N children + 1 convergence
+        int expectedTransitions = branchCount * 2; // N root->child + N child->convergence
+        AssertDiamondShape(result, branchCount, expectedStates, expectedTransitions);
+
+        // Convergence point has inDegree == branchCount
+        var convergence = result.States.Keys
+            .Single(id => result.Transitions.Count(t => t.TargetStateId == id) == branchCount);
+        Assert.Equal(0, result.Transitions.Count(t => t.SourceStateId == convergence));
+    }
+
+    #endregion
+
+    #region Reconnecting — Stacked Diamonds
+
+    [Fact]
+    public void StackedDiamond_Two_7States8Transitions()
+    {
+        // Diamond 1: S0->S1, S0->S2, S1->S3, S2->S3
+        // Diamond 2: S3->S4, S3->S5, S4->S6, S5->S6
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10), TransitionAt(0, 20),
+            TransitionAt(10, 100), TransitionAt(20, 100),
+            TransitionAt(100, 110), TransitionAt(100, 120),
+            TransitionAt(110, 200), TransitionAt(120, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(7, result.States.Count);
+        Assert.Equal(8, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Two convergence points (inDegree == 2)
+        var convergencePoints = result.States.Keys
+            .Where(id => result.Transitions.Count(t => t.TargetStateId == id) == 2)
+            .ToList();
+        Assert.Equal(2, convergencePoints.Count);
+    }
+
+    [Fact]
+    public void StackedDiamond_Three_10States12Transitions()
+    {
+        // Three sequential diamonds
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            // Diamond 1
+            TransitionAt(0, 10), TransitionAt(0, 20),
+            TransitionAt(10, 100), TransitionAt(20, 100),
+            // Diamond 2
+            TransitionAt(100, 110), TransitionAt(100, 120),
+            TransitionAt(110, 200), TransitionAt(120, 200),
+            // Diamond 3
+            TransitionAt(200, 210), TransitionAt(200, 220),
+            TransitionAt(210, 300), TransitionAt(220, 300),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(10, result.States.Count);
+        Assert.Equal(12, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Three convergence points
+        var convergencePoints = result.States.Keys
+            .Where(id => result.Transitions.Count(t => t.TargetStateId == id) == 2)
+            .ToList();
+        Assert.Equal(3, convergencePoints.Count);
+    }
+
+    [Fact]
+    public void StackedDiamond_MixedBranchCounts_2WayThen3Way()
+    {
+        // Diamond 1 (2-way): S0->S1, S0->S2, S1->S3, S2->S3
+        // Diamond 2 (3-way): S3->S4, S3->S5, S3->S6, S4->S7, S5->S7, S6->S7
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            // Diamond 1 (2-way)
+            TransitionAt(0, 10), TransitionAt(0, 20),
+            TransitionAt(10, 100), TransitionAt(20, 100),
+            // Diamond 2 (3-way)
+            TransitionAt(100, 110), TransitionAt(100, 120), TransitionAt(100, 130),
+            TransitionAt(110, 200), TransitionAt(120, 200), TransitionAt(130, 200),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(8, result.States.Count);
+        Assert.Equal(10, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Reconnecting — Nested Diamonds
+
+    [Fact]
+    public void NestedDiamond_OneBranchIsSubDiamond()
+    {
+        // S0 -> S1 (branch A), S0 -> S2 (branch B)
+        // Branch A sub-diamond: S1 -> S3, S1 -> S4, S3 -> S5, S4 -> S5
+        // Branch B direct: S2 -> S5
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10), TransitionAt(0, 20),
+            TransitionAt(10, 30), TransitionAt(10, 40),
+            TransitionAt(30, 100), TransitionAt(40, 100),
+            TransitionAt(20, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(6, result.States.Count);
+        Assert.Equal(7, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Convergence point has inDegree == 3 (from S3, S4, and S2)
+        var convergence = result.States.Keys
+            .Single(id => result.Transitions.Count(t => t.TargetStateId == id) == 3);
+        Assert.NotNull(convergence);
+    }
+
+    [Fact]
+    public void NestedDiamond_BothBranchesContainSubDiamonds()
+    {
+        // S0 -> S1, S0 -> S2
+        // Branch A: S1 -> S3, S1 -> S4, S3 -> S7, S4 -> S7
+        // Branch B: S2 -> S5, S2 -> S6, S5 -> S7, S6 -> S7
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10), TransitionAt(0, 20),
+            TransitionAt(10, 30), TransitionAt(10, 40),
+            TransitionAt(20, 50), TransitionAt(20, 60),
+            TransitionAt(30, 100), TransitionAt(40, 100),
+            TransitionAt(50, 100), TransitionAt(60, 100),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(8, result.States.Count);
+        Assert.Equal(10, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+
+        // Convergence point has inDegree == 4
+        var convergence = result.States.Keys
+            .Single(id => result.Transitions.Count(t => t.TargetStateId == id) == 4);
+        Assert.NotNull(convergence);
+    }
+
+    [Fact]
+    public void NestedDiamond_SubDiamondWithChainThenConvergence()
+    {
+        // S0 -> S1, S0 -> S2
+        // Branch A: S1 -> S3 -> S5 (chain then convergence)
+        // Branch B: S2 -> S4 -> S5 (chain then convergence)
+        // This is the deep diamond — already tested, but add a chain after convergence
+        // S5 -> S6 -> S7
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            TransitionAt(0, 10), TransitionAt(0, 20),
+            TransitionAt(10, 11), TransitionAt(20, 21),
+            TransitionAt(11, 100), TransitionAt(21, 100),
+            TransitionAt(100, 200), TransitionAt(200, 300),
+        };
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        Assert.Equal(8, result.States.Count);
+        Assert.Equal(8, result.Transitions.Count);
+        AssertAllStatesReachable(result);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region Reconnecting — Fully Connected Graphs
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    public void FullyConnectedGraph_KNodes_AllToAll(int nodeCount)
+    {
+        // Use K-1 rules with modular offsets: offset 1..K-1 mod K
+        // Each rule produces a distinct successor, and since all K states exist,
+        // every state connects to every other state.
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = Enumerable.Range(1, nodeCount - 1)
+            .Select(offset => (IRule)ModularOffsetRule(offset, nodeCount))
+            .ToArray();
+
+        StateMachine result = builder.Build(initialState, rules, new BuilderConfig());
+
+        AssertFullyConnectedGraph(result, nodeCount);
     }
 
     #endregion

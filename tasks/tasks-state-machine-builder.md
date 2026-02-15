@@ -119,7 +119,15 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.14.8 Write connected sub-branches tests: two branches producing the same child state via deduplication, three branches where two produce the same child, root branches to children that each produce the same grandchild
     - [x] 3.14.9 Write fully connected branches tests: 2×2 level connectivity (5 states, 6 transitions), 2×3 connectivity (6 states, 8 transitions), 3×2 connectivity (6 states, 9 transitions)
     - [x] 3.14.10 Verify all new branching shape tests pass alongside existing tests, ensure at least 3 distinct variations per branching category
-  - [ ] 3.15 Write tests with rules designed to produce reconnecting branches (diamond/converging paths) and fully connected graphs with varying node counts
+  - [x] 3.15 Write tests with rules designed to produce reconnecting branches (diamond/converging paths) and fully connected graphs with varying node counts
+    - [x] 3.15.1 Implement `AssertDiamondShape` helper method that validates diamond topology: convergence point has inDegree == branchCount, correct state/transition counts, all states reachable, `IsValidMachine()` returns true
+    - [x] 3.15.2 Implement `AssertFullyConnected` helper method that validates complete graph: K states, K*(K-1) transitions, every state has outDegree == K-1 and inDegree == K-1
+    - [x] 3.15.3 Write simple diamond tests: classic 2-branch diamond (4 states, 4 transitions), diamond with chain prefix (5 states, 5 transitions), diamond with chain suffix (5 states, 5 transitions), deep diamond with 2-step branches before converging (6 states, 6 transitions)
+    - [x] 3.15.4 Write parameterized wide convergence tests using `[Theory]` with branch counts (3, 4, 5): N branches from root all converge to same descendant, verify convergence point inDegree == N
+    - [x] 3.15.5 Write stacked diamond tests: two sequential diamonds (7 states, 8 transitions), three sequential diamonds (10 states, 12 transitions), stacked with mixed branch counts (2-way then 3-way)
+    - [x] 3.15.6 Write nested diamond tests: one branch is a sub-diamond converging at the outer convergence point, both branches contain sub-diamonds converging at the same final state
+    - [x] 3.15.7 Write parameterized fully connected graph tests using `[Theory]` with node counts (2, 3, 4, 5): verify K states, K*(K-1) transitions, every state has outDegree == inDegree == K-1
+    - [x] 3.15.8 Verify all new reconnecting branch and fully connected graph tests pass alongside existing 150+ tests, ensure at least 3 distinct variations per category
   - [ ] 3.16 Write tests with rules designed to produce hybrid shapes combining multiple topologies (chains + cycles, branches + cycles, multiple shape neighborhoods)
   - [ ] 3.17 Write tests verifying exploration strategy equivalence: same initial state, rules, and config must produce the same state machine (same states and transitions) under both BFS and DFS
   - [ ] 3.18 Write tests for rule behavior edge cases: rules that always generate unique states (unbounded growth), rules that return malformed or unexpected states
