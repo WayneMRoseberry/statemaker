@@ -134,7 +134,13 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.16.3 Write multiple shape neighborhood tests: chain -> branch -> cycle (three-phase topology), diamond with one cyclic branch and one chain branch, fully connected sub-graph reachable from a chain prefix
     - [x] 3.16.4 Write complex hybrid composition tests: branch where each arm has a different topology (chain, cycle, diamond), chain -> diamond -> cycle -> terminal, nested outer cycle with inner branch containing a sub-cycle
     - [x] 3.16.5 Verify all new hybrid shape tests pass alongside existing 167+ tests, ensure at least 3 distinct variations per hybrid category
-  - [ ] 3.17 Write tests verifying exploration strategy equivalence: same initial state, rules, and config must produce the same state machine (same states and transitions) under both BFS and DFS
+  - [x] 3.17 Write tests verifying exploration strategy equivalence: same initial state, rules, and config must produce the same state machine (same states and transitions) under both BFS and DFS
+    - [x] 3.17.1 Implement `AssertStrategyEquivalence` helper method that builds with both BFS and DFS configs and compares structural equivalence: same state count, same set of state variable dictionaries, same transition count, same set of (sourceVars, targetVars, ruleName) triples
+    - [x] 3.17.2 Write simple shape equivalence tests: single state (no rules), chain of length 5, cycle of length 4, self-loop
+    - [x] 3.17.3 Write branching shape equivalence tests: binary tree depth 2, fan-out of 4, connected sub-branches with deduplication
+    - [x] 3.17.4 Write complex shape equivalence tests: chain-then-cycle (3,3), diamond (2-branch), nested cycles (outer 3 inner 2), cycle with exit chain
+    - [x] 3.17.5 Write hybrid shape equivalence tests: branch to chain and cycle, diamond then cycle, three-phase chain-branch-cycle, branch with mixed topology arms
+    - [x] 3.17.6 Verify all new equivalence tests pass alongside existing 182+ tests
   - [ ] 3.18 Write tests for rule behavior edge cases: rules that always generate unique states (unbounded growth), rules that return malformed or unexpected states
   - [ ] 3.19 Write tests for rule behavior edge cases: rules whose `IsAvailable` or `Execute` methods throw exceptions, and rules whose methods hang or take excessively long
   - [ ] 3.20 Write tests for rule behavior edge cases: rules that mutate the input state passed to `Execute` (violating immutability), verifying the builder handles or detects this

@@ -2012,4 +2012,252 @@ public class StateMachineShapeTests
     }
 
     #endregion
+
+    #region Helper — Strategy Equivalence
+
+    private static void AssertStrategyEquivalence(State initialState, IRule[] rules)
+    {
+        var builder = new StateMachineBuilder();
+
+        var bfsConfig = new BuilderConfig { ExplorationStrategy = ExplorationStrategy.BREADTHFIRSTSEARCH };
+        var dfsConfig = new BuilderConfig { ExplorationStrategy = ExplorationStrategy.DEPTHFIRSTSEARCH };
+
+        StateMachine bfsResult = builder.Build(initialState, rules, bfsConfig);
+        StateMachine dfsResult = builder.Build(initialState, rules, dfsConfig);
+
+        // Same state count
+        Assert.Equal(bfsResult.States.Count, dfsResult.States.Count);
+
+        // Same set of state variable dictionaries
+        var bfsStateVars = bfsResult.States.Values
+            .Select(s => string.Join(",", s.Variables.OrderBy(kv => kv.Key).Select(kv => $"{kv.Key}={kv.Value}")))
+            .OrderBy(s => s)
+            .ToList();
+        var dfsStateVars = dfsResult.States.Values
+            .Select(s => string.Join(",", s.Variables.OrderBy(kv => kv.Key).Select(kv => $"{kv.Key}={kv.Value}")))
+            .OrderBy(s => s)
+            .ToList();
+        Assert.Equal(bfsStateVars, dfsStateVars);
+
+        // Same transition count
+        Assert.Equal(bfsResult.Transitions.Count, dfsResult.Transitions.Count);
+
+        // Same set of (sourceVars, targetVars, ruleName) triples
+        string TransitionKey(StateMachine machine, Transition t)
+        {
+            var sourceVars = machine.States[t.SourceStateId];
+            var targetVars = machine.States[t.TargetStateId];
+            string src = string.Join(",", sourceVars.Variables.OrderBy(kv => kv.Key).Select(kv => $"{kv.Key}={kv.Value}"));
+            string tgt = string.Join(",", targetVars.Variables.OrderBy(kv => kv.Key).Select(kv => $"{kv.Key}={kv.Value}"));
+            return $"{src} -> {tgt} [{t.RuleName}]";
+        }
+
+        var bfsTransitions = bfsResult.Transitions.Select(t => TransitionKey(bfsResult, t)).OrderBy(s => s).ToList();
+        var dfsTransitions = dfsResult.Transitions.Select(t => TransitionKey(dfsResult, t)).OrderBy(s => s).ToList();
+        Assert.Equal(bfsTransitions, dfsTransitions);
+    }
+
+    #endregion
+
+    #region Strategy Equivalence — Simple Shapes
+
+    [Fact]
+    public void Equivalence_SingleState_NoRules()
+    {
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        AssertStrategyEquivalence(initialState, Array.Empty<IRule>());
+    }
+
+    [Fact]
+    public void Equivalence_SingleState_SelfLoop()
+    {
+        var initialState = new State();
+        initialState.Variables["x"] = 42;
+        AssertStrategyEquivalence(initialState, new IRule[] { new CloneStateRule() });
+    }
+
+    [Fact]
+    public void Equivalence_Chain_Length5()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[] { new IncrementRule("step", 5) });
+    }
+
+    [Fact]
+    public void Equivalence_Cycle_Length4()
+    {
+        var initialState = new State();
+        initialState.Variables["value"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[] { new ModularCycleRule("value", 4) });
+    }
+
+    #endregion
+
+    #region Strategy Equivalence — Branching Shapes
+
+    [Fact]
+    public void Equivalence_BinaryTree_Depth2()
+    {
+        var initialState = new State();
+        initialState.Variables["path"] = "";
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            AppendPathRule("L", 2),
+            AppendPathRule("R", 2),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_FanOut4()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(0, 2),
+            TransitionAt(0, 3),
+            TransitionAt(0, 4),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_ConnectedSubBranches_Deduplication()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+        });
+    }
+
+    #endregion
+
+    #region Strategy Equivalence — Complex Shapes
+
+    [Fact]
+    public void Equivalence_ChainThenCycle_3_3()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            new ChainThenCycleRule("step", 3, 3),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_Diamond_2Branch()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+            TransitionAt(100, 200),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_NestedCycles_Outer3Inner2()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(1, 100),
+            CycleInRange(100, 2),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_CycleWithExitChain()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            CycleInRange(0, 3),
+            TransitionAt(1, 100),
+            TransitionAt(100, 101),
+            TransitionAt(101, 102),
+        });
+    }
+
+    #endregion
+
+    #region Strategy Equivalence — Hybrid Shapes
+
+    [Fact]
+    public void Equivalence_BranchToChainAndCycle()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            TransitionAt(0, 100),
+            TransitionAt(100, 101),
+            TransitionAt(101, 102),
+            TransitionAt(0, 10),
+            CycleInRange(10, 3),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_DiamondThenCycle()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            TransitionAt(0, 10),
+            TransitionAt(0, 20),
+            TransitionAt(10, 100),
+            TransitionAt(20, 100),
+            CycleInRange(100, 3),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_ThreePhase_ChainBranchCycle()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            TransitionAt(0, 1),
+            TransitionAt(1, 2),
+            TransitionAt(2, 10),
+            TransitionAt(2, 20),
+            CycleInRange(10, 2),
+            CycleInRange(20, 3),
+        });
+    }
+
+    [Fact]
+    public void Equivalence_BranchWithMixedTopologyArms()
+    {
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        AssertStrategyEquivalence(initialState, new IRule[]
+        {
+            TransitionAt(0, 10), TransitionAt(0, 20), TransitionAt(0, 30),
+            TransitionAt(10, 11), TransitionAt(11, 12),
+            CycleInRange(20, 2),
+            TransitionAt(30, 40), TransitionAt(30, 50),
+            TransitionAt(40, 60), TransitionAt(50, 60),
+        });
+    }
+
+    #endregion
 }
