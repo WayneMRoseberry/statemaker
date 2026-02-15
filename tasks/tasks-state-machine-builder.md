@@ -154,8 +154,20 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.21.3 Write tests for combined limits: both MaxStates=1 and MaxDepth=1, MaxStates=2 with MaxDepth=0
     - [x] 3.21.4 Write tests for empty/minimal inputs: empty initial state (no variables), empty rules array with limits set, single rule that is never available
     - [x] 3.21.5 Verify all new edge case and resilience tests pass alongside existing 197+ tests
-  - [ ] 3.22 Implement a test case generator tool that programmatically combines initial state shapes (no variables, one of each data type, multiple variables, 1..N), config combinations (MaxStates x MaxDepth pairwise from null/0/-1/1/2/3/10), and rule variations (sets variable, adds variable, increments, empty) to produce build definition files
-  - [ ] 3.23 Implement a test battery executor tool that runs a set of build definitions through the builder and applies oracle checks: no crash/exception, no infinite loop (heuristic timeout), MaxStates and MaxDepth limits respected in output
+  - [x] 3.22 Implement a test case generator tool that programmatically combines initial state shapes (no variables, one of each data type, multiple variables, 1..N), config combinations (MaxStates x MaxDepth pairwise from null/0/-1/1/2/3/10), and rule variations (sets variable, adds variable, increments, empty) to produce build definition files
+    - [x] 3.22.1 Create `BuildDefinition` record with Name, InitialState, Rules, and Config properties
+    - [x] 3.22.2 Implement initial state shape generators: empty, single string/int/bool/double variable, multiple variables, N int variables (1..5)
+    - [x] 3.22.3 Implement config combination generator with pairwise MaxStates x MaxDepth from null/0/-1/1/2/3/10 and both exploration strategies
+    - [x] 3.22.4 Implement rule variation generators: empty array, sets variable, adds variable, increments int, multiple rules, never-available rule
+    - [x] 3.22.5 Implement `GenerateAll()` method combining state shapes, configs, and rule variations into BuildDefinitions
+  - [x] 3.23 Implement a test battery executor tool that runs a set of build definitions through the builder and applies oracle checks: no crash/exception, no infinite loop (heuristic timeout), MaxStates and MaxDepth limits respected in output
+    - [x] 3.23.1 Create `TestBatteryResult` record with DefinitionName, Passed, FailureReason, StateCount, TransitionCount
+    - [x] 3.23.2 Implement executor that runs each BuildDefinition through StateMachineBuilder.Build with timeout protection
+    - [x] 3.23.3 Implement oracle check: MaxStates limit respected in output (States.Count <= MaxStates when positive)
+    - [x] 3.23.4 Implement oracle check: MaxDepth limit respected via BFS path-length validation
+    - [x] 3.23.5 Implement oracle check: IsValidMachine() returns true for all successful builds
+    - [x] 3.23.6 Write xUnit tests: Theory with MemberData for individual build definition results, Fact for all-pass summary
+    - [x] 3.23.7 Verify all tests pass alongside existing 212+ tests
   - [ ] 3.24 Implement oracle checks in the test battery executor for performance validation: time-to-size ratio within expected bounds, and expected state machine shape matching for tractable cases
   - [ ] 3.25 Implement a reverse rule generator tool that takes a target state machine shape as input and generates one or more sets of rules that would build it, including variations (extra non-triggering rules, different rule orderings) that should not alter the expected output
 
