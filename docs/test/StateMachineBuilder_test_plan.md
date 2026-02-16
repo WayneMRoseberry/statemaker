@@ -27,13 +27,13 @@
 - `States`: Read-only dictionary mapping state IDs (e.g., "S0", "S1") to `State` objects.
 - `StartingStateId`: The ID of the initial state. Setting this to a non-existent state ID throws `StateDoesNotExistException`.
 - `Transitions`: List of all transitions discovered during exploration.
-- `AddState(stateId, state)`: Adds a state to the internal dictionary.
-- `RemoveState(stateId)`: Removes a state; clears `StartingStateId` if it matches.
+- `AddOrUpdateState(stateId, state)`: Adds or updates a state in the internal dictionary.
+- `RemoveState(stateId)`: Removes a state; clears `StartingStateId` if it matches. Does not remove transitions referencing the removed state.
 - `IsValidMachine()`: Returns `true` if the machine has at least one state, a non-null `StartingStateId`, and all transitions reference existing states.
 ### Transition
 - `SourceStateId`: The state the rule was applied to.
 - `TargetStateId`: The state produced by the rule.
-- `RuleName`: Derived from the rule's class name (`rule.GetType().Name`).
+- `RuleName`: Derived from `rule.GetName()` (defaults to `GetType().Name` if not overridden).
 ### StateDoesNotExistException
 
 ## Builder Behavior Summary
@@ -42,8 +42,8 @@
 2. **Initialization**: Adds the initial state as "S0" and sets it as `StartingStateId`.
 3. **Exploration loop**: Uses a `LinkedList` as a unified frontier (FIFO for BFS, LIFO for DFS). For each state taken from the frontier, applies every rule:
    - If the rule is not available (`IsAvailable` returns `false`), skip it.
-   - If the rule produces a state already visited (detected via `HashSet<State>` using value equality), record a transition to the existing state but do not re-explore.
-   - If the rule produces a new state, add it to the machine, record the transition, and add it to the frontier for further exploration.
+   - If the rule produces a state already in `stateToId` (detected via `Dictionary<State, string>` using value equality), record a transition to the existing state but do not re-explore.
+   - If the rule produces a new state, add it to the machine, map it in `stateToId`, record the transition, and add it to the frontier for further exploration.
 4. **Limits**: `MaxDepth` prevents exploring states beyond a configured depth. `MaxStates` stops adding new states once the count is reached.
 5. **State IDs**: Generated sequentially as "S0", "S1", "S2", etc.
 6. **Output**: Returns a `StateMachine` that satisfies `IsValidMachine() == true`.
@@ -213,6 +213,11 @@ stateDiagram-v2
 
 TOOL: Create a tool which takes a state machine as input and generates one or more sets of rules that would build it.
 Same tool could adjust the rules in ways that are different rules but not alter expected output.
+
+> **Implemented**: See [Test Tools Guide](./test-tools-guide.md) for documentation on:
+> - **TestCaseGenerator** — Combinatorial build definition generator (TOOL above for creating build definitions)
+> - **TestBatteryExecutor** — Battery executor with 7 oracle checks (TOOL above for executing batteries and applying oracles)
+> - **ReverseRuleGenerator** — Generates rules that produce specific state machine shapes, with rule ordering, split/merge, and non-triggering rule variations
 
 **What kinds of rule behaviors in isAvailable and Execute can throw off the build?**
 - always a unique state generated combined with no stop condition on isAvailable
