@@ -21,7 +21,7 @@ public class StateMachineTests
         var state = new State();
         state.Variables["x"] = 1;
 
-        machine.AddState("S0", state);
+        machine.AddOrUpdateState("S0", state);
 
         Assert.Single(machine.States);
         Assert.Equal(1, machine.States["S0"].Variables["x"]);
@@ -43,7 +43,7 @@ public class StateMachineTests
     public void StartingStateId_CanBeSetToExistingState()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
+        machine.AddOrUpdateState("S0", new State());
 
         machine.StartingStateId = "S0";
 
@@ -54,7 +54,7 @@ public class StateMachineTests
     public void StartingStateId_CanBeSetToNull()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
+        machine.AddOrUpdateState("S0", new State());
         machine.StartingStateId = "S0";
 
         machine.StartingStateId = null;
@@ -77,8 +77,8 @@ public class StateMachineTests
     public void RemoveState_ClearsStartingStateIdIfSame()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
-        machine.AddState("S1", new State());
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
         machine.StartingStateId = "S0";
 
         machine.RemoveState("S0");
@@ -92,8 +92,8 @@ public class StateMachineTests
     public void RemoveState_PreservesStartingStateIdIfDifferent()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
-        machine.AddState("S1", new State());
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
         machine.StartingStateId = "S0";
 
         machine.RemoveState("S1");
@@ -106,7 +106,7 @@ public class StateMachineTests
     public void RemoveState_ReturnsTrueWhenStateExists()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
+        machine.AddOrUpdateState("S0", new State());
 
         Assert.True(machine.RemoveState("S0"));
     }
@@ -131,7 +131,7 @@ public class StateMachineTests
     public void IsValidMachine_SingleStateWithStartingStateId_ReturnsTrue()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
+        machine.AddOrUpdateState("S0", new State());
         machine.StartingStateId = "S0";
 
         Assert.True(machine.IsValidMachine());
@@ -141,8 +141,8 @@ public class StateMachineTests
     public void IsValidMachine_TwoStatesWithTransition_ReturnsTrue()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
-        machine.AddState("S1", new State());
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
         machine.StartingStateId = "S0";
         machine.Transitions.Add(new Transition("S0", "S1", "Rule1"));
 
@@ -153,8 +153,8 @@ public class StateMachineTests
     public void IsValidMachine_CycleTransitions_ReturnsTrue()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
-        machine.AddState("S1", new State());
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
         machine.StartingStateId = "S0";
         machine.Transitions.Add(new Transition("S0", "S1", "Rule1"));
         machine.Transitions.Add(new Transition("S1", "S0", "Rule1"));
@@ -174,7 +174,7 @@ public class StateMachineTests
     public void IsValidMachine_NullStartingStateId_ReturnsFalse()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
+        machine.AddOrUpdateState("S0", new State());
 
         Assert.False(machine.IsValidMachine());
     }
@@ -183,8 +183,8 @@ public class StateMachineTests
     public void IsValidMachine_TransitionSourceStateDoesNotExist_ReturnsFalse()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
-        machine.AddState("S1", new State());
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
         machine.StartingStateId = "S0";
         machine.Transitions.Add(new Transition("S99", "S1", "Rule1"));
 
@@ -195,8 +195,8 @@ public class StateMachineTests
     public void IsValidMachine_TransitionTargetStateDoesNotExist_ReturnsFalse()
     {
         var machine = new StateMachine();
-        machine.AddState("S0", new State());
-        machine.AddState("S1", new State());
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
         machine.StartingStateId = "S0";
         machine.Transitions.Add(new Transition("S0", "S99", "Rule1"));
 

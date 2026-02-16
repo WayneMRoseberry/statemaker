@@ -908,4 +908,206 @@ public class StateMachineBuilderTests
     }
 
     #endregion
+
+    #region Duplicate Transitions — Same Name, Same Source→Target
+
+    [Fact]
+    public void Build_TwoRulesSameNameSameResult_CreatesDuplicateTransitions()
+    {
+        // Two rules with identical GetName() that produce the same target state from the same source.
+        // The builder should create two transitions with the same source, target, and rule name.
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new NamedTestRule("Push_OK",
+                s => (int)s.Variables["x"]! == 0,
+                s => { var c = s.Clone(); c.Variables["x"] = 1; return c; }),
+            new NamedTestRule("Push_OK",
+                s => (int)s.Variables["x"]! == 0,
+                s => { var c = s.Clone(); c.Variables["x"] = 1; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.States.Count);
+        // Both rules fire from same source, produce same target, same name → 2 identical transitions
+        Assert.Equal(2, result.Transitions.Count);
+        Assert.All(result.Transitions, t =>
+        {
+            Assert.Equal(result.StartingStateId, t.SourceStateId);
+            Assert.Equal("Push_OK", t.RuleName);
+        });
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_TwoRulesSameNameDifferentResults_CreatesDistinctTransitions()
+    {
+        // Two rules with identical GetName() but producing different target states.
+        // Each creates a distinct transition.
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new NamedTestRule("Transform",
+                s => (int)s.Variables["x"]! == 0,
+                s => { var c = s.Clone(); c.Variables["x"] = 1; return c; }),
+            new NamedTestRule("Transform",
+                s => (int)s.Variables["x"]! == 0,
+                s => { var c = s.Clone(); c.Variables["x"] = 2; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(3, result.States.Count);
+        // Two transitions from initial, both named "Transform", but to different targets
+        var fromInitial = result.Transitions.Where(t => t.SourceStateId == result.StartingStateId).ToList();
+        Assert.Equal(2, fromInitial.Count);
+        Assert.All(fromInitial, t => Assert.Equal("Transform", t.RuleName));
+        Assert.NotEqual(fromInitial[0].TargetStateId, fromInitial[1].TargetStateId);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_ThreeRulesSameName_AllProduceSameTarget_ThreeDuplicateTransitions()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["status"] = "start";
+        var rules = new IRule[]
+        {
+            new NamedTestRule("Push_OK",
+                s => (string)s.Variables["status"]! == "start",
+                s => { var c = s.Clone(); c.Variables["status"] = "done"; return c; }),
+            new NamedTestRule("Push_OK",
+                s => (string)s.Variables["status"]! == "start",
+                s => { var c = s.Clone(); c.Variables["status"] = "done"; return c; }),
+            new NamedTestRule("Push_OK",
+                s => (string)s.Variables["status"]! == "start",
+                s => { var c = s.Clone(); c.Variables["status"] = "done"; return c; })
+        };
+        var config = new BuilderConfig();
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.States.Count);
+        Assert.Equal(3, result.Transitions.Count);
+        Assert.All(result.Transitions, t => Assert.Equal("Push_OK", t.RuleName));
+    }
+
+    #endregion
+
+    #region Rule Order at MaxStates Boundary
+
+    [Fact]
+    public void Build_RuleOrderAffectsStructure_WhenMaxStatesConstrains()
+    {
+        // When MaxStates limits exploration, the first rule that generates a new state
+        // gets its state added, while subsequent rules that would generate different new
+        // states are blocked by the MaxStates break. Different rule order → different states.
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+
+        var ruleA = new NamedTestRule("GoToA",
+            s => (int)s.Variables["x"]! == 0,
+            s => { var c = s.Clone(); c.Variables["x"] = 1; return c; });
+        var ruleB = new NamedTestRule("GoToB",
+            s => (int)s.Variables["x"]! == 0,
+            s => { var c = s.Clone(); c.Variables["x"] = 2; return c; });
+
+        // MaxStates=2: initial + one more
+        var config = new BuilderConfig { MaxStates = 2 };
+
+        // Order [A, B]: A fires first, state x=1 is added, B is blocked
+        var resultAB = builder.Build(initialState.Clone(), new IRule[] { ruleA, ruleB }, config);
+        // Order [B, A]: B fires first, state x=2 is added, A is blocked
+        var resultBA = builder.Build(initialState.Clone(), new IRule[] { ruleB, ruleA }, config);
+
+        Assert.Equal(2, resultAB.States.Count);
+        Assert.Equal(2, resultBA.States.Count);
+
+        // AB should contain x=1 but not x=2
+        Assert.Contains(resultAB.States.Values, s => (int)s.Variables["x"]! == 1);
+        Assert.DoesNotContain(resultAB.States.Values, s => (int)s.Variables["x"]! == 2);
+
+        // BA should contain x=2 but not x=1
+        Assert.Contains(resultBA.States.Values, s => (int)s.Variables["x"]! == 2);
+        Assert.DoesNotContain(resultBA.States.Values, s => (int)s.Variables["x"]! == 1);
+    }
+
+    [Fact]
+    public void Build_RuleOrderDoesNotAffectStructure_WhenMaxStatesNotConstraining()
+    {
+        // Without MaxStates constraining, rule order should not affect the set of states
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+
+        var ruleA = new NamedTestRule("GoToA",
+            s => (int)s.Variables["x"]! == 0,
+            s => { var c = s.Clone(); c.Variables["x"] = 1; return c; });
+        var ruleB = new NamedTestRule("GoToB",
+            s => (int)s.Variables["x"]! == 0,
+            s => { var c = s.Clone(); c.Variables["x"] = 2; return c; });
+
+        var config = new BuilderConfig(); // no MaxStates limit
+
+        var resultAB = builder.Build(initialState.Clone(), new IRule[] { ruleA, ruleB }, config);
+        var resultBA = builder.Build(initialState.Clone(), new IRule[] { ruleB, ruleA }, config);
+
+        // Both should have the same states (x=0, x=1, x=2)
+        Assert.Equal(3, resultAB.States.Count);
+        Assert.Equal(3, resultBA.States.Count);
+
+        var valuesAB = resultAB.States.Values.Select(s => (int)s.Variables["x"]!).OrderBy(v => v).ToArray();
+        var valuesBA = resultBA.States.Values.Select(s => (int)s.Variables["x"]!).OrderBy(v => v).ToArray();
+        Assert.Equal(valuesAB, valuesBA);
+    }
+
+    [Fact]
+    public void Build_RuleOrderAffectsStructure_MultipleBranches_AtMaxStates()
+    {
+        // Three rules from initial, MaxStates=3 (initial + 2 more), third rule's state is dropped
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["branch"] = "root";
+
+        var ruleA = new NamedTestRule("GoA",
+            s => (string)s.Variables["branch"]! == "root",
+            s => { var c = s.Clone(); c.Variables["branch"] = "A"; return c; });
+        var ruleB = new NamedTestRule("GoB",
+            s => (string)s.Variables["branch"]! == "root",
+            s => { var c = s.Clone(); c.Variables["branch"] = "B"; return c; });
+        var ruleC = new NamedTestRule("GoC",
+            s => (string)s.Variables["branch"]! == "root",
+            s => { var c = s.Clone(); c.Variables["branch"] = "C"; return c; });
+
+        var config = new BuilderConfig { MaxStates = 3 };
+
+        // [A,B,C]: adds A and B, C is blocked
+        var resultABC = builder.Build(initialState.Clone(), new IRule[] { ruleA, ruleB, ruleC }, config);
+        // [C,B,A]: adds C and B, A is blocked
+        var resultCBA = builder.Build(initialState.Clone(), new IRule[] { ruleC, ruleB, ruleA }, config);
+
+        Assert.Equal(3, resultABC.States.Count);
+        Assert.Equal(3, resultCBA.States.Count);
+
+        // ABC has A and B but not C
+        Assert.Contains(resultABC.States.Values, s => (string)s.Variables["branch"]! == "A");
+        Assert.Contains(resultABC.States.Values, s => (string)s.Variables["branch"]! == "B");
+        Assert.DoesNotContain(resultABC.States.Values, s => (string)s.Variables["branch"]! == "C");
+
+        // CBA has C and B but not A
+        Assert.Contains(resultCBA.States.Values, s => (string)s.Variables["branch"]! == "C");
+        Assert.Contains(resultCBA.States.Values, s => (string)s.Variables["branch"]! == "B");
+        Assert.DoesNotContain(resultCBA.States.Values, s => (string)s.Variables["branch"]! == "A");
+    }
+
+    #endregion
 }
