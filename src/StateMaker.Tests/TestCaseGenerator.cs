@@ -2,7 +2,9 @@ using System.Globalization;
 
 namespace StateMaker.Tests;
 
-public record BuildDefinition(string Name, State InitialState, IRule[] Rules, BuilderConfig Config);
+public record ExpectedShapeInfo(int? ExpectedStateCount, int? ExpectedTransitionCount, int? ExpectedMaxDepth);
+
+public record BuildDefinition(string Name, State InitialState, IRule[] Rules, BuilderConfig Config, ExpectedShapeInfo? ExpectedShape = null);
 
 public static class TestCaseGenerator
 {

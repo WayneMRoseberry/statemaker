@@ -168,8 +168,19 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.23.5 Implement oracle check: IsValidMachine() returns true for all successful builds
     - [x] 3.23.6 Write xUnit tests: Theory with MemberData for individual build definition results, Fact for all-pass summary
     - [x] 3.23.7 Verify all tests pass alongside existing 212+ tests
-  - [ ] 3.24 Implement oracle checks in the test battery executor for performance validation: time-to-size ratio within expected bounds, and expected state machine shape matching for tractable cases
-  - [ ] 3.25 Implement a reverse rule generator tool that takes a target state machine shape as input and generates one or more sets of rules that would build it, including variations (extra non-triggering rules, different rule orderings) that should not alter the expected output
+  - [x] 3.24 Implement oracle checks in the test battery executor for performance validation: time-to-size ratio within expected bounds, and expected state machine shape matching for tractable cases
+    - [x] 3.24.1 Add `ExpectedShapeInfo` record and extend `BuildDefinition` with optional `ExpectedShape` field
+    - [x] 3.24.2 Add `ElapsedTime` to `TestBatteryResult` and capture build duration in executor
+    - [x] 3.24.3 Implement time-to-size ratio oracle: elapsed ms per state below threshold (100ms/state)
+    - [x] 3.24.4 Implement shape matching oracle: verify expected state count, transition count, and max depth when specified
+    - [x] 3.24.5 Write tests verifying performance oracle passes for known-good definitions and shape oracle matches expected shapes
+  - [x] 3.25 Implement a reverse rule generator tool that takes a target state machine shape as input and generates one or more sets of rules that would build it, including variations (extra non-triggering rules, different rule orderings) that should not alter the expected output
+    - [x] 3.25.1 Implement chain shape generator: produces rules and initial state for chains of varying length with expected shape info
+    - [x] 3.25.2 Implement cycle shape generator: produces rules for cycles of varying length
+    - [x] 3.25.3 Implement chain-then-cycle, binary tree, diamond, and fully connected shape generators
+    - [x] 3.25.4 Implement variation generators: add non-triggering rules, shuffle rule ordering
+    - [x] 3.25.5 Write tests: generate reverse rules for each shape, run through battery executor, verify shape oracle passes
+    - [x] 3.25.6 Verify all tests pass alongside existing 279+ tests
 
 - [ ] 4.0 Implement configuration validation
   - [ ] 4.1 Add null check for initial state — throw `ArgumentNullException` with message "No initial state provided"
