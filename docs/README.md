@@ -17,6 +17,14 @@ Technical architecture documents explaining how the system is designed and how c
 - [**State Immutability**](./architecture/state-immutability.md) - Why immutability matters, the Clone pattern, common mistakes, testing patterns, and correct equality implementation
 - [**Export Formats**](./architecture/export-formats.md) - JSON, DOT, and GraphML export/import specifications, state and transition representation, visualization options, and format comparison
 
+### Test Documentation (`/test`)
+
+Documentation for test plans and test tooling.
+
+**Available Documents:**
+- [**StateMachineBuilder Test Plan**](./test/StateMachineBuilder_test_plan.md) - Test plan covering shapes, rule combinations, and oracle strategies
+- [**Test Tools Guide**](./test/test-tools-guide.md) - How to use TestCaseGenerator, TestBatteryExecutor, and ReverseRuleGenerator for automated state machine testing
+
 ### API Documentation (`/api`)
 *Coming soon* - Auto-generated API documentation from XML comments
 
