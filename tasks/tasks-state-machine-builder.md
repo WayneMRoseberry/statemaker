@@ -200,17 +200,17 @@ All tests must pass before moving on to the next sub-task.
     - [x] 4.7.3 Write test for null config (already exists, verify coverage)
     - [x] 4.7.4 Write test for null element in rules array (already exists, verify coverage)
 
-- [ ] 5.0 Implement expression evaluation system
-  - [ ] 5.1 Define `IExpressionEvaluator` interface with `bool EvaluateBoolean(string expression, Dictionary<string, object> variables)` and `object Evaluate(string expression, Dictionary<string, object> variables)`
-  - [ ] 5.2 Choose and add expression evaluator library dependency (NCalc or DynamicExpresso) to the project
-  - [ ] 5.3 Implement `ExpressionEvaluator` class supporting Phase 1 comparison operators: `==`, `!=`, `<`, `>`, `<=`, `>=`
-  - [ ] 5.4 Implement Phase 1 logical operators: `&&`, `||`, `!`
-  - [ ] 5.5 Implement literal value support: strings (`'Pending'`), integers, booleans (`true`/`false`), floats
-  - [ ] 5.6 Implement variable resolution: case-sensitive exact match against state variable dictionary keys
-  - [ ] 5.7 Implement Phase 2 arithmetic operators: `+`, `-`, `*`, `/` and parenthetical grouping
-  - [ ] 5.8 Implement error handling: undefined variable, type mismatch, division by zero, invalid syntax — each with clear error messages
-  - [ ] 5.9 Ensure expressions are sandboxed (no file system, network, reflection, or arbitrary code execution)
-  - [ ] 5.10 Write unit tests for each operator type, variable resolution with all primitive types, compound expressions, and all error cases
+- [x] 5.0 Implement expression evaluation system
+  - [x] 5.1 Define `IExpressionEvaluator` interface with `bool EvaluateBoolean(string expression, Dictionary<string, object> variables)` and `object Evaluate(string expression, Dictionary<string, object> variables)`
+  - [x] 5.2 Choose and add expression evaluator library dependency (NCalcSync v5.11.0) to the project
+  - [x] 5.3 Implement `ExpressionEvaluator` class supporting Phase 1 comparison operators: `==`, `!=`, `<`, `>`, `<=`, `>=`
+  - [x] 5.4 Implement Phase 1 logical operators: `&&`, `||`, `!`
+  - [x] 5.5 Implement literal value support: strings (`'Pending'`), integers, booleans (`true`/`false`), floats
+  - [x] 5.6 Implement variable resolution: case-sensitive exact match against state variable dictionary keys
+  - [x] 5.7 Implement Phase 2 arithmetic operators: `+`, `-`, `*`, `/` and parenthetical grouping
+  - [x] 5.8 Implement error handling: undefined variable, type mismatch, division by zero, invalid syntax — each with clear error messages
+  - [x] 5.9 Ensure expressions are sandboxed (no file system, network, reflection, or arbitrary code execution)
+  - [x] 5.10 Write unit tests for each operator type, variable resolution with all primitive types, compound expressions, and all error cases
 
 - [ ] 6.0 Implement declarative rules and JSON file loader
   - [ ] 6.1 Implement `DeclarativeRule` class that implements `IRule`, storing name, condition string, and transformations dictionary
