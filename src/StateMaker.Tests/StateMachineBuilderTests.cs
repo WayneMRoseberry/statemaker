@@ -1110,4 +1110,412 @@ public class StateMachineBuilderTests
     }
 
     #endregion
+
+    #region 3.18 — Unbounded Growth and Malformed State Rules
+
+    [Fact]
+    public void Build_UnboundedGrowthRule_LimitedByMaxStates()
+    {
+        // Rule always generates a unique state (incrementing counter) — would grow forever without limits
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(10, result.States.Count);
+        Assert.Equal(9, result.Transitions.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_UnboundedGrowthRule_LimitedByMaxDepth()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxDepth = 5 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(6, result.States.Count); // S0 through S5
+        Assert.Equal(5, result.Transitions.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_UnboundedGrowthRule_BothLimits_MaxStatesBindsFirst()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 3, MaxDepth = 100 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(3, result.States.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_UnboundedGrowthRule_BothLimits_MaxDepthBindsFirst()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["counter"] = (int)c.Variables["counter"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 100, MaxDepth = 3 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(4, result.States.Count); // depth 0,1,2,3
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_RuleReturnsEmptyState_BuilderHandlesIt()
+    {
+        // Rule returns a state with no variables (malformed relative to input)
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 1;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => s.Variables.ContainsKey("x"),
+                _ => new State()) // returns empty state
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.States.Count);
+        Assert.Single(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_RuleAddsExtraVariables_BuilderHandlesIt()
+    {
+        // Rule returns a state with more variables than the input
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 1;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => !s.Variables.ContainsKey("extra"),
+                s => { var c = s.Clone(); c.Variables["extra"] = "added"; c.Variables["x"] = (int)c.Variables["x"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        // Initial state (no extra) -> state with extra (rule no longer fires)
+        Assert.Equal(2, result.States.Count);
+        Assert.Single(result.Transitions);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_RuleRemovesVariables_BuilderHandlesIt()
+    {
+        // Rule returns a state with fewer variables than input
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 1;
+        initialState.Variables["y"] = 2;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => s.Variables.ContainsKey("y"),
+                s => { var c = new State(); c.Variables["x"] = (int)s.Variables["x"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.States.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_RuleChangesVariableType_BuilderHandlesIt()
+    {
+        // Rule changes a variable from int to string
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["value"] = 42;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => s.Variables["value"] is int,
+                s => { var c = s.Clone(); c.Variables["value"] = "forty-two"; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.States.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_RuleReturnsNullVariable_BuilderHandlesIt()
+    {
+        // Rule sets a variable to null
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 1;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => s.Variables["x"] is not null,
+                s => { var c = s.Clone(); c.Variables["x"] = null; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(2, result.States.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_MultipleUnboundedRules_MaxStatesLimitsTotal()
+    {
+        // Two rules both always generate unique states — growth is double-rate
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["a"] = 0;
+        initialState.Variables["b"] = 0;
+        var rules = new IRule[]
+        {
+            new NamedTestRule("IncA",
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["a"] = (int)c.Variables["a"]! + 1; return c; }),
+            new NamedTestRule("IncB",
+                _ => true,
+                s => { var c = s.Clone(); c.Variables["b"] = (int)c.Variables["b"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 5 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(5, result.States.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    #endregion
+
+    #region 3.19 — Rules That Throw Exceptions or Hang
+
+    [Fact]
+    public void Build_IsAvailableThrows_ExceptionPropagates()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => throw new InvalidOperationException("IsAvailable exploded"),
+                s => s.Clone())
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            builder.Build(initialState, rules, config));
+        Assert.Contains("IsAvailable exploded", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Build_ExecuteThrows_ExceptionPropagates()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                _ => throw new InvalidOperationException("Execute exploded"))
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            builder.Build(initialState, rules, config));
+        Assert.Contains("Execute exploded", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Build_IsAvailableThrowsArgumentException_ExceptionPropagates()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => throw new ArgumentException("bad argument"),
+                s => s.Clone())
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        Assert.Throws<ArgumentException>(() =>
+            builder.Build(initialState, rules, config));
+    }
+
+    [Fact]
+    public void Build_ExecuteThrowsInvalidOperation_ExceptionPropagates()
+    {
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                _ => throw new InvalidOperationException("error in Execute"))
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        Assert.Throws<InvalidOperationException>(() =>
+            builder.Build(initialState, rules, config));
+    }
+
+    [Fact]
+    public void Build_SecondRuleThrows_FirstRuleStillProcessed()
+    {
+        // First rule works fine, second rule throws on Execute.
+        // The first rule's state should be added before the exception.
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["x"] = 0;
+        var rules = new IRule[]
+        {
+            new NamedTestRule("Good",
+                s => (int)s.Variables["x"]! == 0,
+                s => { var c = s.Clone(); c.Variables["x"] = 1; return c; }),
+            new NamedTestRule("Bad",
+                _ => true,
+                _ => throw new InvalidOperationException("boom"))
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        // The good rule fires first (x=0 -> x=1), then bad rule throws on x=0
+        Assert.Throws<InvalidOperationException>(() =>
+            builder.Build(initialState, rules, config));
+    }
+
+    [Fact]
+    public void Build_IsAvailableThrowsOnSecondState_FirstStateProcessed()
+    {
+        // Rule works for initial state but throws IsAvailable on the second state
+        int callCount = 0;
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s =>
+                {
+                    callCount++;
+                    if ((int)s.Variables["step"]! > 0)
+                        throw new InvalidOperationException("IsAvailable fails on step > 0");
+                    return true;
+                },
+                s => { var c = s.Clone(); c.Variables["step"] = (int)c.Variables["step"]! + 1; return c; })
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        // Builds S0, rule fires (step=0->step=1), then when exploring S1, IsAvailable throws
+        Assert.Throws<InvalidOperationException>(() =>
+            builder.Build(initialState, rules, config));
+    }
+
+    [Fact]
+    public void Build_SlowRule_CompletesWithinTimeout()
+    {
+        // Rule with artificial delay — should still complete if given enough time
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["step"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                s => (int)s.Variables["step"]! < 3,
+                s =>
+                {
+                    Thread.Sleep(10); // small delay per execution
+                    var c = s.Clone();
+                    c.Variables["step"] = (int)c.Variables["step"]! + 1;
+                    return c;
+                })
+        };
+        var config = new BuilderConfig { MaxStates = 10 };
+
+        StateMachine result = builder.Build(initialState, rules, config);
+
+        Assert.Equal(4, result.States.Count);
+        Assert.True(result.IsValidMachine());
+    }
+
+    [Fact]
+    public void Build_HangingRule_CanBeCancelledByMaxStates()
+    {
+        // Rule that always generates new states (simulating near-infinite work)
+        // MaxStates prevents actual infinite loop
+        var builder = new StateMachineBuilder();
+        var initialState = new State();
+        initialState.Variables["counter"] = 0;
+        var rules = new IRule[]
+        {
+            new TestRule(
+                _ => true,
+                s =>
+                {
+                    var c = s.Clone();
+                    c.Variables["counter"] = (int)c.Variables["counter"]! + 1;
+                    return c;
+                })
+        };
+        var config = new BuilderConfig { MaxStates = 100 };
+
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        StateMachine result = builder.Build(initialState, rules, config);
+        sw.Stop();
+
+        Assert.Equal(100, result.States.Count);
+        Assert.True(result.IsValidMachine());
+        // Should complete quickly — not hang
+        Assert.True(sw.ElapsedMilliseconds < 5000, $"Build took {sw.ElapsedMilliseconds}ms, expected < 5000ms");
+    }
+
+    #endregion
 }

@@ -141,8 +141,8 @@ All tests must pass before moving on to the next sub-task.
     - [x] 3.17.4 Write complex shape equivalence tests: chain-then-cycle (3,3), diamond (2-branch), nested cycles (outer 3 inner 2), cycle with exit chain
     - [x] 3.17.5 Write hybrid shape equivalence tests: branch to chain and cycle, diamond then cycle, three-phase chain-branch-cycle, branch with mixed topology arms
     - [x] 3.17.6 Verify all new equivalence tests pass alongside existing 182+ tests
-  - [ ] 3.18 Write tests for rule behavior edge cases: rules that always generate unique states (unbounded growth), rules that return malformed or unexpected states
-  - [ ] 3.19 Write tests for rule behavior edge cases: rules whose `IsAvailable` or `Execute` methods throw exceptions, and rules whose methods hang or take excessively long
+  - [x] 3.18 Write tests for rule behavior edge cases: rules that always generate unique states (unbounded growth), rules that return malformed or unexpected states
+  - [x] 3.19 Write tests for rule behavior edge cases: rules whose `IsAvailable` or `Execute` methods throw exceptions, and rules whose methods hang or take excessively long
   - [x] 3.20 Write tests for rule behavior edge cases: rules that mutate the input state passed to `Execute` (violating immutability), verifying the builder handles or detects this
     - [x] 3.20.1 Write test for rule that mutates input state variable directly (no clone): verify builder still completes and produces a valid machine
     - [x] 3.20.2 Write test for rule that adds a new variable to the input state: verify builder handles the mutation
