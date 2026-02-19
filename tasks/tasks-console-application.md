@@ -45,11 +45,11 @@ All tests must pass before moving on to the next sub-task.
 
 - [x] 0.0 Create feature branch
   - [x] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b consoleapp`)
-- [ ] 1.0 Set up the console application project
-  - [ ] 1.1 Create new console project directory `src/StateMaker.Console`
-  - [ ] 1.2 Create `StateMaker.Console.csproj` targeting `net6.0` as an executable, referencing the `StateMaker` library project
-  - [ ] 1.3 Add the new project to `StateMaker.sln`
-  - [ ] 1.4 Verify the solution builds successfully with `dotnet build`
+- [x] 1.0 Set up the console application project
+  - [x] 1.1 Create new console project directory `src/StateMaker.Console`
+  - [x] 1.2 Create `StateMaker.Console.csproj` targeting `net6.0` as an executable, referencing the `StateMaker` library project
+  - [x] 1.3 Add the new project to `StateMaker.sln`
+  - [x] 1.4 Verify the solution builds successfully with `dotnet build`
 - [ ] 2.0 Implement the build definition file parser
   - [ ] 2.1 Create `BuildDefinitionLoader.cs` that parses a combined JSON file containing `initialState`, `rules`, and optional `config` sections
   - [ ] 2.2 Parse the `initialState` section into a `State` object (reuse `RuleFileLoader` logic or call its methods)
