@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace StateMaker.Tests;
 
 public class RuleFileLoaderTests
@@ -20,9 +18,9 @@ public class RuleFileLoaderTests
 
         Assert.NotNull(initialState);
         Assert.Equal("Pending", initialState!.Variables["Status"]);
-        Assert.Equal(0, Convert.ToInt32(initialState.Variables["Count"]));
+        Assert.Equal(0, (int)initialState.Variables["Count"]!);
         Assert.Equal(true, initialState.Variables["IsActive"]);
-        Assert.Equal(9.99, Convert.ToDouble(initialState.Variables["Price"]));
+        Assert.Equal(9.99, (double)initialState.Variables["Price"]!);
     }
 
     [Fact]
@@ -443,7 +441,7 @@ public class RuleFileLoaderTests
             var (initialState, rules) = _loader.LoadFromFile(tempFile);
 
             Assert.NotNull(initialState);
-            Assert.Equal(0, Convert.ToInt32(initialState!.Variables["x"]));
+            Assert.Equal(0, (int)initialState!.Variables["x"]!);
             Assert.Single(rules);
             Assert.Equal("Inc", rules[0].GetName());
         }
