@@ -226,22 +226,22 @@ All tests must pass before moving on to the next sub-task.
   - [x] 6.11 Provide a programmatic API method to create declarative rules without a file (e.g., `RuleBuilder.DefineRule(name, condition, transformations)`)
   - [x] 6.12 Write unit tests for programmatic declarative rule creation
 
-- [ ] 7.0 Implement export and import capabilities (JSON, DOT, GraphML)
-  - [ ] 7.1 Define `IStateMachineExporter` interface with `string Export(StateMachine stateMachine)` method
-  - [ ] 7.2 Define `IStateMachineImporter` interface with `StateMachine Import(string content)` method
-  - [ ] 7.3 Implement `JsonExporter`: serialize StateMachine to JSON with `startingStateId`, `states` (id-to-variables map), and `transitions` array
-  - [ ] 7.4 Implement `JsonImporter`: deserialize JSON back to a `StateMachine` object preserving all state IDs, variables, and transitions
-  - [ ] 7.5 Write unit tests for JSON round-trip: export then import produces an equivalent StateMachine
-  - [ ] 7.6 Implement `DotExporter`: generate DOT format with box nodes showing state ID + variables, directed edges with rule names, starting state indicator
-  - [ ] 7.7 Write unit tests for DOT export: valid DOT syntax, all states and transitions present, starting state arrow
-  - [ ] 7.8 Implement `GraphMlExporter`: generate GraphML/yEd-compatible XML with ShapeNode elements, edge labels, visual properties (colors, shapes)
-  - [ ] 7.9 Write unit tests for GraphML export: valid XML structure, all states and transitions present, yEd visual properties
-  - [ ] 7.10 Write unit tests for import-then-re-export: import from JSON, export to DOT and GraphML, verify no data loss
+- [x] 7.0 Implement export and import capabilities (JSON, DOT, GraphML)
+  - [x] 7.1 Define `IStateMachineExporter` interface with `string Export(StateMachine stateMachine)` method
+  - [x] 7.2 Define `IStateMachineImporter` interface with `StateMachine Import(string content)` method
+  - [x] 7.3 Implement `JsonExporter`: serialize StateMachine to JSON with `startingStateId`, `states` (id-to-variables map), and `transitions` array
+  - [x] 7.4 Implement `JsonImporter`: deserialize JSON back to a `StateMachine` object preserving all state IDs, variables, and transitions
+  - [x] 7.5 Write unit tests for JSON round-trip: export then import produces an equivalent StateMachine
+  - [x] 7.6 Implement `DotExporter`: generate DOT format with box nodes showing state ID + variables, directed edges with rule names, starting state indicator
+  - [x] 7.7 Write unit tests for DOT export: valid DOT syntax, all states and transitions present, starting state arrow
+  - [x] 7.8 Implement `GraphMlExporter`: generate GraphML/yEd-compatible XML with ShapeNode elements, edge labels, visual properties (colors, shapes)
+  - [x] 7.9 Write unit tests for GraphML export: valid XML structure, all states and transitions present, yEd visual properties
+  - [x] 7.10 Write unit tests for import-then-re-export: import from JSON, export to DOT and GraphML, verify no data loss
 
-- [ ] 8.0 Implement logging and diagnostics
-  - [ ] 8.1 Define `ILogger` interface with methods for INFO, DEBUG, and ERROR log levels
-  - [ ] 8.2 Implement `ConsoleLogger` class that outputs to the console, respecting the configured `LogLevel`
-  - [ ] 8.3 Integrate logging into `StateMachineBuilder`: log state discovery, rule application, cycle detection, limit reached events
-  - [ ] 8.4 Default logging level is INFO and ERROR (DEBUG disabled unless configured)
-  - [ ] 8.5 Ensure the logging system is extensible — users can provide custom `ILogger` implementations
-  - [ ] 8.6 Write unit tests for logging: correct messages at each level, DEBUG suppressed by default, custom logger receives expected calls
+- [x] 8.0 Implement logging and diagnostics
+  - [x] 8.1 Define `IStateMachineLogger` interface with methods for INFO, DEBUG, and ERROR log levels
+  - [x] 8.2 Implement `ConsoleLogger` class that outputs to the console, respecting the configured `LogLevel`
+  - [x] 8.3 Integrate logging into `StateMachineBuilder`: log state discovery, rule application, cycle detection, limit reached events
+  - [x] 8.4 Default logging level is INFO and ERROR (DEBUG disabled unless configured)
+  - [x] 8.5 Ensure the logging system is extensible — users can provide custom `ILogger` implementations
+  - [x] 8.6 Write unit tests for logging: correct messages at each level, DEBUG suppressed by default, custom logger receives expected calls
