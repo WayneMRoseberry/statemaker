@@ -212,19 +212,19 @@ All tests must pass before moving on to the next sub-task.
   - [x] 5.9 Ensure expressions are sandboxed (no file system, network, reflection, or arbitrary code execution)
   - [x] 5.10 Write unit tests for each operator type, variable resolution with all primitive types, compound expressions, and all error cases
 
-- [ ] 6.0 Implement declarative rules and JSON file loader
-  - [ ] 6.1 Implement `DeclarativeRule` class that implements `IRule`, storing name, condition string, and transformations dictionary
-  - [ ] 6.2 Implement `DeclarativeRule.IsAvailable()` — evaluates condition expression against state variables using `IExpressionEvaluator.EvaluateBoolean()`
-  - [ ] 6.3 Implement `DeclarativeRule.Execute()` — clones state, evaluates each transformation expression against the **original** state variables, sets new values on the clone
-  - [ ] 6.4 Write unit tests for DeclarativeRule: condition evaluation, transformation application, immutability of input state, multiple transformations
-  - [ ] 6.5 Implement `RuleFileLoader` class that reads a JSON file and returns initial state (if present) and an `IRule[]` array
-  - [ ] 6.6 Implement JSON parsing for `initialState` object — construct a `State` from the key-value pairs
-  - [ ] 6.7 Implement JSON parsing for declarative rule entries (rules without `type` or with `type: "declarative"`) — create `DeclarativeRule` instances
-  - [ ] 6.8 Implement JSON parsing for custom rule entries (`type: "custom"`) — load assembly, instantiate class via reflection, validate it implements `IRule`
-  - [ ] 6.9 Implement validation and clear error messages: missing required fields, invalid JSON syntax, class not found, class doesn't implement IRule, no parameterless constructor
-  - [ ] 6.10 Write unit tests for file loader: valid declarative rules, valid custom rules, mixed rules, missing initialState, present initialState, all error cases
-  - [ ] 6.11 Provide a programmatic API method to create declarative rules without a file (e.g., `RuleBuilder.DefineRule(name, condition, transformations)`)
-  - [ ] 6.12 Write unit tests for programmatic declarative rule creation
+- [x] 6.0 Implement declarative rules and JSON file loader
+  - [x] 6.1 Implement `DeclarativeRule` class that implements `IRule`, storing name, condition string, and transformations dictionary
+  - [x] 6.2 Implement `DeclarativeRule.IsAvailable()` — evaluates condition expression against state variables using `IExpressionEvaluator.EvaluateBoolean()`
+  - [x] 6.3 Implement `DeclarativeRule.Execute()` — clones state, evaluates each transformation expression against the **original** state variables, sets new values on the clone
+  - [x] 6.4 Write unit tests for DeclarativeRule: condition evaluation, transformation application, immutability of input state, multiple transformations
+  - [x] 6.5 Implement `RuleFileLoader` class that reads a JSON file and returns initial state (if present) and an `IRule[]` array
+  - [x] 6.6 Implement JSON parsing for `initialState` object — construct a `State` from the key-value pairs
+  - [x] 6.7 Implement JSON parsing for declarative rule entries (rules without `type` or with `type: "declarative"`) — create `DeclarativeRule` instances
+  - [x] 6.8 Implement JSON parsing for custom rule entries (`type: "custom"`) — load assembly, instantiate class via reflection, validate it implements `IRule`
+  - [x] 6.9 Implement validation and clear error messages: missing required fields, invalid JSON syntax, class not found, class doesn't implement IRule, no parameterless constructor
+  - [x] 6.10 Write unit tests for file loader: valid declarative rules, valid custom rules, mixed rules, missing initialState, present initialState, all error cases
+  - [x] 6.11 Provide a programmatic API method to create declarative rules without a file (e.g., `RuleBuilder.DefineRule(name, condition, transformations)`)
+  - [x] 6.12 Write unit tests for programmatic declarative rule creation
 
 - [ ] 7.0 Implement export and import capabilities (JSON, DOT, GraphML)
   - [ ] 7.1 Define `IStateMachineExporter` interface with `string Export(StateMachine stateMachine)` method
