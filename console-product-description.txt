@@ -1,0 +1,6 @@
+create a console based application called statemaker.exe with the following features
+- build state machines from state machine build definition files specified on the command line
+- output a state machine to a json file
+- load a pre-built state machine from file and export it to a specified format
+- emit help content if the console is run with no arguments
+
