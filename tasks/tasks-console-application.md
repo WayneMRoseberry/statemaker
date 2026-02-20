@@ -81,12 +81,12 @@ All tests must pass before moving on to the next sub-task.
   - [x] 7.2 On error, print the exception message and full stack trace to stderr
   - [x] 7.3 Return exit code 1 on error, exit code 0 on success
   - [x] 7.4 Handle specific error cases: missing file path argument, file not found, invalid JSON, unsupported format
-- [ ] 8.0 End-to-end testing with sample definition files
-  - [ ] 8.1 Create a sample build definition file (`samples/simple-build.json`) with a small state machine definition
-  - [ ] 8.2 Test the `build` command: build from definition file with default format (JSON), verify output
-  - [ ] 8.3 Test the `build` command with `--format dot` and `--format graphml`, verify output
-  - [ ] 8.4 Test the `build` command with `--output` flag, verify file is created
-  - [ ] 8.5 Test the `export` command: export a JSON state machine to DOT and GraphML formats
-  - [ ] 8.6 Test running with no arguments, verify help content is displayed
-  - [ ] 8.7 Test error cases: missing file, invalid JSON, bad format string
-  - [ ] 8.8 Verify all existing library tests still pass with `dotnet test`
+- [x] 8.0 End-to-end testing with sample definition files
+  - [x] 8.1 Create a sample build definition file (`samples/simple-build.json`) with a small state machine definition
+  - [x] 8.2 Test the `build` command: build from definition file with default format (JSON), verify output
+  - [x] 8.3 Test the `build` command with `--format dot` and `--format graphml`, verify output
+  - [x] 8.4 Test the `build` command with `--output` flag, verify file is created
+  - [x] 8.5 Test the `export` command: export a JSON state machine to DOT and GraphML formats
+  - [x] 8.6 Test running with no arguments, verify help content is displayed
+  - [x] 8.7 Test error cases: missing file, invalid JSON, bad format string
+  - [x] 8.8 Verify all existing library tests still pass with `dotnet test`

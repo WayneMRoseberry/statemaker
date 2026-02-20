@@ -1,0 +1,26 @@
+{
+  "initialState": {
+    "step": 0,
+    "done": false
+  },
+  "rules": [
+    {
+      "name": "Advance",
+      "condition": "step < 3",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "Finish",
+      "condition": "step == 3 && done == false",
+      "transformations": {
+        "done": "true"
+      }
+    }
+  ],
+  "config": {
+    "maxStates": 20,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}
