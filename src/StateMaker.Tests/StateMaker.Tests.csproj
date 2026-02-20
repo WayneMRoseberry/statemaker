@@ -7,7 +7,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <NoWarn>CA1707</NoWarn>
+    <NoWarn>CA1707;CA1861</NoWarn>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StateMaker\StateMaker.csproj" />
+    <ProjectReference Include="..\StateMaker.Console\StateMaker.Console.csproj" />
   </ItemGroup>
 
 </Project>

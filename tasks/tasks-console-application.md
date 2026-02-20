@@ -71,16 +71,16 @@ All tests must pass before moving on to the next sub-task.
   - [x] 5.2 Read the input file and use `JsonImporter` to load the state machine
   - [x] 5.3 Use `ExporterFactory` to get the appropriate exporter and export the state machine
   - [x] 5.4 Write the exported content to the output file if `--output` is specified, otherwise write to stdout
-- [ ] 6.0 Implement help content and argument routing
-  - [ ] 6.1 Create `HelpPrinter.cs` that prints usage syntax, command descriptions, options, and examples to stdout
-  - [ ] 6.2 Implement `Program.cs` with argument parsing that routes to `build`, `export`, or help based on the first argument
-  - [ ] 6.3 Parse `--output`/`-o` and `--format`/`-f` flags from the argument array
-  - [ ] 6.4 Print help when no arguments are provided or when an unrecognized command is given
-- [ ] 7.0 Implement error handling
-  - [ ] 7.1 Wrap command execution in try/catch in `Program.cs`
-  - [ ] 7.2 On error, print the exception message and full stack trace to stderr
-  - [ ] 7.3 Return exit code 1 on error, exit code 0 on success
-  - [ ] 7.4 Handle specific error cases: missing file path argument, file not found, invalid JSON, unsupported format
+- [x] 6.0 Implement help content and argument routing
+  - [x] 6.1 Create `HelpPrinter.cs` that prints usage syntax, command descriptions, options, and examples to stdout
+  - [x] 6.2 Implement `Program.cs` with argument parsing that routes to `build`, `export`, or help based on the first argument
+  - [x] 6.3 Parse `--output`/`-o` and `--format`/`-f` flags from the argument array
+  - [x] 6.4 Print help when no arguments are provided or when an unrecognized command is given
+- [x] 7.0 Implement error handling
+  - [x] 7.1 Wrap command execution in try/catch in `Program.cs`
+  - [x] 7.2 On error, print the exception message and full stack trace to stderr
+  - [x] 7.3 Return exit code 1 on error, exit code 0 on success
+  - [x] 7.4 Handle specific error cases: missing file path argument, file not found, invalid JSON, unsupported format
 - [ ] 8.0 End-to-end testing with sample definition files
   - [ ] 8.1 Create a sample build definition file (`samples/simple-build.json`) with a small state machine definition
   - [ ] 8.2 Test the `build` command: build from definition file with default format (JSON), verify output

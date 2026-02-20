@@ -63,7 +63,7 @@ public class LoggerTests
     public void ConsoleLogger_InfoLevel_WritesInfoAndError()
     {
         var output = new StringWriter();
-        Console.SetOut(output);
+        System.Console.SetOut(output);
         try
         {
             var logger = new ConsoleLogger(LogLevel.INFO);
@@ -78,7 +78,7 @@ public class LoggerTests
         }
         finally
         {
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            System.Console.SetOut(new StreamWriter(System.Console.OpenStandardOutput()) { AutoFlush = true });
         }
     }
 
@@ -86,7 +86,7 @@ public class LoggerTests
     public void ConsoleLogger_DebugLevel_WritesAll()
     {
         var output = new StringWriter();
-        Console.SetOut(output);
+        System.Console.SetOut(output);
         try
         {
             var logger = new ConsoleLogger(LogLevel.DEBUG);
@@ -101,7 +101,7 @@ public class LoggerTests
         }
         finally
         {
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            System.Console.SetOut(new StreamWriter(System.Console.OpenStandardOutput()) { AutoFlush = true });
         }
     }
 
@@ -109,7 +109,7 @@ public class LoggerTests
     public void ConsoleLogger_ErrorLevel_WritesErrorOnly()
     {
         var output = new StringWriter();
-        Console.SetOut(output);
+        System.Console.SetOut(output);
         try
         {
             var logger = new ConsoleLogger(LogLevel.ERROR);
@@ -124,7 +124,7 @@ public class LoggerTests
         }
         finally
         {
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            System.Console.SetOut(new StreamWriter(System.Console.OpenStandardOutput()) { AutoFlush = true });
         }
     }
 
@@ -132,7 +132,7 @@ public class LoggerTests
     public void ConsoleLogger_DefaultLevel_IsInfo()
     {
         var output = new StringWriter();
-        Console.SetOut(output);
+        System.Console.SetOut(output);
         try
         {
             var logger = new ConsoleLogger();
@@ -145,7 +145,7 @@ public class LoggerTests
         }
         finally
         {
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            System.Console.SetOut(new StreamWriter(System.Console.OpenStandardOutput()) { AutoFlush = true });
         }
     }
 
