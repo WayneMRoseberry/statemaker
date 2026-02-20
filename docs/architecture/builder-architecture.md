@@ -150,10 +150,21 @@ public class BuilderConfig
 {
     public int? MaxDepth { get; set; }
     public int? MaxStates { get; set; }
-    public ExplorationStrategy ExplorationStrategy { get; set; }  // BREADTHFIRSTSEARCH or DEPTHFIRSTSEARCH
-    public LogLevel LogLevel { get; set; }
+    public ExplorationStrategy ExplorationStrategy { get; set; } = ExplorationStrategy.BREADTHFIRSTSEARCH;
+    public LogLevel LogLevel { get; set; } = LogLevel.INFO;
 }
 ```
+
+### Logging
+
+The `StateMachineBuilder` supports optional logging via the `IStateMachineLogger` interface:
+
+```csharp
+public StateMachineBuilder();                           // No logging
+public StateMachineBuilder(IStateMachineLogger logger); // With logging
+```
+
+Log messages are emitted at `INFO` level for state discovery and exploration progress, and at `DEBUG` level for rule application and cycle detection details.
 
 ## State ID Generation
 

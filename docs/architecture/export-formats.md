@@ -114,45 +114,35 @@ A previously exported JSON file can be imported back into a `StateMachine` objec
 ```dot
 digraph StateMachine {
     rankdir=LR;
-    node [shape=box, style=filled, fillcolor=lightyellow];
-
-    // States
-    S0 [label="S0\n─────────────\nOrderStatus = Pending\nAmount = 500\nIsApproved = false"];
-    S1 [label="S1\n─────────────\nOrderStatus = Approved\nAmount = 500\nIsApproved = true"];
-    S2 [label="S2\n─────────────\nOrderStatus = Rejected\nAmount = 500\nIsApproved = false"];
-
-    // Starting state indicator
-    start [shape=point, width=0.2];
-    start -> S0;
-
-    // Transitions
-    S0 -> S1 [label="ApproveOrder"];
-    S0 -> S2 [label="RejectOrder"];
-    S2 -> S0 [label="RetryOrder"];
+    node [shape=box];
+    __start [shape=point, width=0.2, label=""];
+    __start -> "S0";
+    "S0" [label="S0\nOrderStatus='Pending'\nAmount=500\nIsApproved=false"];
+    "S1" [label="S1\nOrderStatus='Approved'\nAmount=500\nIsApproved=true"];
+    "S2" [label="S2\nOrderStatus='Rejected'\nAmount=500\nIsApproved=false"];
+    "S0" -> "S1" [label="ApproveOrder"];
+    "S0" -> "S2" [label="RejectOrder"];
+    "S2" -> "S0" [label="RetryOrder"];
 }
 ```
 
 ### State Representation in DOT
 
-States are rendered as **box nodes** with a label containing:
-1. The state ID (e.g., `S0`)
-2. A separator line
-3. All variable names and values, one per line
+States are rendered as **box nodes** with a label containing the state ID followed by variable name/value pairs, one per line. String values are wrapped in single quotes, booleans are `true`/`false`.
 
 ```dot
-S0 [label="S0\n─────────────\nOrderStatus = Pending\nAmount = 500\nIsApproved = false"];
+"S0" [label="S0\nOrderStatus='Pending'\nAmount=500\nIsApproved=false"];
 ```
 
 Rendered as:
 
 ```
-┌───────────────────────┐
-│ S0                    │
-│ ───────────────────── │
-│ OrderStatus = Pending │
-│ Amount = 500          │
-│ IsApproved = false    │
-└───────────────────────┘
+┌────────────────────────┐
+│ S0                     │
+│ OrderStatus='Pending'  │
+│ Amount=500             │
+│ IsApproved=false       │
+└────────────────────────┘
 ```
 
 ### Transition Representation in DOT
@@ -160,52 +150,16 @@ Rendered as:
 Transitions are rendered as **directed edges** with the rule name as label:
 
 ```dot
-S0 -> S1 [label="ApproveOrder"];
+"S0" -> "S1" [label="ApproveOrder"];
 ```
 
 ### Starting State Indicator
 
-The starting state is indicated by an arrow from an invisible point node:
+The starting state is indicated by an arrow from an invisible point node named `__start`:
 
 ```dot
-start [shape=point, width=0.2];
-start -> S0;
-```
-
-### Visualization Options
-
-| Option | DOT Attribute | Description |
-|---|---|---|
-| Layout direction | `rankdir=LR` | Left-to-right (default). Use `TB` for top-to-bottom |
-| Node shape | `node [shape=box]` | Box for states. Alternatives: `ellipse`, `record` |
-| Node color | `fillcolor=lightyellow` | Background color for state nodes |
-| Starting state color | `fillcolor=lightgreen` | Different color to highlight the starting state |
-| Edge color | `color=blue` | Color for transition arrows |
-| Font | `fontname="Courier"` | Monospace font for variable alignment |
-
-### Example with Options
-
-```dot
-digraph StateMachine {
-    rankdir=LR;
-    node [shape=box, style=filled, fontname="Courier"];
-
-    // Starting state (highlighted)
-    S0 [label="S0\n─────────────\nOrderStatus = Pending\nAmount = 500", fillcolor=lightgreen];
-
-    // Other states
-    S1 [label="S1\n─────────────\nOrderStatus = Approved\nAmount = 500", fillcolor=lightyellow];
-    S2 [label="S2\n─────────────\nOrderStatus = Rejected\nAmount = 500", fillcolor=lightyellow];
-
-    // Starting state arrow
-    start [shape=point, width=0.2];
-    start -> S0;
-
-    // Transitions
-    S0 -> S1 [label="ApproveOrder", color=darkgreen];
-    S0 -> S2 [label="RejectOrder", color=red];
-    S2 -> S0 [label="RetryOrder", color=blue, style=dashed];
-}
+__start [shape=point, width=0.2, label=""];
+__start -> "S0";
 ```
 
 ## GraphML Format (yEd)
@@ -225,94 +179,55 @@ digraph StateMachine {
 ### Structure
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<graphml xmlns="http://graphml.graphstudio.org"
+<?xml version="1.0" encoding="utf-16"?>
+<graphml xmlns="http://graphml.graphstruct.org/xmlns"
          xmlns:y="http://www.yworks.com/xml/graphml">
 
-  <!-- Property declarations -->
-  <key id="d0" for="node" attr.name="label" attr.type="string"/>
-  <key id="d1" for="edge" attr.name="label" attr.type="string"/>
-  <key id="d2" for="node" yfiles.type="nodegraphics"/>
-  <key id="d3" for="edge" yfiles.type="edgegraphics"/>
+  <!-- Key declarations for yEd visual properties -->
+  <key id="d0" for="node" yfiles.type="nodegraphics" />
+  <key id="d1" for="edge" yfiles.type="edgegraphics" />
 
-  <graph id="StateMachine" edgedefault="directed">
+  <graph id="G" edgedefault="directed">
 
-    <!-- State nodes -->
+    <!-- Starting state (green fill, thick border) -->
     <node id="S0">
-      <data key="d0">S0</data>
-      <data key="d2">
+      <data key="d0">
         <y:ShapeNode>
-          <y:Geometry height="80" width="200"/>
-          <y:Fill color="#CCFFCC"/>
+          <y:Geometry height="60.0" width="120.0" />
+          <y:Fill color="#CCFFCC" />
+          <y:BorderStyle color="#000000" type="line" width="2.0" />
           <y:NodeLabel>S0
-─────────────
-OrderStatus = Pending
-Amount = 500
-IsApproved = false</y:NodeLabel>
-          <y:Shape type="roundrectangle"/>
+OrderStatus='Pending'
+Amount=500
+IsApproved=false</y:NodeLabel>
+          <y:Shape type="roundrectangle" />
         </y:ShapeNode>
       </data>
     </node>
 
+    <!-- Non-starting state (white fill, normal border) -->
     <node id="S1">
-      <data key="d0">S1</data>
-      <data key="d2">
+      <data key="d0">
         <y:ShapeNode>
-          <y:Geometry height="80" width="200"/>
-          <y:Fill color="#FFFFCC"/>
+          <y:Geometry height="60.0" width="120.0" />
+          <y:Fill color="#FFFFFF" />
+          <y:BorderStyle color="#000000" type="line" width="1.0" />
           <y:NodeLabel>S1
-─────────────
-OrderStatus = Approved
-Amount = 500
-IsApproved = true</y:NodeLabel>
-          <y:Shape type="roundrectangle"/>
-        </y:ShapeNode>
-      </data>
-    </node>
-
-    <node id="S2">
-      <data key="d0">S2</data>
-      <data key="d2">
-        <y:ShapeNode>
-          <y:Geometry height="80" width="200"/>
-          <y:Fill color="#FFFFCC"/>
-          <y:NodeLabel>S2
-─────────────
-OrderStatus = Rejected
-Amount = 500
-IsApproved = false</y:NodeLabel>
-          <y:Shape type="roundrectangle"/>
+OrderStatus='Approved'
+Amount=500
+IsApproved=true</y:NodeLabel>
+          <y:Shape type="roundrectangle" />
         </y:ShapeNode>
       </data>
     </node>
 
     <!-- Transition edges -->
     <edge id="e0" source="S0" target="S1">
-      <data key="d1">ApproveOrder</data>
-      <data key="d3">
+      <data key="d1">
         <y:PolyLineEdge>
+          <y:LineStyle color="#000000" type="line" width="1.0" />
+          <y:Arrows source="none" target="standard" />
           <y:EdgeLabel>ApproveOrder</y:EdgeLabel>
-          <y:Arrows source="none" target="standard"/>
-        </y:PolyLineEdge>
-      </data>
-    </edge>
-
-    <edge id="e1" source="S0" target="S2">
-      <data key="d1">RejectOrder</data>
-      <data key="d3">
-        <y:PolyLineEdge>
-          <y:EdgeLabel>RejectOrder</y:EdgeLabel>
-          <y:Arrows source="none" target="standard"/>
-        </y:PolyLineEdge>
-      </data>
-    </edge>
-
-    <edge id="e2" source="S2" target="S0">
-      <data key="d1">RetryOrder</data>
-      <data key="d3">
-        <y:PolyLineEdge>
-          <y:EdgeLabel>RetryOrder</y:EdgeLabel>
-          <y:Arrows source="none" target="standard"/>
         </y:PolyLineEdge>
       </data>
     </edge>
@@ -325,61 +240,45 @@ IsApproved = false</y:NodeLabel>
 
 Each state is a `<node>` element containing:
 1. **Node ID** matching the state ID (e.g., `S0`)
-2. **Label** containing the state ID and all variables
-3. **Visual properties** (shape, color, size)
+2. **Label** containing the state ID and all variables (one per line)
+3. **Visual properties** (shape, color, size, border)
 
-```xml
-<node id="S0">
-  <data key="d2">
-    <y:ShapeNode>
-      <y:Geometry height="80" width="200"/>
-      <y:Fill color="#CCFFCC"/>
-      <y:NodeLabel>S0
-─────────────
-OrderStatus = Pending
-Amount = 500</y:NodeLabel>
-      <y:Shape type="roundrectangle"/>
-    </y:ShapeNode>
-  </data>
-</node>
-```
+The starting state is visually distinguished with a green fill (`#CCFFCC`) and thicker border (`2.0`). Non-starting states have a white fill (`#FFFFFF`) and normal border (`1.0`).
 
 ### State Variable Representation
 
-Variables are listed in the node label, one per line:
+Variables are listed in the node label, one per line (string values in single quotes):
 ```
 S0
-─────────────
-VariableName1 = Value1
-VariableName2 = Value2
+VariableName1='Value1'
+VariableName2=500
 ```
 
 ### Transition Representation in GraphML
 
-Each transition is an `<edge>` element:
+Each transition is an `<edge>` element with line styling and an edge label:
 ```xml
 <edge id="e0" source="S0" target="S1">
-  <data key="d3">
+  <data key="d1">
     <y:PolyLineEdge>
+      <y:LineStyle color="#000000" type="line" width="1.0" />
+      <y:Arrows source="none" target="standard" />
       <y:EdgeLabel>ApproveOrder</y:EdgeLabel>
-      <y:Arrows source="none" target="standard"/>
     </y:PolyLineEdge>
   </data>
 </edge>
 ```
 
-### Visualization Options in yEd
+### Visualization Properties
 
-| Option | GraphML Element | Description |
-|---|---|---|
-| Node shape | `<y:Shape type="..."/>` | `roundrectangle`, `rectangle`, `ellipse` |
-| Node color | `<y:Fill color="..."/>` | Hex color code for node background |
-| Starting state color | `#CCFFCC` (light green) | Distinguish starting state from others |
-| Other states color | `#FFFFCC` (light yellow) | Default state color |
-| Node size | `<y:Geometry height="..." width="..."/>` | Auto-sized based on variable count |
-| Edge labels | `<y:EdgeLabel>` | Rule name displayed on the edge |
-| Arrow style | `<y:Arrows target="..."/>` | `standard`, `delta`, `diamond` |
-| Layout | Applied in yEd | Hierarchical, Organic, Orthogonal |
+| Property | GraphML Element | Starting State | Other States |
+|---|---|---|---|
+| Node shape | `<y:Shape type="roundrectangle"/>` | roundrectangle | roundrectangle |
+| Fill color | `<y:Fill color="..."/>` | `#CCFFCC` (light green) | `#FFFFFF` (white) |
+| Border width | `<y:BorderStyle width="..."/>` | `2.0` (thick) | `1.0` (normal) |
+| Node size | `<y:Geometry height="60.0" width="120.0"/>` | Fixed | Fixed |
+| Edge labels | `<y:EdgeLabel>` | Rule name displayed on the edge | |
+| Arrow style | `<y:Arrows target="standard"/>` | Standard arrowhead | |
 
 ### Using in yEd
 
@@ -433,21 +332,9 @@ Only JSON import is supported. DOT and GraphML are export-only formats.
 
 ### Node Label Generation
 
-For both DOT and GraphML, state labels are generated consistently:
+For both DOT and GraphML, state labels are generated from the state ID followed by variable key=value pairs. Values are formatted by type: strings in single quotes, booleans as `true`/`false`, nulls as `null`, and numbers as-is.
 
-```csharp
-string GenerateLabel(string stateId, State state)
-{
-    var lines = new List<string> { stateId, "─────────────" };
-    foreach (var kvp in state.Variables.OrderBy(k => k.Key))
-    {
-        lines.Add($"{kvp.Key} = {kvp.Value}");
-    }
-    return string.Join("\n", lines);
-}
-```
-
-Variables are sorted alphabetically by key for consistent output.
+Variables appear in dictionary iteration order (insertion order). They are not sorted alphabetically.
 
 ## Related Documentation
 

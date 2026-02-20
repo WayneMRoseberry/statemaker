@@ -8,7 +8,7 @@ State immutability is a fundamental design principle in StateMaker. The `Execute
 
 ### 1. Correct Cycle Detection
 
-The builder maintains a `HashSet<State>` of all visited states. If a rule modifies the input state instead of creating a new one, the visited set becomes corrupted because the original state object's hash has changed.
+The builder maintains a `Dictionary<State, string>` mapping visited states to their IDs. If a rule modifies the input state instead of creating a new one, the dictionary becomes corrupted because the original state object's hash has changed.
 
 **Broken (mutable):**
 ```csharp
@@ -23,7 +23,7 @@ public State Execute(State state)
 What happens:
 1. S0 has `Status = "Pending"`, hash = 12345
 2. Rule executes, changes S0 in-place to `Status = "Approved"`, hash = 67890
-3. HashSet now has S0 with a different hash than when it was inserted
+3. Dictionary now has S0 with a different hash than when it was inserted
 4. The original "Pending" state no longer exists for comparison
 5. Cycle detection fails because the original state was destroyed
 
@@ -41,7 +41,7 @@ public State Execute(State state)
 What happens:
 1. S0 has `Status = "Pending"`, hash = 12345 (unchanged)
 2. S1 is created with `Status = "Approved"`, hash = 67890
-3. Both states exist independently in the HashSet
+3. Both states exist independently in the dictionary
 4. If another path leads back to `Status = "Pending"`, it correctly matches S0
 
 ### 2. Correct State Graph
@@ -70,27 +70,26 @@ State S0: { Count: 0 }
 
 ### State.Clone() Method
 
-The `State` class must provide a method to create a deep copy:
+The `State` class provides a `Clone()` method to create a copy:
 
 ```csharp
 public class State : IEquatable<State>
 {
-    public Dictionary<string, object> Variables { get; private set; }
-
-    public State(Dictionary<string, object> variables)
-    {
-        Variables = new Dictionary<string, object>(variables);
-    }
+    public Dictionary<string, object?> Variables { get; } = new();
 
     public State Clone()
     {
-        // Deep copy - primitive values are safe to copy by value
-        return new State(new Dictionary<string, object>(Variables));
+        var clone = new State();
+        foreach (var kvp in Variables)
+        {
+            clone.Variables[kvp.Key] = kvp.Value;
+        }
+        return clone;
     }
 }
 ```
 
-Since state variables are restricted to primitive types (`string`, `int`, `bool`, `float/double`), a shallow copy of the dictionary is sufficient because primitive types are value types (or immutable in the case of strings).
+Since state variables are restricted to primitive types (`string`, `int`, `bool`, `float/double`, `null`), a shallow copy of the dictionary is sufficient because primitive types are value types (or immutable in the case of strings).
 
 ### Custom Rule Pattern
 
@@ -149,9 +148,10 @@ Immutability depends on correct equality implementation:
 ```csharp
 public class State : IEquatable<State>
 {
-    public bool Equals(State other)
+    public bool Equals(State? other)
     {
-        if (other == null) return false;
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
         if (Variables.Count != other.Variables.Count) return false;
 
         foreach (var kvp in Variables)
@@ -165,18 +165,17 @@ public class State : IEquatable<State>
         return true;
     }
 
+    public override bool Equals(object? obj) => obj is State other && Equals(other);
+
     public override int GetHashCode()
     {
-        unchecked
+        var hash = new HashCode();
+        foreach (var kvp in Variables.OrderBy(k => k.Key, StringComparer.Ordinal))
         {
-            int hash = 17;
-            foreach (var kvp in Variables.OrderBy(k => k.Key))
-            {
-                hash = hash * 31 + kvp.Key.GetHashCode();
-                hash = hash * 31 + (kvp.Value?.GetHashCode() ?? 0);
-            }
-            return hash;
+            hash.Add(kvp.Key, StringComparer.Ordinal);
+            hash.Add(kvp.Value);
         }
+        return hash.ToHashCode();
     }
 }
 ```
@@ -192,52 +191,44 @@ public class State : IEquatable<State>
 ### Test Pattern: Verify Input State Unchanged
 
 ```csharp
-[Test]
+[Fact]
 public void Execute_DoesNotModifyInputState()
 {
     var rule = new MyRule();
-    var inputState = new State(new Dictionary<string, object>
-    {
-        { "Status", "Pending" }
-    });
-
-    // Capture original values
-    var originalStatus = inputState.Variables["Status"];
+    var inputState = new State();
+    inputState.Variables["Status"] = "Pending";
 
     // Execute the rule
     var newState = rule.Execute(inputState);
 
     // Verify input state is unchanged
-    Assert.AreEqual("Pending", inputState.Variables["Status"]);
-    Assert.AreEqual(originalStatus, inputState.Variables["Status"]);
+    Assert.Equal("Pending", inputState.Variables["Status"]);
 
     // Verify new state is different
-    Assert.AreEqual("Approved", newState.Variables["Status"]);
+    Assert.Equal("Approved", newState.Variables["Status"]);
 
     // Verify they are different object references
-    Assert.AreNotSame(inputState, newState);
+    Assert.NotSame(inputState, newState);
 }
 ```
 
 ### Test Pattern: Verify New State Created
 
 ```csharp
-[Test]
+[Fact]
 public void Execute_ReturnsNewStateObject()
 {
     var rule = new MyRule();
-    var inputState = new State(new Dictionary<string, object>
-    {
-        { "Status", "Pending" }
-    });
+    var inputState = new State();
+    inputState.Variables["Status"] = "Pending";
 
     var newState = rule.Execute(inputState);
 
     // Different objects
-    Assert.AreNotSame(inputState, newState);
+    Assert.NotSame(inputState, newState);
 
     // Different dictionaries
-    Assert.AreNotSame(inputState.Variables, newState.Variables);
+    Assert.NotSame(inputState.Variables, newState.Variables);
 }
 ```
 
