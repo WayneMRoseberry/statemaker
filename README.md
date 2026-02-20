@@ -11,6 +11,18 @@ StateMaker automates the tedious and error-prone process of manually defining al
 3. Configure **exploration limits** (exhaustive or bounded)
 4. Let StateMaker **generate all reachable states** automatically
 
+## Getting Started with the Command Line
+
+The fastest way to use StateMaker is through the command-line tool. Define your states and rules in a JSON file, then run:
+
+```bash
+statemaker build definition.json
+statemaker build definition.json --format dot --output graph.dot
+statemaker export machine.json --format graphml -o machine.graphml
+```
+
+For complete command-line usage, file format reference, and input validation rules, see the **[Console Usage Guide](/docs/statemaker-console-usage.md)**.
+
 ## Key Features
 
 - **Automatic State Discovery**: Generate all reachable states from transformation rules
@@ -85,6 +97,7 @@ var stateMachine = builder.Build(initialState, rules, config);
 ## Project Resources
 
 ### Documentation
+- **[Console Usage Guide](/docs/statemaker-console-usage.md)** - Command-line usage, file formats, and input validation rules
 - **[Developer Documentation](/docs/README.md)** - Architecture guides and design documents
 - **[Declarative Rules Architecture](/docs/architecture/declarative-rules.md)** - How declarative rules work
 - **[Product Requirements Document](/tasks/prd-state-machine-builder.md)** - Complete PRD with requirements, user stories, and technical specifications
