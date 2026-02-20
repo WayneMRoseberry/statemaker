@@ -57,20 +57,20 @@ All tests must pass before moving on to the next sub-task.
   - [x] 2.4 Parse the optional `config` section into a `BuilderConfig` object (handle `maxStates`, `maxDepth`, `explorationStrategy` fields)
   - [x] 2.5 Return a result containing the initial state, rules, and config; use sensible defaults when config is omitted
   - [x] 2.6 Verify the build definition loader works by building the project
-- [ ] 3.0 Implement the ExporterFactory
-  - [ ] 3.1 Create `ExporterFactory.cs` that maps format strings (`json`, `dot`, `graphml`) to the corresponding `IStateMachineExporter` implementations
-  - [ ] 3.2 Throw a clear error for unrecognized format strings
-- [ ] 4.0 Implement the build command
-  - [ ] 4.1 Create `BuildCommand.cs` that accepts a definition file path, optional output path, and optional format string
-  - [ ] 4.2 Use `BuildDefinitionLoader` to parse the definition file
-  - [ ] 4.3 Use `StateMachineBuilder.Build()` to build the state machine from the parsed initial state, rules, and config
-  - [ ] 4.4 Use `ExporterFactory` to get the appropriate exporter and export the state machine
-  - [ ] 4.5 Write the exported content to the output file if `--output` is specified, otherwise write to stdout
-- [ ] 5.0 Implement the export command
-  - [ ] 5.1 Create `ExportCommand.cs` that accepts a JSON state machine file path, required format string, and optional output path
-  - [ ] 5.2 Read the input file and use `JsonImporter` to load the state machine
-  - [ ] 5.3 Use `ExporterFactory` to get the appropriate exporter and export the state machine
-  - [ ] 5.4 Write the exported content to the output file if `--output` is specified, otherwise write to stdout
+- [x] 3.0 Implement the ExporterFactory
+  - [x] 3.1 Create `ExporterFactory.cs` that maps format strings (`json`, `dot`, `graphml`) to the corresponding `IStateMachineExporter` implementations
+  - [x] 3.2 Throw a clear error for unrecognized format strings
+- [x] 4.0 Implement the build command
+  - [x] 4.1 Create `BuildCommand.cs` that accepts a definition file path, optional output path, and optional format string
+  - [x] 4.2 Use `BuildDefinitionLoader` to parse the definition file
+  - [x] 4.3 Use `StateMachineBuilder.Build()` to build the state machine from the parsed initial state, rules, and config
+  - [x] 4.4 Use `ExporterFactory` to get the appropriate exporter and export the state machine
+  - [x] 4.5 Write the exported content to the output file if `--output` is specified, otherwise write to stdout
+- [x] 5.0 Implement the export command
+  - [x] 5.1 Create `ExportCommand.cs` that accepts a JSON state machine file path, required format string, and optional output path
+  - [x] 5.2 Read the input file and use `JsonImporter` to load the state machine
+  - [x] 5.3 Use `ExporterFactory` to get the appropriate exporter and export the state machine
+  - [x] 5.4 Write the exported content to the output file if `--output` is specified, otherwise write to stdout
 - [ ] 6.0 Implement help content and argument routing
   - [ ] 6.1 Create `HelpPrinter.cs` that prints usage syntax, command descriptions, options, and examples to stdout
   - [ ] 6.2 Implement `Program.cs` with argument parsing that routes to `build`, `export`, or help based on the first argument
