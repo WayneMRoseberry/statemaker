@@ -46,7 +46,7 @@ public class RuleFileLoader
 
     private static State? ParseInitialState(JsonElement root)
     {
-        if (!root.TryGetProperty("initialState", out var stateElement))
+        if (!root.TryGetProperty(BuildJsonPropertyNames.InitialState, out var stateElement))
             return null;
 
         if (stateElement.ValueKind == JsonValueKind.Null)
@@ -62,8 +62,8 @@ public class RuleFileLoader
 
     private IRule[] ParseRules(JsonElement root)
     {
-        if (!root.TryGetProperty("rules", out var rulesElement))
-            throw new InvalidOperationException("JSON must contain a 'rules' array.");
+        if (!root.TryGetProperty(BuildJsonPropertyNames.Rules, out var rulesElement))
+            throw new InvalidOperationException($"JSON must contain a '{BuildJsonPropertyNames.Rules}' array.");
 
         var rules = new List<IRule>();
         foreach (var ruleElement in rulesElement.EnumerateArray())
@@ -75,30 +75,30 @@ public class RuleFileLoader
 
     private IRule ParseSingleRule(JsonElement element)
     {
-        var type = GetOptionalString(element, "type");
+        var type = GetOptionalString(element, BuildJsonPropertyNames.Type);
 
-        if (type == null || type.Equals("declarative", StringComparison.OrdinalIgnoreCase))
+        if (type == null || type.Equals(BuildJsonPropertyNames.Declarative, StringComparison.OrdinalIgnoreCase))
             return ParseDeclarativeRule(element);
 
-        if (type.Equals("custom", StringComparison.OrdinalIgnoreCase))
+        if (type.Equals(BuildJsonPropertyNames.Custom, StringComparison.OrdinalIgnoreCase))
             return ParseCustomRule(element);
 
         throw new InvalidOperationException(
-            $"Unknown rule type '{type}'. Supported types: 'declarative', 'custom'.");
+            $"Unknown rule type '{type}'. Supported types: '{BuildJsonPropertyNames.Declarative}', '{BuildJsonPropertyNames.Custom}'.");
     }
 
     private DeclarativeRule ParseDeclarativeRule(JsonElement element)
     {
-        var name = GetOptionalString(element, "name")
+        var name = GetOptionalString(element, BuildJsonPropertyNames.Name)
             ?? throw new InvalidOperationException(
-                "Declarative rule is missing required 'name' field.");
+                $"Declarative rule is missing required '{BuildJsonPropertyNames.Name}' field.");
 
-        var condition = GetOptionalString(element, "condition")
+        var condition = GetOptionalString(element, BuildJsonPropertyNames.Condition)
             ?? throw new InvalidOperationException(
-                $"Declarative rule '{name}' is missing required 'condition' field.");
+                $"Declarative rule '{name}' is missing required '{BuildJsonPropertyNames.Condition}' field.");
 
         var transformations = new Dictionary<string, string>();
-        if (element.TryGetProperty("transformations", out var transElement))
+        if (element.TryGetProperty(BuildJsonPropertyNames.Transformations, out var transElement))
         {
             foreach (var prop in transElement.EnumerateObject())
             {
@@ -113,13 +113,13 @@ public class RuleFileLoader
 
     private static IRule ParseCustomRule(JsonElement element)
     {
-        var assemblyPath = GetOptionalString(element, "assemblyPath")
+        var assemblyPath = GetOptionalString(element, BuildJsonPropertyNames.AssemblyPath)
             ?? throw new InvalidOperationException(
-                "Custom rule is missing required 'assemblyPath' field.");
+                $"Custom rule is missing required '{BuildJsonPropertyNames.AssemblyPath}' field.");
 
-        var className = GetOptionalString(element, "className")
+        var className = GetOptionalString(element, BuildJsonPropertyNames.ClassName)
             ?? throw new InvalidOperationException(
-                "Custom rule is missing required 'className' field.");
+                $"Custom rule is missing required '{BuildJsonPropertyNames.ClassName}' field.");
 
         Assembly assembly;
         try
