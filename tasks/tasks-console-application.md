@@ -50,13 +50,13 @@ All tests must pass before moving on to the next sub-task.
   - [x] 1.2 Create `StateMaker.Console.csproj` targeting `net6.0` as an executable, referencing the `StateMaker` library project
   - [x] 1.3 Add the new project to `StateMaker.sln`
   - [x] 1.4 Verify the solution builds successfully with `dotnet build`
-- [ ] 2.0 Implement the build definition file parser
-  - [ ] 2.1 Create `BuildDefinitionLoader.cs` that parses a combined JSON file containing `initialState`, `rules`, and optional `config` sections
-  - [ ] 2.2 Parse the `initialState` section into a `State` object (reuse `RuleFileLoader` logic or call its methods)
-  - [ ] 2.3 Parse the `rules` section into an `IRule[]` array (reuse `RuleFileLoader` logic or call its methods)
-  - [ ] 2.4 Parse the optional `config` section into a `BuilderConfig` object (handle `maxStates`, `maxDepth`, `explorationStrategy` fields)
-  - [ ] 2.5 Return a result containing the initial state, rules, and config; use sensible defaults when config is omitted
-  - [ ] 2.6 Verify the build definition loader works by building the project
+- [x] 2.0 Implement the build definition file parser
+  - [x] 2.1 Create `BuildDefinitionLoader.cs` that parses a combined JSON file containing `initialState`, `rules`, and optional `config` sections
+  - [x] 2.2 Parse the `initialState` section into a `State` object (reuse `RuleFileLoader` logic or call its methods)
+  - [x] 2.3 Parse the `rules` section into an `IRule[]` array (reuse `RuleFileLoader` logic or call its methods)
+  - [x] 2.4 Parse the optional `config` section into a `BuilderConfig` object (handle `maxStates`, `maxDepth`, `explorationStrategy` fields)
+  - [x] 2.5 Return a result containing the initial state, rules, and config; use sensible defaults when config is omitted
+  - [x] 2.6 Verify the build definition loader works by building the project
 - [ ] 3.0 Implement the ExporterFactory
   - [ ] 3.1 Create `ExporterFactory.cs` that maps format strings (`json`, `dot`, `graphml`) to the corresponding `IStateMachineExporter` implementations
   - [ ] 3.2 Throw a clear error for unrecognized format strings
