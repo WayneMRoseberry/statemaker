@@ -126,16 +126,20 @@ namespace StateMaker
 
 ### 4. JSON Definition Format
 
-Users define declarative rules in JSON files:
+Users define declarative rules in JSON files. Rules can be declarative (the default) or custom (loaded from an external assembly). The `type` field is optional for declarative rules.
 
 ```json
 {
+  "initialState": {
+    "OrderStatus": "Pending",
+    "Amount": 500
+  },
   "rules": [
     {
       "name": "ApproveOrder",
       "condition": "OrderStatus == 'Pending' && Amount < 1000",
       "transformations": {
-        "OrderStatus": "Approved",
+        "OrderStatus": "'Approved'",
         "ApprovedCount": "ApprovedCount + 1"
       }
     },
@@ -143,71 +147,66 @@ Users define declarative rules in JSON files:
       "name": "RejectOrder",
       "condition": "OrderStatus == 'Pending' && Amount >= 1000",
       "transformations": {
-        "OrderStatus": "Rejected",
-        "RejectedCount": "RejectedCount + 1"
+        "OrderStatus": "'Rejected'"
       }
+    },
+    {
+      "type": "custom",
+      "assemblyPath": "path/to/MyRules.dll",
+      "className": "MyNamespace.MyCustomRule"
     }
-  ]
+  ],
+  "config": {
+    "maxStates": 100,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
 }
 ```
 
-### 5. File Loader Component
+Custom rules loaded from assemblies must implement `IRule` and have a parameterless constructor.
 
-The `RuleFileLoader` reads JSON and creates `DeclarativeRule` instances:
+### 5. File Loader Components
+
+Two loader classes handle JSON definition files:
+
+**`RuleFileLoader`** reads JSON and creates rule instances. It returns a tuple of the optional initial state and the parsed rules array:
 
 ```csharp
 public class RuleFileLoader
 {
     private readonly IExpressionEvaluator _evaluator;
 
-    public IRule[] LoadFromFile(string jsonFilePath)
-    {
-        var json = File.ReadAllText(jsonFilePath);
-        var ruleDefinitions = JsonSerializer.Deserialize<RuleDefinitions>(json);
-
-        var rules = new List<IRule>();
-
-        foreach (var ruleDef in ruleDefinitions.Rules)
-        {
-            var declarativeRule = new DeclarativeRule(
-                ruleDef.Name,
-                ruleDef.Condition,
-                ruleDef.Transformations,
-                _evaluator
-            );
-
-            rules.Add(declarativeRule); // Returns IRule[]
-        }
-
-        return rules.ToArray();
-    }
+    public (State? initialState, IRule[] rules) LoadFromFile(string filePath);
+    public (State? initialState, IRule[] rules) LoadFromJson(string json);
 }
 ```
 
-### 6. Programmatic API
+The loader supports both declarative rules (parsed from `name`, `condition`, `transformations` fields) and custom rules (loaded via reflection from `assemblyPath` and `className` fields).
 
-For users who want to define declarative rules in code without JSON files:
+**`BuildDefinitionLoader`** wraps `RuleFileLoader` and adds config parsing for the console application's `build` command:
 
 ```csharp
-public class RuleBuilder
+public class BuildDefinitionLoader
 {
-    private readonly IExpressionEvaluator _evaluator;
+    public BuildDefinitionResult LoadFromFile(string filePath);
+    public BuildDefinitionResult LoadFromJson(string json);
+}
 
-    public IRule DefineRule(
-        string name,
-        string condition,
-        Dictionary<string, string> transformations)
-    {
-        return new DeclarativeRule(name, condition, transformations, _evaluator);
-    }
+public class BuildDefinitionResult
+{
+    public State InitialState { get; set; }
+    public IRule[] Rules { get; set; }
+    public BuilderConfig Config { get; set; }
 }
 ```
+
+Both loaders use shared property name constants from `BuildJsonPropertyNames` (e.g., `"initialState"`, `"rules"`, `"config"`).
 
 ## Builder Integration
 
 ### The StateMachineBuilder
 
-The builder works with `IRule` instances and doesn't distinguish between rule types:
+The builder works with `IRule` instances and doesn't distinguish between rule types. It uses a `Dictionary<State, string>` for O(1) duplicate detection and a `LinkedList` as a unified frontier (FIFO for BFS, LIFO for DFS):
 
 ```csharp
 public class StateMachineBuilder : IStateMachineBuilder
@@ -218,19 +217,20 @@ public class StateMachineBuilder : IStateMachineBuilder
         BuilderConfig config)
     {
         var stateMachine = new StateMachine();
-        var visited = new HashSet<State>();
-        var queue = new Queue<(string id, State state)>();
+        var stateToId = new Dictionary<State, string>();
+        var frontier = new LinkedList<(string id, State state, int depth)>();
         int stateCounter = 0;
 
         string initialId = $"S{stateCounter++}";
-        stateMachine.AddState(initialId, initialState);
+        stateMachine.AddOrUpdateState(initialId, initialState);
         stateMachine.StartingStateId = initialId;
-        visited.Add(initialState);
-        queue.Enqueue((initialId, initialState));
+        stateToId[initialState] = initialId;
+        frontier.AddLast((initialId, initialState, 0));
 
-        while (queue.Count > 0)
+        while (frontier.Count > 0)
         {
-            var (currentId, currentState) = queue.Dequeue();
+            // BFS takes from front, DFS takes from back
+            var (currentId, currentState, currentDepth) = /* ... */;
 
             // Apply ALL rules regardless of type
             foreach (var rule in rules)
@@ -239,12 +239,18 @@ public class StateMachineBuilder : IStateMachineBuilder
                 {
                     var newState = rule.Execute(currentState);  // Polymorphism
 
-                    if (!visited.Contains(newState))
+                    if (stateToId.TryGetValue(newState, out string? existingId))
+                    {
+                        // Cycle: transition to existing state
+                        stateMachine.Transitions.Add(new Transition(currentId, existingId, rule.GetName()));
+                    }
+                    else
                     {
                         string newId = $"S{stateCounter++}";
-                        stateMachine.AddState(newId, newState);
-                        visited.Add(newState);
-                        queue.Enqueue((newId, newState));
+                        stateMachine.AddOrUpdateState(newId, newState);
+                        stateToId[newState] = newId;
+                        stateMachine.Transitions.Add(new Transition(currentId, newId, rule.GetName()));
+                        frontier.AddLast((newId, newState, currentDepth + 1));
                     }
                 }
             }
@@ -261,8 +267,8 @@ This architecture enables powerful composition:
 
 ```csharp
 // Load declarative rules from file
-var loader = new RuleFileLoader();
-var declarativeRules = loader.LoadFromFile("rules.json");
+var loader = new RuleFileLoader(new ExpressionEvaluator());
+var (initialState, declarativeRules) = loader.LoadFromFile("rules.json");
 
 // Create custom code-based rules
 var customRules = new IRule[]
@@ -275,7 +281,8 @@ var customRules = new IRule[]
 var allRules = declarativeRules.Concat(customRules).ToArray();
 
 // Build - the builder treats all rules identically
-var stateMachine = builder.Build(initialState, allRules, config);
+var builder = new StateMachineBuilder();
+var stateMachine = builder.Build(initialState!, allRules, new BuilderConfig());
 ```
 
 ## Design Principles
@@ -320,21 +327,15 @@ Evaluates value expressions for `Execute()`:
 
 ### Supported Expression Features
 
-**Phase 1 (Initial Implementation):**
+The expression evaluator (NCalc) supports:
 - Comparison operators: `==`, `!=`, `<`, `>`, `<=`, `>=`
 - Logical operators: `&&`, `||`, `!`
-- Basic arithmetic: `+`, `-`, `*`, `/`
-- Parenthetical expressions
-
-**Phase 2 (Future):**
-- String manipulation functions
-- Math functions (Max, Min, Abs, etc.)
-- Type conversions
+- Arithmetic operators: `+`, `-`, `*`, `/`, `%`
+- Parenthetical expressions: `(Amount + Tax) * Rate`
 
 ### Security Considerations
-- Expressions must be sandboxed
-- No arbitrary code execution allowed
-- Expression evaluator libraries (NCalc, DynamicExpresso) provide this safety
+- Expressions are sandboxed via NCalc — no arbitrary code execution
+- Expressions can only read state variables and return primitive values
 
 ## Implementation Requirements
 

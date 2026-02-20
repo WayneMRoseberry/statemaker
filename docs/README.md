@@ -13,9 +13,12 @@ Technical architecture documents explaining how the system is designed and how c
 **Available Documents:**
 - [**Declarative Rules Architecture**](./architecture/declarative-rules.md) - How declarative rule building works, including polymorphism, expression evaluation, and integration between custom and declarative rules
 - [**Builder Architecture**](./architecture/builder-architecture.md) - How the state machine builder explores state space, including validation, BFS/DFS strategies, cycle detection, and logging
-- [**Expression Evaluation**](./architecture/expression-evaluation.md) - Expression evaluator integration, supported operators, variable resolution, security sandboxing, and phased implementation plan
+- [**Expression Evaluation**](./architecture/expression-evaluation.md) - Expression evaluator integration, supported operators, variable resolution, and security sandboxing
 - [**State Immutability**](./architecture/state-immutability.md) - Why immutability matters, the Clone pattern, common mistakes, testing patterns, and correct equality implementation
 - [**Export Formats**](./architecture/export-formats.md) - JSON, DOT, and GraphML export/import specifications, state and transition representation, visualization options, and format comparison
+
+### Console Usage
+- [**Console Usage Guide**](./statemaker-console-usage.md) - Command-line usage, build definition file format, output formats, and input validation rules
 
 ### Test Documentation (`/test`)
 

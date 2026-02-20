@@ -58,9 +58,9 @@ Used in `Execute()` to compute new variable values.
 | `true` | (any) | `true` (literal) |
 | `(Price * Quantity) - Discount` | `{ Price: 10, Quantity: 3, Discount: 5 }` | `25` |
 
-## Phased Implementation
+## Supported Operators
 
-### Phase 1: Core Operators (Initial Release)
+The expression evaluator supports the following operators via NCalc:
 
 **Comparison Operators:**
 - Equality: `==`, `!=`
@@ -71,33 +71,21 @@ Used in `Execute()` to compute new variable values.
 - OR: `||`
 - NOT: `!`
 
-**Literal Values:**
-- Strings: `'Pending'`, `"Approved"`
-- Integers: `42`, `0`, `-1`
-- Booleans: `true`, `false`
-- Floats: `3.14`, `0.5`
-
-### Phase 2: Arithmetic and Grouping
-
 **Arithmetic Operators:**
 - Addition: `+`
 - Subtraction: `-`
 - Multiplication: `*`
 - Division: `/`
+- Modulo: `%`
 
 **Grouping:**
 - Parenthetical expressions: `(Amount + Tax) * Rate`
 
-### Phase 3: Functions (Future)
-
-**String Functions:**
-- `ToUpper()`, `ToLower()`, `Contains()`, `StartsWith()`
-
-**Math Functions:**
-- `Math.Max()`, `Math.Min()`, `Math.Abs()`, `Math.Round()`
-
-**Type Conversions:**
-- `ToString()`, `ToInt()`, `ToFloat()`
+**Literal Values:**
+- Strings: `'Pending'`, `"Approved"`
+- Integers: `42`, `0`, `-1`
+- Booleans: `true`, `false`
+- Floats: `3.14`, `0.5`
 
 ## Variable Resolution
 
@@ -123,45 +111,38 @@ Step 3: Evaluate `500 < 1000 && "Pending" == "Pending"` → `true`
 If an expression references a variable not present in the state, the evaluator should throw an exception with a clear message:
 - `"Variable 'MissingVar' not found in state"`
 
-## Implementation Options
+## Implementation
 
-### NCalc
+The expression evaluator uses **NCalc**, a lightweight expression evaluator for .NET. NCalc was chosen for its simple API, sandboxed execution (no arbitrary code), minimal dependencies, and .NET 6.0+ support.
 
-Lightweight expression evaluator for .NET.
-
-```csharp
-var expression = new Expression("Amount < 1000 && Status == 'Pending'");
-expression.Parameters["Amount"] = 500;
-expression.Parameters["Status"] = "Pending";
-bool result = (bool)expression.Evaluate();
-```
-
-**Pros:** Simple API, good performance, well-maintained
-**Cons:** Limited string function support
-
-### DynamicExpresso
-
-More powerful expression evaluator with C#-like syntax.
+### ExpressionEvaluator Class
 
 ```csharp
-var interpreter = new Interpreter();
-interpreter.SetVariable("Amount", 500);
-interpreter.SetVariable("Status", "Pending");
-bool result = interpreter.Eval<bool>("Amount < 1000 && Status == \"Pending\"");
+public class ExpressionEvaluator : IExpressionEvaluator
+{
+    public bool EvaluateBoolean(string expression, Dictionary<string, object> variables)
+    {
+        var result = Evaluate(expression, variables);
+        if (result is bool boolResult)
+            return boolResult;
+        throw new InvalidOperationException(
+            $"Expression '{expression}' did not evaluate to a boolean value.");
+    }
+
+    public object Evaluate(string expression, Dictionary<string, object> variables)
+    {
+        var ncalcExpr = new Expression(expression, ExpressionOptions.NoCache);
+
+        // Set parameters from state variables
+        foreach (var kvp in variables)
+            ncalcExpr.Parameters[kvp.Key] = kvp.Value;
+
+        return ncalcExpr.Evaluate();
+    }
+}
 ```
 
-**Pros:** Full C# expression support, type-safe
-**Cons:** Larger dependency, more complex
-
-### Selection Criteria
-
-The chosen library must:
-1. Support all Phase 1 operators
-2. Be sandboxed (no arbitrary code execution)
-3. Have minimal dependencies
-4. Support .NET 6.0+
-5. Be actively maintained
-6. Have clear error messages for invalid expressions
+The evaluator also handles division by zero (NCalc returns `Infinity` instead of throwing) and provides clear error messages for undefined variables and invalid syntax.
 
 ## Security
 
@@ -182,18 +163,18 @@ The chosen library must:
 ### Input Validation
 
 - Expression strings are validated at evaluation time (not at load time)
-- Maximum expression length should be enforced to prevent abuse
-- Nested parentheses depth should have a reasonable limit
+- NCalc's `HasErrors()` method is checked before evaluation to catch syntax errors early
 
 ## Error Handling
 
-| Error | Message Example |
+All errors are thrown as `InvalidOperationException` with descriptive messages:
+
+| Error | Message Pattern |
 |---|---|
-| Undefined variable | `"Variable 'Foo' not found in state"` |
-| Type mismatch | `"Cannot compare string 'abc' with integer 5"` |
-| Division by zero | `"Division by zero in expression 'Amount / 0'"` |
-| Invalid syntax | `"Invalid expression syntax: unexpected token '&&' at position 5"` |
-| Unknown operator | `"Unknown operator '===' in expression"` |
+| Undefined variable | `"Variable not found in state. Expression: '{expr}'. Detail: {message}"` |
+| Non-boolean condition | `"Expression '{expr}' did not evaluate to a boolean value. Got: {type}"` |
+| Division by zero | `"Division by zero in expression '{expr}'"` |
+| Invalid syntax | `"Invalid expression syntax: {details}"` |
 
 ## Testing Considerations
 

@@ -49,7 +49,7 @@ public class ApproveOrderRule : IRule
 {
     public bool IsAvailable(State state)
     {
-        return state.Variables["OrderStatus"] == "Pending";
+        return (string?)state.Variables["OrderStatus"] == "Pending";
     }
 
     public State Execute(State state)
@@ -61,11 +61,10 @@ public class ApproveOrderRule : IRule
 }
 
 // Build the state machine
-var initialState = new State(new Dictionary<string, object>
-{
-    { "OrderStatus", "Pending" }
-});
+var initialState = new State();
+initialState.Variables["OrderStatus"] = "Pending";
 
+var builder = new StateMachineBuilder();
 var rules = new IRule[] { new ApproveOrderRule() };
 var config = new BuilderConfig { MaxStates = 100 };
 var stateMachine = builder.Build(initialState, rules, config);
@@ -136,7 +135,7 @@ See the [Developer Documentation](/docs/README.md) for detailed examples and gui
 - **Polymorphic Rule Execution**: Builder works with `IRule`, agnostic to implementation
 - **Immutable States**: Rules return new states, preventing side effects
 - **BFS/DFS Exploration**: Configurable exploration strategies
-- **Expression Evaluation**: Declarative rules use sandboxed expression evaluation (NCalc/DynamicExpresso)
+- **Expression Evaluation**: Declarative rules use sandboxed expression evaluation (NCalc)
 
 ## Development
 
@@ -144,9 +143,13 @@ See the [Developer Documentation](/docs/README.md) for detailed examples and gui
 ```
 /docs                    # Developer documentation
   /architecture          # Architecture documents
+  /test                  # Test plans and test tools documentation
 /tasks                   # PRDs and task lists
-/src                     # Source code (coming soon)
-/tests                   # Unit tests (coming soon)
+/samples                 # Sample build definition files
+/src
+  /StateMaker            # Core library
+  /StateMaker.Console    # Command-line application
+  /StateMaker.Tests      # Unit and end-to-end tests
 ```
 
 ### CI/CD
