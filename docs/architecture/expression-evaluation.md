@@ -52,11 +52,13 @@ Used in `Execute()` to compute new variable values.
 
 | Expression | State Variables | Result |
 |---|---|---|
-| `"Approved"` | (any) | `"Approved"` (literal) |
+| `'Approved'` | (any) | `"Approved"` (string literal) |
 | `Count + 1` | `{ Count: 5 }` | `6` |
 | `Amount * 0.9` | `{ Amount: 100 }` | `90.0` |
 | `true` | (any) | `true` (literal) |
 | `(Price * Quantity) - Discount` | `{ Price: 10, Quantity: 3, Discount: 5 }` | `25` |
+
+**Important:** String literals in expressions must use **single quotes** (`'Approved'`). Unquoted text like `Approved` is interpreted as a variable name reference, which will cause an error if no variable with that name exists in the state.
 
 ## Supported Operators
 
@@ -82,7 +84,7 @@ The expression evaluator supports the following operators via NCalc:
 - Parenthetical expressions: `(Amount + Tax) * Rate`
 
 **Literal Values:**
-- Strings: `'Pending'`, `"Approved"`
+- Strings: `'Pending'`, `'Approved'` (must use single quotes)
 - Integers: `42`, `0`, `-1`
 - Booleans: `true`, `false`
 - Floats: `3.14`, `0.5`
@@ -171,7 +173,7 @@ All errors are thrown as `InvalidOperationException` with descriptive messages:
 
 | Error | Message Pattern |
 |---|---|
-| Undefined variable | `"Variable not found in state. Expression: '{expr}'. Detail: {message}"` |
+| Undefined parameter | `"Undefined parameter in expression '{expr}'. If you intended a string literal, wrap it in single quotes (e.g. 'value' instead of value). Detail: {message}"` |
 | Non-boolean condition | `"Expression '{expr}' did not evaluate to a boolean value. Got: {type}"` |
 | Division by zero | `"Division by zero in expression '{expr}'"` |
 | Invalid syntax | `"Invalid expression syntax: {details}"` |

@@ -64,13 +64,14 @@ public class ExpressionEvaluator : IExpressionEvaluator
             throw new InvalidOperationException(
                 $"Division by zero in expression '{expression}'");
         }
-        catch (Exception ex) when (ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase)
-                                   || ex.Message.Contains("parameter", StringComparison.OrdinalIgnoreCase))
+        catch (Exception ex) when (ex.Message.Contains("not defined", StringComparison.OrdinalIgnoreCase)
+                                   || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
         {
-            // NCalc throws when a parameter referenced in the expression is not in Parameters dict
-            // Extract the variable name from the message if possible
+            // NCalc throws when a parameter referenced in the expression is not in Parameters dict.
+            // This commonly happens when a user writes a string literal without single quotes,
+            // e.g. "activity": "jumping" instead of "activity": "'jumping'"
             throw new InvalidOperationException(
-                $"Variable not found in state. Expression: '{expression}'. Detail: {ex.Message}", ex);
+                $"Undefined parameter in expression '{expression}'. If you intended a string literal, wrap it in single quotes (e.g. 'value' instead of value). Detail: {ex.Message}", ex);
         }
         catch (Exception ex)
         {

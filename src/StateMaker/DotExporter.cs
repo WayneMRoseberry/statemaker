@@ -27,7 +27,7 @@ public class DotExporter : IStateMachineExporter
         {
             var label = BuildNodeLabel(kvp.Key, kvp.Value);
             sb.AppendLine(CultureInfo.InvariantCulture,
-                $"    \"{EscapeDot(kvp.Key)}\" [label=\"{EscapeDot(label)}\"];");
+                $"    \"{EscapeDot(kvp.Key)}\" [label=\"{label}\"];");
         }
 
         // Edges
@@ -43,17 +43,13 @@ public class DotExporter : IStateMachineExporter
 
     private static string BuildNodeLabel(string stateId, State state)
     {
-        var sb = new StringBuilder();
-        sb.Append(stateId);
-        if (state.Variables.Count > 0)
+        var parts = new List<string>();
+        parts.Add(EscapeDot(stateId));
+        foreach (var kvp in state.Variables)
         {
-            sb.Append("\\n");
-            foreach (var kvp in state.Variables)
-            {
-                sb.Append(CultureInfo.InvariantCulture, $"{kvp.Key}={FormatValue(kvp.Value)}\\n");
-            }
+            parts.Add($"{EscapeDot(kvp.Key)}={EscapeDot(FormatValue(kvp.Value))}");
         }
-        return sb.ToString().TrimEnd('\\', 'n');
+        return string.Join("\\n", parts);
     }
 
     private static string FormatValue(object? value)
