@@ -9,7 +9,7 @@ StateMaker is a command-line tool that builds state machines from JSON definitio
 Builds a state machine from a build definition file.
 
 ```
-statemaker build <definition-file> [options]
+statemaker.console build <definition-file> [options]
 ```
 
 | Option | Short | Description | Default |
@@ -20,10 +20,10 @@ statemaker build <definition-file> [options]
 **Examples:**
 
 ```
-statemaker build definition.json
-statemaker build definition.json --format dot
-statemaker build definition.json -f graphml -o machine.graphml
-statemaker build definition.json --format dot --output graph.dot
+statemaker.console build definition.json
+statemaker.console build definition.json --format dot
+statemaker.console build definition.json -f graphml -o machine.graphml
+statemaker.console build definition.json --format dot --output graph.dot
 ```
 
 ### `export`
@@ -31,7 +31,7 @@ statemaker build definition.json --format dot --output graph.dot
 Loads a previously built JSON state machine and exports it to another format.
 
 ```
-statemaker export <state-machine-file> [options]
+statemaker.console export <state-machine-file> [options]
 ```
 
 | Option | Short | Description | Default |
@@ -42,13 +42,13 @@ statemaker export <state-machine-file> [options]
 **Examples:**
 
 ```
-statemaker export machine.json --format dot
-statemaker export machine.json -f graphml -o machine.graphml
+statemaker.console export machine.json --format dot
+statemaker.console export machine.json -f graphml -o machine.graphml
 ```
 
 ### No arguments
 
-Running `statemaker` with no arguments displays help text showing available commands and options.
+Running `statemaker.console` with no arguments displays help text showing available commands and options.
 
 ## Exit Codes
 
@@ -206,6 +206,17 @@ Conditions and transformations use the [NCalc](https://github.com/ncalc/ncalc) e
 | Comparison | `==`, `!=`, `<`, `>`, `<=`, `>=` |
 | Logical | `&&`, `\|\|`, `!` |
 
+**Literal values:**
+
+| Type | Syntax | Example |
+|------|--------|---------|
+| String | Single quotes | `'Approved'`, `'idle'` |
+| Integer | Numeric | `0`, `42`, `-1` |
+| Double | Decimal | `3.14`, `0.5` |
+| Boolean | `true` / `false` | `true` |
+
+String literals **must** use single quotes. Unquoted text is interpreted as a variable name reference.
+
 **Examples:**
 
 ```
@@ -213,7 +224,24 @@ step + 1
 count < 10
 active == true && retries < 3
 score * 2 + bonus
+'Approved'
 ```
+
+**String transformation example:**
+
+To set a variable to a string value, wrap the value in single quotes:
+
+```json
+{
+  "name": "Approve",
+  "condition": "Status == 'Pending'",
+  "transformations": {
+    "Status": "'Approved'"
+  }
+}
+```
+
+Without single quotes, `"Status": "Approved"` would be interpreted as a reference to a variable named `Approved`, not the string value.
 
 **Validation rules:**
 - Expressions must use valid syntax. Invalid syntax produces an error.
