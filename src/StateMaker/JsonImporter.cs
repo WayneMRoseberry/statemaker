@@ -15,7 +15,7 @@ public class JsonImporter : IStateMachineImporter
         }
         catch (JsonException ex)
         {
-            throw new InvalidOperationException($"Invalid JSON syntax: {ex.Message}", ex);
+            throw new JsonParseException(ex);
         }
 
         var root = doc.RootElement;

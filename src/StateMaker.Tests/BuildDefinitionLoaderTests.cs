@@ -19,7 +19,7 @@ public class BuildDefinitionLoaderTests
     {
         var loader = new BuildDefinitionLoader();
 
-        Assert.Throws<InvalidOperationException>(() => loader.LoadFromJson("not valid json"));
+        Assert.Throws<JsonParseException>(() => loader.LoadFromJson("not valid json"));
     }
 
     [Fact]

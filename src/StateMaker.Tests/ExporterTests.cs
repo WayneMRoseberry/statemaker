@@ -193,7 +193,7 @@ public class ExporterTests
     [Fact]
     public void JsonImporter_InvalidJson_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.Throws<JsonParseException>(() =>
             new JsonImporter().Import("not json {{{"));
     }
 

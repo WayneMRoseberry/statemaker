@@ -9,8 +9,8 @@ public class ExpressionEvaluator : IExpressionEvaluator
         var result = Evaluate(expression, variables);
         if (result is bool boolResult)
             return boolResult;
-        throw new InvalidOperationException(
-            $"Expression '{expression}' did not evaluate to a boolean value. Got: {result?.GetType().Name ?? "null"}");
+        throw new ExpressionEvaluationException(expression,
+            $"Expected a boolean result but got: {result?.GetType().Name ?? "null"}");
     }
 
     public object Evaluate(string expression, Dictionary<string, object> variables)
@@ -25,15 +25,15 @@ public class ExpressionEvaluator : IExpressionEvaluator
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException(
-                $"Invalid expression syntax: {ex.Message}", ex);
+            throw new ExpressionEvaluationException(expression,
+                "Invalid syntax.", ex);
         }
 
         // Check for syntax errors before evaluating
         if (ncalcExpr.HasErrors())
         {
-            throw new InvalidOperationException(
-                $"Invalid expression syntax: {ncalcExpr.Error}");
+            throw new ExpressionEvaluationException(expression,
+                "Invalid syntax.");
         }
 
         // Set parameters from variables — case-sensitive exact match
@@ -49,20 +49,20 @@ public class ExpressionEvaluator : IExpressionEvaluator
             // NCalc returns Infinity for division by zero instead of throwing
             if (result is double d && (double.IsInfinity(d) || double.IsNaN(d)))
             {
-                throw new InvalidOperationException(
-                    $"Division by zero in expression '{expression}'");
+                throw new ExpressionEvaluationException(expression,
+                    "Division by zero.");
             }
 
             return result!;
         }
-        catch (InvalidOperationException)
+        catch (ExpressionEvaluationException)
         {
             throw;
         }
-        catch (DivideByZeroException)
+        catch (DivideByZeroException ex)
         {
-            throw new InvalidOperationException(
-                $"Division by zero in expression '{expression}'");
+            throw new ExpressionEvaluationException(expression,
+                "Division by zero.", ex);
         }
         catch (Exception ex) when (ex.Message.Contains("not defined", StringComparison.OrdinalIgnoreCase)
                                    || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
@@ -70,13 +70,13 @@ public class ExpressionEvaluator : IExpressionEvaluator
             // NCalc throws when a parameter referenced in the expression is not in Parameters dict.
             // This commonly happens when a user writes a string literal without single quotes,
             // e.g. "activity": "jumping" instead of "activity": "'jumping'"
-            throw new InvalidOperationException(
-                $"Undefined parameter in expression '{expression}'. If you intended a string literal, wrap it in single quotes (e.g. 'value' instead of value). Detail: {ex.Message}", ex);
+            throw new ExpressionEvaluationException(expression,
+                "Undefined parameter. If you intended a string literal, wrap it in single quotes (e.g. 'value' instead of value).", ex);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException(
-                $"Error evaluating expression '{expression}': {ex.Message}", ex);
+            throw new ExpressionEvaluationException(expression,
+                "Evaluation failed.", ex);
         }
     }
 }
