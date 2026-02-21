@@ -29,6 +29,22 @@ public class ExporterFactoryTests
     }
 
     [Fact]
+    public void GetExporter_Mermaid_ReturnsMermaidExporter()
+    {
+        var exporter = ExporterFactory.GetExporter("mermaid");
+
+        Assert.IsType<MermaidExporter>(exporter);
+    }
+
+    [Fact]
+    public void GetExporter_CaseInsensitive_Mermaid()
+    {
+        var exporter = ExporterFactory.GetExporter("MERMAID");
+
+        Assert.IsType<MermaidExporter>(exporter);
+    }
+
+    [Fact]
     public void GetExporter_CaseInsensitive_Json()
     {
         var exporter = ExporterFactory.GetExporter("JSON");
