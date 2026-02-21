@@ -427,6 +427,67 @@ public class ExporterTests
 
     #endregion
 
+    #region MermaidExporter
+
+    [Fact]
+    public void MermaidExporter_ProducesValidMermaidSyntax()
+    {
+        var machine = BuildSimpleMachine();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.StartsWith("flowchart TD", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_ContainsAllStates()
+    {
+        var machine = BuildSimpleMachine();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.Contains("S0", mermaid, StringComparison.Ordinal);
+        Assert.Contains("S1", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_ContainsAllTransitions()
+    {
+        var machine = BuildSimpleMachine();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.Contains("S0 -->|Approve| S1", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_ContainsStartingStateIndicator()
+    {
+        var machine = BuildSimpleMachine();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.Contains("_start_", mermaid, StringComparison.Ordinal);
+        Assert.Contains("--> S0", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_NodeLabelsIncludeVariables()
+    {
+        var machine = BuildSimpleMachine();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.Contains("Status", mermaid, StringComparison.Ordinal);
+        Assert.Contains("Pending", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_CycleMachine_ContainsBackEdge()
+    {
+        var machine = BuildCycleMachine();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.Contains("S1 -->|Reset| S0", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_NullStateMachine_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => new MermaidExporter().Export(null!));
+    }
+
+    #endregion
+
     #region 7.10 — Import-Then-Re-Export
 
     [Fact]
@@ -455,6 +516,21 @@ public class ExporterTests
         Assert.Contains("S1", graphml, StringComparison.Ordinal);
         Assert.Contains("Approve", graphml, StringComparison.Ordinal);
         Assert.Contains("ShapeNode", graphml, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ImportThenReExport_JsonToMermaid_ContainsAllData()
+    {
+        var original = BuildSimpleMachine();
+        var json = new JsonExporter().Export(original);
+        var imported = new JsonImporter().Import(json);
+        var mermaid = new MermaidExporter().Export(imported);
+
+        Assert.Contains("S0", mermaid, StringComparison.Ordinal);
+        Assert.Contains("S1", mermaid, StringComparison.Ordinal);
+        Assert.Contains("Approve", mermaid, StringComparison.Ordinal);
+        Assert.Contains("_start_", mermaid, StringComparison.Ordinal);
+        Assert.Contains("--> S0", mermaid, StringComparison.Ordinal);
     }
 
     [Fact]

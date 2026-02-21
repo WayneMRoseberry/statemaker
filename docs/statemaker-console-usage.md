@@ -14,7 +14,7 @@ statemaker.console build <definition-file> [options]
 
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
-| `--format` | `-f` | Output format: `json`, `dot`, `graphml` | `json` |
+| `--format` | `-f` | Output format: `json`, `dot`, `graphml`, `mermaid` | `json` |
 | `--output` | `-o` | Output file path | stdout |
 
 **Examples:**
@@ -36,7 +36,7 @@ statemaker.console export <state-machine-file> [options]
 
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
-| `--format` | `-f` | Output format: `json`, `dot`, `graphml` | `json` |
+| `--format` | `-f` | Output format: `json`, `dot`, `graphml`, `mermaid` | `json` |
 | `--output` | `-o` | Output file path | stdout |
 
 **Examples:**
@@ -309,6 +309,21 @@ Render with Graphviz tools such as `dot -Tpng graph.dot -o graph.png`.
 Produces [GraphML](http://graphml.graphdrawing.org/) XML with [yEd](https://www.yworks.com/products/yed) extensions for visual styling. Nodes include shape, color, and label data. The starting state node is highlighted with a green fill and thicker border.
 
 This format can be opened directly in yEd for interactive viewing and layout.
+
+### Mermaid (`--format mermaid`)
+
+Produces a [Mermaid](https://mermaid.js.org/) flowchart diagram. States include their variable values as labels. Transitions are labeled with the rule name. The starting state is indicated with a filled circle node.
+
+```mermaid
+flowchart TD
+    S0["S0<br />step=0<br />done=false"]
+    S1["S1<br />step=1<br />done=false"]
+    _start_((" ")) --> S0
+    style _start_ fill:#000,stroke:#000,color:#000
+    S0 -->|Advance| S1
+```
+
+Mermaid diagrams render natively in GitHub markdown, GitLab, and the [Mermaid Live Editor](https://mermaid.live).
 
 ## Error Cases
 

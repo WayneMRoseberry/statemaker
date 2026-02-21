@@ -11,8 +11,9 @@ public static class ExporterFactory
             "JSON" => new JsonExporter(),
             "DOT" => new DotExporter(),
             "GRAPHML" => new GraphMlExporter(),
+            "MERMAID" => new MermaidExporter(),
             _ => throw new ArgumentException(
-                $"Unsupported export format '{format}'. Supported formats: json, dot, graphml.", nameof(format))
+                $"Unsupported export format '{format}'. Supported formats: json, dot, graphml, mermaid.", nameof(format))
         };
     }
 }

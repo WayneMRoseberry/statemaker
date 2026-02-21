@@ -288,19 +288,72 @@ Each transition is an `<edge>` element with line styling and an edge label:
 4. The graph renders with all states, variables, and transitions visible
 5. Use yEd's layout algorithms to arrange the graph
 
+## Mermaid Format
+
+### Purpose
+- Text-based diagram syntax rendered by Mermaid.js
+- Native support in GitHub markdown, GitLab, Notion, and many documentation tools
+- No external tools needed — renders directly in browsers
+- Good for embedding state machine diagrams in documentation and README files
+
+### Target Tools
+- **GitHub**: Renders Mermaid in markdown files and PR descriptions
+- **Mermaid Live Editor**: https://mermaid.live
+- **IDE extensions**: Mermaid Preview for VSCode
+- **Documentation tools**: Docusaurus, MkDocs, Notion
+
+### Structure
+
+```mermaid
+flowchart TD
+    S0["S0<br />OrderStatus='Pending'<br />Amount=500<br />IsApproved=false"]
+    S1["S1<br />OrderStatus='Approved'<br />Amount=500<br />IsApproved=true"]
+    S2["S2<br />OrderStatus='Rejected'<br />Amount=500<br />IsApproved=false"]
+    _start_((" ")) --> S0
+    style _start_ fill:#000,stroke:#000,color:#000
+    S0 -->|ApproveOrder| S1
+    S0 -->|RejectOrder| S2
+    S2 -->|RetryOrder| S0
+```
+
+### State Representation in Mermaid
+
+States are defined as flowchart nodes with a quoted label containing the state ID followed by variable name/value pairs separated by `<br />`. HTML entities are used to escape `<`, `>`, and `&` in values:
+
+```
+S0["S0<br />OrderStatus='Pending'<br />Amount=500"]
+```
+
+### Transition Representation in Mermaid
+
+Transitions use the `-->` arrow with a pipe-delimited label:
+
+```
+S0 -->|ApproveOrder| S1
+```
+
+### Starting State Indicator
+
+The starting state is indicated using a filled circle node:
+
+```
+_start_((" ")) --> S0
+style _start_ fill:#000,stroke:#000,color:#000
+```
+
 ## Format Comparison
 
-| Feature | JSON | DOT | GraphML |
-|---|---|---|---|
-| Human readable | Moderate | High | Low (XML) |
-| Machine readable | High | Low | Moderate |
-| Round-trip import | Yes | No | No |
-| Visualization | Via JSON viewers | Graphviz | yEd |
-| State variables | Key-value pairs | Node labels | Node labels |
-| Transition labels | Rule name field | Edge labels | Edge labels |
-| Visual styling | None | Basic | Rich |
-| File size | Small | Small | Large (XML overhead) |
-| Version control | Good (diffable) | Good (diffable) | Poor (XML noise) |
+| Feature | JSON | DOT | GraphML | Mermaid |
+|---|---|---|---|---|
+| Human readable | Moderate | High | Low (XML) | High |
+| Machine readable | High | Low | Moderate | Moderate |
+| Round-trip import | Yes | No | No | No |
+| Visualization | Via JSON viewers | Graphviz | yEd | Mermaid.js / GitHub |
+| State variables | Key-value pairs | Node labels | Node labels | State labels |
+| Transition labels | Rule name field | Edge labels | Edge labels | Edge labels |
+| Visual styling | None | Basic | Rich | Basic |
+| File size | Small | Small | Large (XML overhead) | Small |
+| Version control | Good (diffable) | Good (diffable) | Poor (XML noise) | Good (diffable) |
 
 ## Implementation Notes
 
@@ -315,6 +368,7 @@ public interface IStateMachineExporter
 public class JsonExporter : IStateMachineExporter { ... }
 public class DotExporter : IStateMachineExporter { ... }
 public class GraphMlExporter : IStateMachineExporter { ... }
+public class MermaidExporter : IStateMachineExporter { ... }
 ```
 
 ### Import Interface
@@ -328,11 +382,11 @@ public interface IStateMachineImporter
 public class JsonImporter : IStateMachineImporter { ... }
 ```
 
-Only JSON import is supported. DOT and GraphML are export-only formats.
+Only JSON import is supported. DOT, GraphML, and Mermaid are export-only formats.
 
 ### Node Label Generation
 
-For both DOT and GraphML, state labels are generated from the state ID followed by variable key=value pairs. Values are formatted by type: strings in single quotes, booleans as `true`/`false`, nulls as `null`, and numbers as-is.
+For DOT, GraphML, and Mermaid, state labels are generated from the state ID followed by variable key=value pairs. Values are formatted by type: strings in single quotes, booleans as `true`/`false`, nulls as `null`, and numbers as-is.
 
 Variables appear in dictionary iteration order (insertion order). They are not sorted alphabetically.
 
