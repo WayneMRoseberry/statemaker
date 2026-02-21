@@ -324,7 +324,7 @@ public class ExpressionEvaluatorTests
     [Fact]
     public void Evaluate_UndefinedVariable_Throws()
     {
-        var ex = Assert.Throws<InvalidOperationException>(() =>
+        var ex = Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.Evaluate("[MissingVar] + 1", Vars(("Other", 5))));
         Assert.Contains("MissingVar", ex.Message, StringComparison.Ordinal);
     }
@@ -332,7 +332,7 @@ public class ExpressionEvaluatorTests
     [Fact]
     public void EvaluateBoolean_UndefinedVariable_Throws()
     {
-        var ex = Assert.Throws<InvalidOperationException>(() =>
+        var ex = Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.EvaluateBoolean("[Missing] == true", Vars()));
         Assert.Contains("Missing", ex.Message, StringComparison.Ordinal);
     }
@@ -340,7 +340,7 @@ public class ExpressionEvaluatorTests
     [Fact]
     public void Evaluate_InvalidSyntax_Throws()
     {
-        var ex = Assert.Throws<InvalidOperationException>(() =>
+        var ex = Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.Evaluate("=== invalid ===", Vars()));
         Assert.Contains("syntax", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -348,7 +348,7 @@ public class ExpressionEvaluatorTests
     [Fact]
     public void Evaluate_DivisionByZero_Throws()
     {
-        var ex = Assert.Throws<InvalidOperationException>(() =>
+        var ex = Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.Evaluate("[x] / 0", Vars(("x", 10))));
         Assert.Contains("Division by zero", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -356,9 +356,9 @@ public class ExpressionEvaluatorTests
     [Fact]
     public void EvaluateBoolean_NonBooleanExpression_Throws()
     {
-        var ex = Assert.Throws<InvalidOperationException>(() =>
+        var ex = Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.EvaluateBoolean("[x] + 1", Vars(("x", 5))));
-        Assert.Contains("did not evaluate to a boolean", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("Expected a boolean result", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -378,7 +378,7 @@ public class ExpressionEvaluatorTests
     [Fact]
     public void Evaluate_EmptyExpression_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.Evaluate("", Vars()));
     }
 
@@ -392,14 +392,14 @@ public class ExpressionEvaluatorTests
         // NCalc only evaluates mathematical/logical expressions
         // It cannot call .NET methods, access files, or make network calls.
         // This test verifies that function-like syntax fails (no custom functions registered).
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.Evaluate("System.IO.File.ReadAllText('test.txt')", Vars()));
     }
 
     [Fact]
     public void Evaluate_NoReflection()
     {
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.Throws<ExpressionEvaluationException>(() =>
             _evaluator.Evaluate("GetType().Assembly", Vars()));
     }
 

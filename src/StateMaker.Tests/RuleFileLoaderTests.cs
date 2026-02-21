@@ -242,7 +242,7 @@ public class RuleFileLoaderTests
     [Fact]
     public void LoadFromJson_InvalidJson_Throws()
     {
-        var ex = Assert.Throws<InvalidOperationException>(() =>
+        var ex = Assert.Throws<JsonParseException>(() =>
             _loader.LoadFromJson("not valid json {{{"));
         Assert.Contains("JSON", ex.Message, StringComparison.OrdinalIgnoreCase);
     }

@@ -234,7 +234,7 @@ public class DeclarativeRuleTests
             Transforms(("x", "=== invalid ===")), _evaluator);
         var state = MakeState(("x", 1));
 
-        Assert.Throws<InvalidOperationException>(() => rule.Execute(state));
+        Assert.Throws<ExpressionEvaluationException>(() => rule.Execute(state));
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public class DeclarativeRuleTests
             Transforms(), _evaluator);
         var state = MakeState(("x", 1));
 
-        Assert.Throws<InvalidOperationException>(() => rule.IsAvailable(state));
+        Assert.Throws<ExpressionEvaluationException>(() => rule.IsAvailable(state));
     }
 
     #endregion
