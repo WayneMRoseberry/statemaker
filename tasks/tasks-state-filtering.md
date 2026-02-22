@@ -68,14 +68,14 @@ All tests must pass before moving on to the next sub-task.
   - [x] 1.7 Add tests in `ExporterTests.cs` for JSON round-trip with attributes
   - [x] 1.8 Run all tests and confirm no regressions from the `State` class changes
 
-- [ ] 2.0 Create filter definition model and loader
-  - [ ] 2.1 Create `FilterRule` model class with `Condition` (string) and `Attributes` (dictionary) properties
-  - [ ] 2.2 Create `FilterDefinition` model class containing a list of `FilterRule` objects
-  - [ ] 2.3 Create `FilterDefinitionLoader` class with `LoadFromFile(string path)` and `LoadFromJson(string json)` methods, following the same patterns as `BuildDefinitionLoader` and `RuleFileLoader`
-  - [ ] 2.4 Handle invalid JSON with `JsonParseException`, validate required fields (e.g., `condition` must be present)
-  - [ ] 2.5 Support requirement 4.1.6: allow `condition` to refer to the state ID (add a reserved variable name like `_stateId` that gets injected during evaluation)
-  - [ ] 2.6 Add tests in `FilterDefinitionLoaderTests.cs` for valid definitions, missing fields, invalid JSON, multiple rules, and empty filters
-  - [ ] 2.7 Run tests and confirm all pass
+- [x] 2.0 Create filter definition model and loader
+  - [x] 2.1 Create `FilterRule` model class with `Condition` (string) and `Attributes` (dictionary) properties
+  - [x] 2.2 Create `FilterDefinition` model class containing a list of `FilterRule` objects
+  - [x] 2.3 Create `FilterDefinitionLoader` class with `LoadFromFile(string path)` and `LoadFromJson(string json)` methods, following the same patterns as `BuildDefinitionLoader` and `RuleFileLoader`
+  - [x] 2.4 Handle invalid JSON with `JsonParseException`, validate required fields (e.g., `condition` must be present)
+  - [x] 2.5 Support requirement 4.1.6: allow `condition` to refer to the state ID (add a reserved variable name like `_stateId` that gets injected during evaluation)
+  - [x] 2.6 Add tests in `FilterDefinitionLoaderTests.cs` for valid definitions, missing fields, invalid JSON, multiple rules, and empty filters
+  - [x] 2.7 Run tests and confirm all pass
 
 - [ ] 3.0 Create filter engine (evaluate filter rules against state machine states)
   - [ ] 3.1 Create `FilterEngine` class that accepts a `StateMachine`, a `FilterDefinition`, and an `IExpressionEvaluator`
