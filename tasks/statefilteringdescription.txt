@@ -1,0 +1,26 @@
+State filtering, selection and attribution.
+
+We want to be able to highlight states in a state machine definition which
+certain criteria and then use to for selection, filtering, marking up with special
+attributes and definition path traversal selection.
+
+- A rules based mechanism for selecting nodes inside a state machine. Uses
+similar rule expression mechanism as machine building, but rather than
+driving the creation of a state machine, selects or filters items from an
+already built state machine that match the criteria.
+
+- A markup mechanism that adds attributes to state machine nodes as indicated
+by the filtering rules. These attributes could be anything the filter
+indicates, for example "ranking":"low". The attributes would be a different
+set of properties on the state machine node than the state machine variables.
+
+- The ability to export state machines definitions that only include
+traversals that lead to one of the filtered nodes. This allows scenarios such
+as:
+
+Picking High Value Usage Paths
+A business analyst wants to know which sequence of actions lead to high
+priority features. They build a criteria for what the high priority features
+are, load a built state machine definition, and export it to a new state
+machine definition that now has all the ways through the machine that lead
+to the high priority features.
