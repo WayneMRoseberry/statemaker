@@ -3,6 +3,7 @@ namespace StateMaker;
 public class State : IEquatable<State>
 {
     public Dictionary<string, object?> Variables { get; } = new();
+    public Dictionary<string, object?> Attributes { get; } = new();
 
     public State Clone()
     {
@@ -10,6 +11,10 @@ public class State : IEquatable<State>
         foreach (var kvp in Variables)
         {
             clone.Variables[kvp.Key] = kvp.Value;
+        }
+        foreach (var kvp in Attributes)
+        {
+            clone.Attributes[kvp.Key] = kvp.Value;
         }
         return clone;
     }
@@ -34,6 +39,18 @@ public class State : IEquatable<State>
                 return false;
         }
 
+        if (Attributes.Count != other.Attributes.Count)
+            return false;
+
+        foreach (var kvp in Attributes)
+        {
+            if (!other.Attributes.TryGetValue(kvp.Key, out var otherValue))
+                return false;
+
+            if (!Equals(kvp.Value, otherValue))
+                return false;
+        }
+
         return true;
     }
 
@@ -46,6 +63,11 @@ public class State : IEquatable<State>
     {
         var hash = new HashCode();
         foreach (var kvp in Variables.OrderBy(k => k.Key, StringComparer.Ordinal))
+        {
+            hash.Add(kvp.Key, StringComparer.Ordinal);
+            hash.Add(kvp.Value);
+        }
+        foreach (var kvp in Attributes.OrderBy(k => k.Key, StringComparer.Ordinal))
         {
             hash.Add(kvp.Key, StringComparer.Ordinal);
             hash.Add(kvp.Value);

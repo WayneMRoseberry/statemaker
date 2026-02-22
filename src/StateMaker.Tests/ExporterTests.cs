@@ -562,4 +562,77 @@ public class ExporterTests
     }
 
     #endregion
+
+    #region JSON Attributes Round-Trip
+
+    [Fact]
+    public void JsonExporter_IncludesAttributesInOutput()
+    {
+        var machine = BuildSimpleMachine();
+        machine.States["S0"].Attributes["ranking"] = "high";
+        machine.States["S0"].Attributes["priority"] = 1;
+
+        var json = new JsonExporter().Export(machine);
+        var doc = JsonDocument.Parse(json);
+        var s0 = doc.RootElement.GetProperty("states").GetProperty("S0");
+
+        Assert.True(s0.TryGetProperty("attributes", out var attrs));
+        Assert.Equal("high", attrs.GetProperty("ranking").GetString());
+        Assert.Equal(1, attrs.GetProperty("priority").GetInt32());
+    }
+
+    [Fact]
+    public void JsonExporter_OmitsAttributesWhenEmpty()
+    {
+        var machine = BuildSimpleMachine();
+
+        var json = new JsonExporter().Export(machine);
+        var doc = JsonDocument.Parse(json);
+        var s0 = doc.RootElement.GetProperty("states").GetProperty("S0");
+
+        Assert.False(s0.TryGetProperty("attributes", out _));
+    }
+
+    [Fact]
+    public void JsonImporter_ReadsAttributes()
+    {
+        var machine = BuildSimpleMachine();
+        machine.States["S0"].Attributes["ranking"] = "high";
+        machine.States["S0"].Attributes["flagged"] = true;
+
+        var json = new JsonExporter().Export(machine);
+        var imported = new JsonImporter().Import(json);
+
+        Assert.Equal(2, imported.States["S0"].Attributes.Count);
+        Assert.Equal("high", imported.States["S0"].Attributes["ranking"]);
+        Assert.True((bool)imported.States["S0"].Attributes["flagged"]!);
+    }
+
+    [Fact]
+    public void JsonImporter_MissingAttributes_DefaultsToEmpty()
+    {
+        var machine = BuildSimpleMachine();
+        var json = new JsonExporter().Export(machine);
+        var imported = new JsonImporter().Import(json);
+
+        Assert.Empty(imported.States["S0"].Attributes);
+        Assert.Empty(imported.States["S1"].Attributes);
+    }
+
+    [Fact]
+    public void JsonRoundTrip_WithAttributes_PreservesAll()
+    {
+        var machine = BuildSimpleMachine();
+        machine.States["S0"].Attributes["ranking"] = "high";
+        machine.States["S0"].Attributes["priority"] = 1;
+        machine.States["S1"].Attributes["ranking"] = "low";
+
+        var json1 = new JsonExporter().Export(machine);
+        var imported = new JsonImporter().Import(json1);
+        var json2 = new JsonExporter().Export(imported);
+
+        Assert.Equal(json1, json2);
+    }
+
+    #endregion
 }
