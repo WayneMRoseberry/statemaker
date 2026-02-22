@@ -77,14 +77,14 @@ All tests must pass before moving on to the next sub-task.
   - [x] 2.6 Add tests in `FilterDefinitionLoaderTests.cs` for valid definitions, missing fields, invalid JSON, multiple rules, and empty filters
   - [x] 2.7 Run tests and confirm all pass
 
-- [ ] 3.0 Create filter engine (evaluate filter rules against state machine states)
-  - [ ] 3.1 Create `FilterEngine` class that accepts a `StateMachine`, a `FilterDefinition`, and an `IExpressionEvaluator`
-  - [ ] 3.2 Implement evaluation: iterate all states, evaluate each filter rule condition against the state's variables, collect matching states
-  - [ ] 3.3 Inject the state ID as a reserved variable (e.g., `_stateId`) so conditions can reference it per requirement 4.1.6
-  - [ ] 3.4 Implement attribute assignment: add each matching rule's attributes to the state's `Attributes` dictionary, with later rules overwriting duplicate keys
-  - [ ] 3.5 Return the set of selected state IDs (and the state machine with attributes applied)
-  - [ ] 3.6 Add tests in `FilterEngineTests.cs`: single rule match, no matches, multiple rules with attribute merging, condition referencing state ID, expression evaluation errors
-  - [ ] 3.7 Run tests and confirm all pass
+- [x] 3.0 Create filter engine (evaluate filter rules against state machine states)
+  - [x] 3.1 Create `FilterEngine` class that accepts a `StateMachine`, a `FilterDefinition`, and an `IExpressionEvaluator`
+  - [x] 3.2 Implement evaluation: iterate all states, evaluate each filter rule condition against the state's variables, collect matching states
+  - [x] 3.3 Inject the state ID as a reserved variable (e.g., `_stateId`) so conditions can reference it per requirement 4.1.6
+  - [x] 3.4 Implement attribute assignment: add each matching rule's attributes to the state's `Attributes` dictionary, with later rules overwriting duplicate keys
+  - [x] 3.5 Return the set of selected state IDs (and the state machine with attributes applied)
+  - [x] 3.6 Add tests in `FilterEngineTests.cs`: single rule match, no matches, multiple rules with attribute merging, condition referencing state ID, expression evaluation errors
+  - [x] 3.7 Run tests and confirm all pass
 
 - [ ] 4.0 Create path traversal filter (forward reachability from starting state to selected states)
   - [ ] 4.1 Create `PathFilter` class that accepts a `StateMachine` and a set of selected state IDs
