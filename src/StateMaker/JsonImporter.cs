@@ -29,7 +29,17 @@ public class JsonImporter : IStateMachineImporter
             var state = new State();
             foreach (var variable in stateProperty.Value.EnumerateObject())
             {
-                state.Variables[variable.Name] = ConvertJsonValue(variable.Value);
+                if (variable.Name == "attributes" && variable.Value.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var attr in variable.Value.EnumerateObject())
+                    {
+                        state.Attributes[attr.Name] = ConvertJsonValue(attr.Value);
+                    }
+                }
+                else
+                {
+                    state.Variables[variable.Name] = ConvertJsonValue(variable.Value);
+                }
             }
             stateMachine.AddOrUpdateState(stateProperty.Name, state);
         }

@@ -371,4 +371,150 @@ public class StateTests
         Assert.Equal(state, clone);
         Assert.Equal(state.GetHashCode(), clone.GetHashCode());
     }
+
+    // --- Attributes tests ---
+
+    [Fact]
+    public void Constructor_CreatesEmptyAttributes()
+    {
+        var state = new State();
+
+        Assert.NotNull(state.Attributes);
+        Assert.Empty(state.Attributes);
+    }
+
+    [Fact]
+    public void Attributes_CanStoreStringValue()
+    {
+        var state = new State();
+        state.Attributes["ranking"] = "high";
+
+        Assert.Equal("high", state.Attributes["ranking"]);
+    }
+
+    [Fact]
+    public void Attributes_CanStoreMultipleTypes()
+    {
+        var state = new State();
+        state.Attributes["label"] = "important";
+        state.Attributes["priority"] = 1;
+        state.Attributes["flagged"] = true;
+        state.Attributes["notes"] = null;
+
+        Assert.Equal(4, state.Attributes.Count);
+        Assert.Equal("important", state.Attributes["label"]);
+        Assert.Equal(1, state.Attributes["priority"]);
+        Assert.True((bool)state.Attributes["flagged"]!);
+        Assert.Null(state.Attributes["notes"]);
+    }
+
+    [Fact]
+    public void Clone_CopiesAttributes()
+    {
+        var state = new State();
+        state.Variables["x"] = 1;
+        state.Attributes["ranking"] = "high";
+        state.Attributes["priority"] = 1;
+
+        var clone = state.Clone();
+
+        Assert.Equal(2, clone.Attributes.Count);
+        Assert.Equal("high", clone.Attributes["ranking"]);
+        Assert.Equal(1, clone.Attributes["priority"]);
+    }
+
+    [Fact]
+    public void Clone_ModifyingCloneAttributesDoesNotAffectOriginal()
+    {
+        var state = new State();
+        state.Attributes["ranking"] = "high";
+
+        var clone = state.Clone();
+        clone.Attributes["ranking"] = "low";
+        clone.Attributes["extra"] = true;
+
+        Assert.Equal("high", state.Attributes["ranking"]);
+        Assert.Single(state.Attributes);
+    }
+
+    [Fact]
+    public void Equals_SameAttributes_ReturnsTrue()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+        a.Attributes["ranking"] = "high";
+
+        var b = new State();
+        b.Variables["x"] = 1;
+        b.Attributes["ranking"] = "high";
+
+        Assert.True(a.Equals(b));
+    }
+
+    [Fact]
+    public void Equals_DifferentAttributes_ReturnsFalse()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+        a.Attributes["ranking"] = "high";
+
+        var b = new State();
+        b.Variables["x"] = 1;
+        b.Attributes["ranking"] = "low";
+
+        Assert.False(a.Equals(b));
+    }
+
+    [Fact]
+    public void Equals_OneHasAttributesOtherDoesNot_ReturnsFalse()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+        a.Attributes["ranking"] = "high";
+
+        var b = new State();
+        b.Variables["x"] = 1;
+
+        Assert.False(a.Equals(b));
+    }
+
+    [Fact]
+    public void Equals_BothEmptyAttributes_ReturnsTrue()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+
+        var b = new State();
+        b.Variables["x"] = 1;
+
+        Assert.True(a.Equals(b));
+    }
+
+    [Fact]
+    public void GetHashCode_SameAttributes_SameHash()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+        a.Attributes["ranking"] = "high";
+
+        var b = new State();
+        b.Variables["x"] = 1;
+        b.Attributes["ranking"] = "high";
+
+        Assert.Equal(a.GetHashCode(), b.GetHashCode());
+    }
+
+    [Fact]
+    public void GetHashCode_DifferentAttributes_DifferentHash()
+    {
+        var a = new State();
+        a.Variables["x"] = 1;
+        a.Attributes["ranking"] = "high";
+
+        var b = new State();
+        b.Variables["x"] = 1;
+        b.Attributes["ranking"] = "low";
+
+        Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
+    }
 }

@@ -23,6 +23,15 @@ public class JsonExporter : IStateMachineExporter
             {
                 WriteJsonValue(writer, variable.Key, variable.Value);
             }
+            if (kvp.Value.Attributes.Count > 0)
+            {
+                writer.WriteStartObject("attributes");
+                foreach (var attr in kvp.Value.Attributes)
+                {
+                    WriteJsonValue(writer, attr.Key, attr.Value);
+                }
+                writer.WriteEndObject();
+            }
             writer.WriteEndObject();
         }
         writer.WriteEndObject();

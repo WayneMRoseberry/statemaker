@@ -55,18 +55,18 @@ All tests must pass before moving on to the next sub-task.
 
 ## Tasks
 
-- [ ] 0.0 Create feature branch
-  - [ ] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b feature/state-filtering`)
+- [x] 0.0 Create feature branch
+  - [x] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b feature/state-filtering`)
 
-- [ ] 1.0 Add `Attributes` dictionary to the `State` class and update serialization
-  - [ ] 1.1 Add an `Attributes` property (`Dictionary<string, object>`) to the `State` class, initialized to an empty dictionary
-  - [ ] 1.2 Update `State.Clone()` to deep-copy the `Attributes` dictionary
-  - [ ] 1.3 Update `State.Equals()` and `State.GetHashCode()` to include `Attributes`
-  - [ ] 1.4 Update `JsonExporter` to include `attributes` as a separate field in JSON output (omit or output empty object when no attributes)
-  - [ ] 1.5 Update `JsonImporter` to read the optional `attributes` field from JSON (default to empty dictionary if missing, for backward compatibility)
-  - [ ] 1.6 Add tests in `StateTests.cs` for clone, equality, and hashing with attributes
-  - [ ] 1.7 Add tests in `ExporterTests.cs` for JSON round-trip with attributes
-  - [ ] 1.8 Run all tests and confirm no regressions from the `State` class changes
+- [x] 1.0 Add `Attributes` dictionary to the `State` class and update serialization
+  - [x] 1.1 Add an `Attributes` property (`Dictionary<string, object>`) to the `State` class, initialized to an empty dictionary
+  - [x] 1.2 Update `State.Clone()` to deep-copy the `Attributes` dictionary
+  - [x] 1.3 Update `State.Equals()` and `State.GetHashCode()` to include `Attributes`
+  - [x] 1.4 Update `JsonExporter` to include `attributes` as a separate field in JSON output (omit or output empty object when no attributes)
+  - [x] 1.5 Update `JsonImporter` to read the optional `attributes` field from JSON (default to empty dictionary if missing, for backward compatibility)
+  - [x] 1.6 Add tests in `StateTests.cs` for clone, equality, and hashing with attributes
+  - [x] 1.7 Add tests in `ExporterTests.cs` for JSON round-trip with attributes
+  - [x] 1.8 Run all tests and confirm no regressions from the `State` class changes
 
 - [ ] 2.0 Create filter definition model and loader
   - [ ] 2.1 Create `FilterRule` model class with `Condition` (string) and `Attributes` (dictionary) properties
@@ -123,5 +123,6 @@ All tests must pass before moving on to the next sub-task.
 
 - [ ] 8.0 Update documentation
   - [ ] 8.1 Create `docs/architecture/state-filtering.md` covering filter definition format, filter engine, path traversal algorithm, and attribute rendering
-  - [ ] 8.2 Update `docs/statemaker-console-usage.md` with `filter` command usage, `--filter` option on `export`, `--list` flag, and example output
-  - [ ] 8.3 Run full test suite and Release build as final verification
+  - [ ] 8.2 In `docs/architecture/state-filtering.md`, document that `Attributes` are included in `State.Equals()` and `GetHashCode()`. This means a state before filtering is not equal to the same state after filter attributes are applied. Consumers and the filter engine should be aware that applying attributes changes state identity.
+  - [ ] 8.3 Update `docs/statemaker-console-usage.md` with `filter` command usage, `--filter` option on `export`, `--list` flag, and example output
+  - [ ] 8.4 Run full test suite and Release build as final verification
