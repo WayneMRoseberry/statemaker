@@ -49,6 +49,14 @@ public class DotExporter : IStateMachineExporter
         {
             parts.Add($"{EscapeDot(kvp.Key)}={EscapeDot(FormatValue(kvp.Value))}");
         }
+        if (state.Attributes.Count > 0)
+        {
+            parts.Add("---");
+            foreach (var kvp in state.Attributes)
+            {
+                parts.Add($"{EscapeDot(kvp.Key)}={EscapeDot(FormatValue(kvp.Value))}");
+            }
+        }
         return string.Join("\\n", parts);
     }
 

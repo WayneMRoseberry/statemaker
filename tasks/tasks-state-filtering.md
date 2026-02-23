@@ -95,13 +95,13 @@ All tests must pass before moving on to the next sub-task.
   - [x] 4.6 Add tests in `PathFilterTests.cs`: linear chain, branching paths, cycles, no matches yields empty machine, starting state inclusion, states not on path excluded
   - [x] 4.7 Run tests and confirm all pass
 
-- [ ] 5.0 Update exporters to render attributes (visually distinguished from variables)
-  - [ ] 5.1 Update `DotExporter` to include attributes in node labels, visually separated from variables (e.g., with a divider line or prefix)
-  - [ ] 5.2 Update `MermaidExporter` to include attributes in node labels, visually separated from variables
-  - [ ] 5.3 Update `GraphMlExporter` to include attributes in node labels, visually separated from variables
-  - [ ] 5.4 Ensure exporters handle states with no attributes gracefully (no divider or extra whitespace)
-  - [ ] 5.5 Add tests in `ExporterTests.cs` for each exporter with states that have attributes and states without attributes
-  - [ ] 5.6 Run tests and confirm all pass
+- [x] 5.0 Update exporters to render attributes (visually distinguished from variables)
+  - [x] 5.1 Update `DotExporter` to include attributes in node labels, visually separated from variables (e.g., with a divider line or prefix)
+  - [x] 5.2 Update `MermaidExporter` to include attributes in node labels, visually separated from variables
+  - [x] 5.3 Update `GraphMlExporter` to include attributes in node labels, visually separated from variables
+  - [x] 5.4 Ensure exporters handle states with no attributes gracefully (no divider or extra whitespace)
+  - [x] 5.5 Add tests in `ExporterTests.cs` for each exporter with states that have attributes and states without attributes
+  - [x] 5.6 Run tests and confirm all pass
 
 - [ ] 6.0 Add `filter` console command and `--filter` option on `export` command
   - [ ] 6.1 Create `FilterCommand` class following the pattern of `BuildCommand` and `ExportCommand`: load state machine, load filter definition, run filter engine, run path traversal, export result

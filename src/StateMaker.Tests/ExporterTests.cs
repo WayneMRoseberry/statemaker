@@ -635,4 +635,173 @@ public class ExporterTests
     }
 
     #endregion
+
+    #region Attribute Rendering — Helpers
+
+    private static StateMachine BuildMachineWithAttributes()
+    {
+        var machine = new StateMachine();
+        var s0 = new State();
+        s0.Variables["Status"] = "Pending";
+        s0.Attributes["ranking"] = "high";
+        s0.Attributes["flagged"] = true;
+        var s1 = new State();
+        s1.Variables["Status"] = "Approved";
+        // S1 has no attributes
+
+        machine.AddOrUpdateState("S0", s0);
+        machine.AddOrUpdateState("S1", s1);
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S0", "S1", "Approve"));
+        return machine;
+    }
+
+    #endregion
+
+    #region Attribute Rendering — DotExporter
+
+    [Fact]
+    public void DotExporter_WithAttributes_ContainsAttributesInLabel()
+    {
+        var machine = BuildMachineWithAttributes();
+        var dot = new DotExporter().Export(machine);
+        Assert.Contains("ranking", dot, StringComparison.Ordinal);
+        Assert.Contains("high", dot, StringComparison.Ordinal);
+        Assert.Contains("flagged", dot, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DotExporter_WithAttributes_ContainsDivider()
+    {
+        var machine = BuildMachineWithAttributes();
+        var dot = new DotExporter().Export(machine);
+        // S0 has both variables and attributes, so there should be a visual divider
+        Assert.Contains("---", dot, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DotExporter_WithoutAttributes_NoDivider()
+    {
+        var machine = BuildMachineWithAttributes();
+        var dot = new DotExporter().Export(machine);
+        // S1 has no attributes — its label should NOT contain the divider
+        // Extract S1's node line and verify no divider
+        var lines = dot.Split('\n');
+        var s1Line = lines.First(l => l.TrimStart().StartsWith("\"S1\"", StringComparison.Ordinal));
+        Assert.DoesNotContain("---", s1Line, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DotExporter_AttributesSeparatedFromVariables()
+    {
+        var machine = BuildMachineWithAttributes();
+        var dot = new DotExporter().Export(machine);
+        var lines = dot.Split('\n');
+        var s0Line = lines.First(l => l.TrimStart().StartsWith("\"S0\"", StringComparison.Ordinal));
+        // Variables appear before the divider, attributes after
+        int statusPos = s0Line.IndexOf("Status", StringComparison.Ordinal);
+        int dividerPos = s0Line.IndexOf("---", StringComparison.Ordinal);
+        int rankingPos = s0Line.IndexOf("ranking", StringComparison.Ordinal);
+        Assert.True(statusPos < dividerPos, "Variables should appear before divider");
+        Assert.True(dividerPos < rankingPos, "Attributes should appear after divider");
+    }
+
+    #endregion
+
+    #region Attribute Rendering — MermaidExporter
+
+    [Fact]
+    public void MermaidExporter_WithAttributes_ContainsAttributesInLabel()
+    {
+        var machine = BuildMachineWithAttributes();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.Contains("ranking", mermaid, StringComparison.Ordinal);
+        Assert.Contains("high", mermaid, StringComparison.Ordinal);
+        Assert.Contains("flagged", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_WithAttributes_ContainsDivider()
+    {
+        var machine = BuildMachineWithAttributes();
+        var mermaid = new MermaidExporter().Export(machine);
+        Assert.Contains("---", mermaid, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_WithoutAttributes_NoDivider()
+    {
+        var machine = BuildMachineWithAttributes();
+        var mermaid = new MermaidExporter().Export(machine);
+        var lines = mermaid.Split('\n');
+        var s1Line = lines.First(l => l.TrimStart().StartsWith("S1[", StringComparison.Ordinal));
+        Assert.DoesNotContain("---", s1Line, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_AttributesSeparatedFromVariables()
+    {
+        var machine = BuildMachineWithAttributes();
+        var mermaid = new MermaidExporter().Export(machine);
+        var lines = mermaid.Split('\n');
+        var s0Line = lines.First(l => l.TrimStart().StartsWith("S0[", StringComparison.Ordinal));
+        int statusPos = s0Line.IndexOf("Status", StringComparison.Ordinal);
+        int dividerPos = s0Line.IndexOf("---", StringComparison.Ordinal);
+        int rankingPos = s0Line.IndexOf("ranking", StringComparison.Ordinal);
+        Assert.True(statusPos < dividerPos, "Variables should appear before divider");
+        Assert.True(dividerPos < rankingPos, "Attributes should appear after divider");
+    }
+
+    #endregion
+
+    #region Attribute Rendering — GraphMlExporter
+
+    [Fact]
+    public void GraphMlExporter_WithAttributes_ContainsAttributesInLabel()
+    {
+        var machine = BuildMachineWithAttributes();
+        var graphml = new GraphMlExporter().Export(machine);
+        Assert.Contains("ranking", graphml, StringComparison.Ordinal);
+        Assert.Contains("high", graphml, StringComparison.Ordinal);
+        Assert.Contains("flagged", graphml, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GraphMlExporter_WithAttributes_ContainsDivider()
+    {
+        var machine = BuildMachineWithAttributes();
+        var graphml = new GraphMlExporter().Export(machine);
+        Assert.Contains("---", graphml, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GraphMlExporter_WithoutAttributes_NoDivider()
+    {
+        var machine = BuildMachineWithAttributes();
+        var graphml = new GraphMlExporter().Export(machine);
+        // The GraphML label for S1 should not contain a divider
+        // S1's label is in a NodeLabel element — extract and check
+        var s1NodeStart = graphml.IndexOf("id=\"S1\"", StringComparison.Ordinal);
+        var s1NodeEnd = graphml.IndexOf("</node>", s1NodeStart, StringComparison.Ordinal);
+        var s1Section = graphml.Substring(s1NodeStart, s1NodeEnd - s1NodeStart);
+        Assert.DoesNotContain("---", s1Section, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GraphMlExporter_AttributesSeparatedFromVariables()
+    {
+        var machine = BuildMachineWithAttributes();
+        var graphml = new GraphMlExporter().Export(machine);
+        // Extract S0 node section
+        var s0NodeStart = graphml.IndexOf("id=\"S0\"", StringComparison.Ordinal);
+        var s0NodeEnd = graphml.IndexOf("</node>", s0NodeStart, StringComparison.Ordinal);
+        var s0Section = graphml.Substring(s0NodeStart, s0NodeEnd - s0NodeStart);
+        int statusPos = s0Section.IndexOf("Status", StringComparison.Ordinal);
+        int dividerPos = s0Section.IndexOf("---", StringComparison.Ordinal);
+        int rankingPos = s0Section.IndexOf("ranking", StringComparison.Ordinal);
+        Assert.True(statusPos < dividerPos, "Variables should appear before divider");
+        Assert.True(dividerPos < rankingPos, "Attributes should appear after divider");
+    }
+
+    #endregion
 }
