@@ -91,10 +91,16 @@ public class Program
         var filterFilePath = args[2];
         var format = GetOptionValue(args, "--format", "-f") ?? "json";
         var outputPath = GetOptionValue(args, "--output", "-o");
+        var list = HasFlag(args, "--list");
 
         var filterCommand = new FilterCommand();
-        filterCommand.Execute(smFilePath, filterFilePath, outputPath, format, stdout);
+        filterCommand.Execute(smFilePath, filterFilePath, outputPath, format, stdout, list: list);
         return 0;
+    }
+
+    private static bool HasFlag(string[] args, string flag)
+    {
+        return args.Any(a => string.Equals(a, flag, StringComparison.OrdinalIgnoreCase));
     }
 
     private static string? GetOptionValue(string[] args, string longFlag, string shortFlag)

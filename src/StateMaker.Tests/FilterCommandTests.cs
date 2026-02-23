@@ -248,4 +248,142 @@ public class FilterCommandTests
     }
 
     #endregion
+
+    #region --list flag
+
+    [Fact]
+    public void Execute_WithListFlag_OutputsJsonArray()
+    {
+        var smPath = CreateTempStateMachineFile();
+        var filterPath = CreateTempFilterFile(SimpleFilter);
+        try
+        {
+            var writer = new StringWriter();
+            var command = new FilterCommand();
+
+            command.Execute(smPath, filterPath, null, "json", writer, list: true);
+
+            var output = writer.ToString();
+            var doc = JsonDocument.Parse(output);
+            Assert.Equal(JsonValueKind.Array, doc.RootElement.ValueKind);
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
+    public void Execute_WithListFlag_ContainsOnlyMatchingStates()
+    {
+        var smPath = CreateTempStateMachineFile();
+        var filterPath = CreateTempFilterFile(SimpleFilter);
+        try
+        {
+            var writer = new StringWriter();
+            var command = new FilterCommand();
+
+            command.Execute(smPath, filterPath, null, "json", writer, list: true);
+
+            var output = writer.ToString();
+            var doc = JsonDocument.Parse(output);
+            var arr = doc.RootElement.EnumerateArray().ToList();
+            // Only S2 matches status == 'end'
+            Assert.Single(arr);
+            Assert.Equal("S2", arr[0].GetProperty("stateId").GetString());
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
+    public void Execute_WithListFlag_IncludesVariablesAndAttributes()
+    {
+        var smPath = CreateTempStateMachineFile();
+        var filterPath = CreateTempFilterFile(SimpleFilter);
+        try
+        {
+            var writer = new StringWriter();
+            var command = new FilterCommand();
+
+            command.Execute(smPath, filterPath, null, "json", writer, list: true);
+
+            var output = writer.ToString();
+            var doc = JsonDocument.Parse(output);
+            var state = doc.RootElement.EnumerateArray().First();
+            // Should have variables
+            Assert.Equal("end", state.GetProperty("variables").GetProperty("status").GetString());
+            // Should have attributes from filter
+            Assert.Equal("red", state.GetProperty("attributes").GetProperty("highlight").GetString());
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
+    public void Execute_WithListFlag_NoMatches_OutputsEmptyArray()
+    {
+        var smPath = CreateTempStateMachineFile();
+        var filterPath = CreateTempFilterFile(@"{
+            ""filters"": [
+                { ""condition"": ""status == 'nonexistent'"", ""attributes"": {} }
+            ]
+        }");
+        try
+        {
+            var writer = new StringWriter();
+            var command = new FilterCommand();
+
+            command.Execute(smPath, filterPath, null, "json", writer, list: true);
+
+            var output = writer.ToString();
+            var doc = JsonDocument.Parse(output);
+            Assert.Empty(doc.RootElement.EnumerateArray().ToList());
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
+    public void Execute_WithListFlag_MultipleMatches_ReturnsAllMatchingStates()
+    {
+        var smPath = CreateTempStateMachineFile();
+        var filterPath = CreateTempFilterFile(@"{
+            ""filters"": [
+                { ""condition"": ""status == 'start' || status == 'end'"", ""attributes"": { ""selected"": true } }
+            ]
+        }");
+        try
+        {
+            var writer = new StringWriter();
+            var command = new FilterCommand();
+
+            command.Execute(smPath, filterPath, null, "json", writer, list: true);
+
+            var output = writer.ToString();
+            var doc = JsonDocument.Parse(output);
+            var arr = doc.RootElement.EnumerateArray().ToList();
+            Assert.Equal(2, arr.Count);
+            var stateIds = arr.Select(e => e.GetProperty("stateId").GetString()).OrderBy(s => s).ToList();
+            Assert.Equal("S0", stateIds[0]);
+            Assert.Equal("S2", stateIds[1]);
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    #endregion
 }

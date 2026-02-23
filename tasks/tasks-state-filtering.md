@@ -114,15 +114,15 @@ All tests must pass before moving on to the next sub-task.
   - [x] 6.8 Update `HelpPrinterTests.cs` for new help text
   - [x] 6.9 Run tests and confirm all pass
 
-- [ ] 7.0 Add `--list` flag support to the `filter` command
-  - [ ] 7.1 Update `FilterCommand` to accept a `--list` flag
-  - [ ] 7.2 When `--list` is provided, output a JSON array of full state definitions (with variables and attributes) for matching states, without path traversal
-  - [ ] 7.3 Add tests in `FilterCommandTests.cs` for `--list` flag output format and content
-  - [ ] 7.4 Update `HelpPrinter` with `--list` option documentation
-  - [ ] 7.5 Run tests and confirm all pass
+- [x] 7.0 Add `--list` flag support to the `filter` command
+  - [x] 7.1 Update `FilterCommand` to accept a `--list` flag
+  - [x] 7.2 When `--list` is provided, output a JSON array of full state definitions (with variables and attributes) for matching states, without path traversal
+  - [x] 7.3 Add tests in `FilterCommandTests.cs` for `--list` flag output format and content
+  - [x] 7.4 Update `HelpPrinter` with `--list` option documentation
+  - [x] 7.5 Run tests and confirm all pass
 
-- [ ] 8.0 Update documentation
-  - [ ] 8.1 Create `docs/architecture/state-filtering.md` covering filter definition format, filter engine, path traversal algorithm, and attribute rendering
-  - [ ] 8.2 In `docs/architecture/state-filtering.md`, document that `Attributes` are included in `State.Equals()` and `GetHashCode()`. This means a state before filtering is not equal to the same state after filter attributes are applied. Consumers and the filter engine should be aware that applying attributes changes state identity.
-  - [ ] 8.3 Update `docs/statemaker-console-usage.md` with `filter` command usage, `--filter` option on `export`, `--list` flag, and example output
-  - [ ] 8.4 Run full test suite and Release build as final verification
+- [x] 8.0 Update documentation
+  - [x] 8.1 Create `docs/architecture/state-filtering.md` covering filter definition format, filter engine, path traversal algorithm, and attribute rendering
+  - [x] 8.2 In `docs/architecture/state-filtering.md`, document that `Attributes` are included in `State.Equals()` and `GetHashCode()`. This means a state before filtering is not equal to the same state after filter attributes are applied. Consumers and the filter engine should be aware that applying attributes changes state identity.
+  - [x] 8.3 Update `docs/statemaker-console-usage.md` with `filter` command usage, `--filter` option on `export`, `--list` flag, and example output
+  - [x] 8.4 Run full test suite and Release build as final verification

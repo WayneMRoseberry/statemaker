@@ -91,4 +91,15 @@ public class HelpPrinterTests
         var output = writer.ToString();
         Assert.Contains("--filter", output, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void PrintHelp_ContainsListOption()
+    {
+        var writer = new StringWriter();
+
+        HelpPrinter.PrintHelp(writer);
+
+        var output = writer.ToString();
+        Assert.Contains("--list", output, StringComparison.Ordinal);
+    }
 }

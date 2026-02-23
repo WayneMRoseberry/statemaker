@@ -15,6 +15,7 @@ public static class HelpPrinter
         writer.WriteLine("  --format, -f <format>   Export format: json, dot, graphml, mermaid (default: json)");
         writer.WriteLine("  --output, -o <file>     Output file path (default: stdout)");
         writer.WriteLine("  --filter <file>         Filter definition file (for export command)");
+        writer.WriteLine("  --list                  Output matching states as a JSON array (for filter command)");
         writer.WriteLine();
         writer.WriteLine("Examples:");
         writer.WriteLine("  statemaker build definition.json");
@@ -22,5 +23,6 @@ public static class HelpPrinter
         writer.WriteLine("  statemaker export machine.json --format graphml -o machine.graphml");
         writer.WriteLine("  statemaker export machine.json --filter filter.json --format dot");
         writer.WriteLine("  statemaker filter machine.json filter.json --format dot");
+        writer.WriteLine("  statemaker filter machine.json filter.json --list");
     }
 }

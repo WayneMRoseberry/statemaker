@@ -377,6 +377,38 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Run_FilterCommand_WithListFlag_OutputsJsonArray()
+    {
+        var sm = new StateMachine();
+        var s0 = new State();
+        s0.Variables["x"] = 0;
+        sm.AddOrUpdateState("S0", s0);
+        sm.StartingStateId = "S0";
+        var smPath = Path.GetTempFileName();
+        File.WriteAllText(smPath, new JsonExporter().Export(sm));
+        var filterPath = Path.GetTempFileName();
+        File.WriteAllText(filterPath, @"{ ""filters"": [ { ""condition"": ""x == 0"", ""attributes"": { ""matched"": true } } ] }");
+        try
+        {
+            var stdout = new StringWriter();
+            var stderr = new StringWriter();
+
+            int exitCode = Program.Run(new[] { "filter", smPath, filterPath, "--list" }, stdout, stderr);
+
+            Assert.Equal(0, exitCode);
+            var output = stdout.ToString();
+            Assert.Contains("\"stateId\"", output, StringComparison.Ordinal);
+            Assert.Contains("\"variables\"", output, StringComparison.Ordinal);
+            Assert.Contains("\"attributes\"", output, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
     public void Run_ExportCommand_WithFilterFlag_AppliesFilter()
     {
         var sm = new StateMachine();
