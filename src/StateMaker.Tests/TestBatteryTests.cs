@@ -1,9 +1,22 @@
 using System.Globalization;
+using Xunit.Abstractions;
 
 namespace StateMaker.Tests;
 
+// NOTE: Intermittent failures have been observed in RunSingle_ReverseGenerated_PassesAllOracles
+// during full test suite runs. The failure could not be reproduced in isolation or in five
+// consecutive full suite runs. The most likely cause is Oracle 6 (performance heuristic,
+// 100ms/state threshold) being sensitive to system load during parallel test execution.
+// Pay attention to any recurrence and note the failure reason when it happens.
+// See docs/test/test-battery-observations.md for potential mitigations under consideration.
 public class TestBatteryTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public TestBatteryTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
     #region 3.22 — Test Case Generator Verification
 
     [Fact]
@@ -224,6 +237,9 @@ public class TestBatteryTests
     {
         var result = TestBatteryExecutor.Run(definition, TimeSpan.FromSeconds(5));
 
+        if (!result.Passed)
+            _output.WriteLine($"FAILURE: {definition.Name} — {result.FailureReason} (states={result.StateCount.ToString(CultureInfo.InvariantCulture)}, transitions={result.TransitionCount.ToString(CultureInfo.InvariantCulture)}, elapsed={result.ElapsedTime.TotalMilliseconds.ToString("F1", CultureInfo.InvariantCulture)}ms)");
+
         Assert.True(result.Passed, $"{definition.Name}: {result.FailureReason}");
     }
 
@@ -407,6 +423,9 @@ public class TestBatteryTests
     public void RunSingle_ReverseGenerated_PassesAllOracles(BuildDefinition definition)
     {
         var result = TestBatteryExecutor.Run(definition, TimeSpan.FromSeconds(5));
+
+        if (!result.Passed)
+            _output.WriteLine($"FAILURE: {definition.Name} — {result.FailureReason} (states={result.StateCount.ToString(CultureInfo.InvariantCulture)}, transitions={result.TransitionCount.ToString(CultureInfo.InvariantCulture)}, elapsed={result.ElapsedTime.TotalMilliseconds.ToString("F1", CultureInfo.InvariantCulture)}ms)");
 
         Assert.True(result.Passed, $"{definition.Name}: {result.FailureReason}");
     }
