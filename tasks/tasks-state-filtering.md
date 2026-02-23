@@ -86,14 +86,14 @@ All tests must pass before moving on to the next sub-task.
   - [x] 3.6 Add tests in `FilterEngineTests.cs`: single rule match, no matches, multiple rules with attribute merging, condition referencing state ID, expression evaluation errors
   - [x] 3.7 Run tests and confirm all pass
 
-- [ ] 4.0 Create path traversal filter (forward reachability from starting state to selected states)
-  - [ ] 4.1 Create `PathFilter` class that accepts a `StateMachine` and a set of selected state IDs
-  - [ ] 4.2 Implement forward reachability: find all paths from starting state to any selected state using BFS/DFS
-  - [ ] 4.3 Produce a new `StateMachine` containing only the states on those paths and their connecting transitions
-  - [ ] 4.4 Always include the starting state if any path exists to a selected state
-  - [ ] 4.5 Return an empty state machine (no states, no transitions) if no states match the filter
-  - [ ] 4.6 Add tests in `PathFilterTests.cs`: linear chain, branching paths, cycles, no matches yields empty machine, starting state inclusion, states not on path excluded
-  - [ ] 4.7 Run tests and confirm all pass
+- [x] 4.0 Create path traversal filter (forward reachability from starting state to selected states)
+  - [x] 4.1 Create `PathFilter` class that accepts a `StateMachine` and a set of selected state IDs
+  - [x] 4.2 Implement forward reachability: find all paths from starting state to any selected state using BFS/DFS
+  - [x] 4.3 Produce a new `StateMachine` containing only the states on those paths and their connecting transitions
+  - [x] 4.4 Always include the starting state if any path exists to a selected state
+  - [x] 4.5 Return an empty state machine (no states, no transitions) if no states match the filter
+  - [x] 4.6 Add tests in `PathFilterTests.cs`: linear chain, branching paths, cycles, no matches yields empty machine, starting state inclusion, states not on path excluded
+  - [x] 4.7 Run tests and confirm all pass
 
 - [ ] 5.0 Update exporters to render attributes (visually distinguished from variables)
   - [ ] 5.1 Update `DotExporter` to include attributes in node labels, visually separated from variables (e.g., with a divider line or prefix)
