@@ -291,4 +291,123 @@ public class ProgramTests
     }
 
     #endregion
+
+    #region Filter Command Routing
+
+    [Fact]
+    public void Run_FilterCommand_WithRequiredArgs_ReturnsZero()
+    {
+        var sm = new StateMachine();
+        var s0 = new State();
+        s0.Variables["x"] = 0;
+        sm.AddOrUpdateState("S0", s0);
+        sm.StartingStateId = "S0";
+        var smPath = Path.GetTempFileName();
+        File.WriteAllText(smPath, new JsonExporter().Export(sm));
+        var filterPath = Path.GetTempFileName();
+        File.WriteAllText(filterPath, @"{ ""filters"": [ { ""condition"": ""x == 0"", ""attributes"": {} } ] }");
+        try
+        {
+            var stdout = new StringWriter();
+            var stderr = new StringWriter();
+
+            int exitCode = Program.Run(new[] { "filter", smPath, filterPath }, stdout, stderr);
+
+            Assert.Equal(0, exitCode);
+            Assert.Contains("startingStateId", stdout.ToString(), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
+    public void Run_FilterCommand_WithFormatFlag_UsesSpecifiedFormat()
+    {
+        var sm = new StateMachine();
+        var s0 = new State();
+        s0.Variables["x"] = 0;
+        sm.AddOrUpdateState("S0", s0);
+        sm.StartingStateId = "S0";
+        var smPath = Path.GetTempFileName();
+        File.WriteAllText(smPath, new JsonExporter().Export(sm));
+        var filterPath = Path.GetTempFileName();
+        File.WriteAllText(filterPath, @"{ ""filters"": [ { ""condition"": ""x == 0"", ""attributes"": {} } ] }");
+        try
+        {
+            var stdout = new StringWriter();
+            var stderr = new StringWriter();
+
+            int exitCode = Program.Run(new[] { "filter", smPath, filterPath, "--format", "dot" }, stdout, stderr);
+
+            Assert.Equal(0, exitCode);
+            Assert.Contains("digraph", stdout.ToString(), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
+    public void Run_FilterCommand_MissingArgs_ReturnsOne()
+    {
+        var stdout = new StringWriter();
+        var stderr = new StringWriter();
+
+        int exitCode = Program.Run(new[] { "filter" }, stdout, stderr);
+
+        Assert.Equal(1, exitCode);
+        Assert.NotEmpty(stderr.ToString());
+    }
+
+    [Fact]
+    public void Run_FilterCommand_MissingFilterFile_ReturnsOne()
+    {
+        var stdout = new StringWriter();
+        var stderr = new StringWriter();
+
+        int exitCode = Program.Run(new[] { "filter", "somefile.json" }, stdout, stderr);
+
+        Assert.Equal(1, exitCode);
+        Assert.NotEmpty(stderr.ToString());
+    }
+
+    [Fact]
+    public void Run_ExportCommand_WithFilterFlag_AppliesFilter()
+    {
+        var sm = new StateMachine();
+        var s0 = new State();
+        s0.Variables["x"] = 0;
+        var s1 = new State();
+        s1.Variables["x"] = 1;
+        sm.AddOrUpdateState("S0", s0);
+        sm.AddOrUpdateState("S1", s1);
+        sm.StartingStateId = "S0";
+        sm.Transitions.Add(new Transition("S0", "S1", "Inc"));
+        var smPath = Path.GetTempFileName();
+        File.WriteAllText(smPath, new JsonExporter().Export(sm));
+        var filterPath = Path.GetTempFileName();
+        File.WriteAllText(filterPath, @"{ ""filters"": [ { ""condition"": ""x == 1"", ""attributes"": { ""found"": true } } ] }");
+        try
+        {
+            var stdout = new StringWriter();
+            var stderr = new StringWriter();
+
+            int exitCode = Program.Run(new[] { "export", smPath, "--filter", filterPath }, stdout, stderr);
+
+            Assert.Equal(0, exitCode);
+            Assert.Contains("found", stdout.ToString(), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    #endregion
 }

@@ -69,4 +69,26 @@ public class HelpPrinterTests
         var output = writer.ToString();
         Assert.Contains("Examples:", output, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void PrintHelp_ContainsFilterCommand()
+    {
+        var writer = new StringWriter();
+
+        HelpPrinter.PrintHelp(writer);
+
+        var output = writer.ToString();
+        Assert.Contains("filter", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PrintHelp_ContainsFilterOption()
+    {
+        var writer = new StringWriter();
+
+        HelpPrinter.PrintHelp(writer);
+
+        var output = writer.ToString();
+        Assert.Contains("--filter", output, StringComparison.Ordinal);
+    }
 }

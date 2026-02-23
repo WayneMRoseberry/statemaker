@@ -27,6 +27,8 @@ public class Program
                     return RunBuild(args, stdout, stderr);
                 case "export":
                     return RunExport(args, stdout, stderr);
+                case "filter":
+                    return RunFilter(args, stdout, stderr);
                 default:
                     stderr.WriteLine($"Unknown command '{args[0]}'.");
                     stderr.WriteLine();
@@ -70,8 +72,28 @@ public class Program
         var format = GetOptionValue(args, "--format", "-f") ?? "json";
         var outputPath = GetOptionValue(args, "--output", "-o");
 
+        var filterPath = GetOptionValue(args, "--filter", "--filter");
+
         var exportCommand = new ExportCommand();
-        exportCommand.Execute(filePath, outputPath, format, stdout);
+        exportCommand.Execute(filePath, outputPath, format, stdout, filterPath);
+        return 0;
+    }
+
+    private static int RunFilter(string[] args, TextWriter stdout, TextWriter stderr)
+    {
+        if (args.Length < 3)
+        {
+            stderr.WriteLine("Error: filter command requires a state machine file path and a filter definition file path.");
+            return 1;
+        }
+
+        var smFilePath = args[1];
+        var filterFilePath = args[2];
+        var format = GetOptionValue(args, "--format", "-f") ?? "json";
+        var outputPath = GetOptionValue(args, "--output", "-o");
+
+        var filterCommand = new FilterCommand();
+        filterCommand.Execute(smFilePath, filterFilePath, outputPath, format, stdout);
         return 0;
     }
 

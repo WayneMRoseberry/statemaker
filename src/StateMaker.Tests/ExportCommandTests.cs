@@ -169,4 +169,82 @@ public class ExportCommandTests
     }
 
     #endregion
+
+    #region Export with --filter
+
+    private static string CreateTempFilterFile(string filterJson)
+    {
+        var path = Path.GetTempFileName();
+        File.WriteAllText(path, filterJson);
+        return path;
+    }
+
+    [Fact]
+    public void Execute_WithFilter_AppliesFilterAndPathTraversal()
+    {
+        // Create a 3-state chain: S0 -> S1 -> S2
+        var sm = new StateMachine();
+        var s0 = new State();
+        s0.Variables["x"] = 0;
+        var s1 = new State();
+        s1.Variables["x"] = 1;
+        var s2 = new State();
+        s2.Variables["x"] = 2;
+        sm.AddOrUpdateState("S0", s0);
+        sm.AddOrUpdateState("S1", s1);
+        sm.AddOrUpdateState("S2", s2);
+        sm.StartingStateId = "S0";
+        sm.Transitions.Add(new Transition("S0", "S1", "Step1"));
+        sm.Transitions.Add(new Transition("S1", "S2", "Step2"));
+
+        var smPath = Path.GetTempFileName();
+        File.WriteAllText(smPath, new JsonExporter().Export(sm));
+        var filterPath = CreateTempFilterFile(@"{
+            ""filters"": [
+                { ""condition"": ""x == 2"", ""attributes"": { ""selected"": true } }
+            ]
+        }");
+        try
+        {
+            var writer = new StringWriter();
+            var command = new ExportCommand();
+
+            command.Execute(smPath, null, "json", writer, filterPath);
+
+            var output = writer.ToString();
+            var doc = System.Text.Json.JsonDocument.Parse(output);
+            var states = doc.RootElement.GetProperty("states");
+            // All states on path from S0 to S2
+            Assert.True(states.TryGetProperty("S0", out _));
+            Assert.True(states.TryGetProperty("S1", out _));
+            Assert.True(states.TryGetProperty("S2", out _));
+        }
+        finally
+        {
+            File.Delete(smPath);
+            File.Delete(filterPath);
+        }
+    }
+
+    [Fact]
+    public void Execute_WithFilter_NullFilterPath_ExportsWithoutFiltering()
+    {
+        var path = CreateTempStateMachineFile();
+        try
+        {
+            var writer = new StringWriter();
+            var command = new ExportCommand();
+
+            command.Execute(path, null, "json", writer, null);
+
+            var output = writer.ToString();
+            Assert.Contains("startingStateId", output, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    #endregion
 }

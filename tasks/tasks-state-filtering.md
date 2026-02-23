@@ -103,16 +103,16 @@ All tests must pass before moving on to the next sub-task.
   - [x] 5.5 Add tests in `ExporterTests.cs` for each exporter with states that have attributes and states without attributes
   - [x] 5.6 Run tests and confirm all pass
 
-- [ ] 6.0 Add `filter` console command and `--filter` option on `export` command
-  - [ ] 6.1 Create `FilterCommand` class following the pattern of `BuildCommand` and `ExportCommand`: load state machine, load filter definition, run filter engine, run path traversal, export result
-  - [ ] 6.2 Update `ExportCommand` to accept an optional `--filter` argument; when provided, apply filter engine and path traversal before exporting
-  - [ ] 6.3 Update `Program.cs` to route the `filter` command to `FilterCommand`
-  - [ ] 6.4 Update `HelpPrinter` with usage text for the `filter` command and `--filter` option on `export`
-  - [ ] 6.5 Add tests in `FilterCommandTests.cs` for successful filtering, missing files, invalid filter definition, and output format options
-  - [ ] 6.6 Add tests in `ExportCommandTests.cs` for the `--filter` option
-  - [ ] 6.7 Update `ProgramTests.cs` for filter command routing
-  - [ ] 6.8 Update `HelpPrinterTests.cs` for new help text
-  - [ ] 6.9 Run tests and confirm all pass
+- [x] 6.0 Add `filter` console command and `--filter` option on `export` command
+  - [x] 6.1 Create `FilterCommand` class following the pattern of `BuildCommand` and `ExportCommand`: load state machine, load filter definition, run filter engine, run path traversal, export result
+  - [x] 6.2 Update `ExportCommand` to accept an optional `--filter` argument; when provided, apply filter engine and path traversal before exporting
+  - [x] 6.3 Update `Program.cs` to route the `filter` command to `FilterCommand`
+  - [x] 6.4 Update `HelpPrinter` with usage text for the `filter` command and `--filter` option on `export`
+  - [x] 6.5 Add tests in `FilterCommandTests.cs` for successful filtering, missing files, invalid filter definition, and output format options
+  - [x] 6.6 Add tests in `ExportCommandTests.cs` for the `--filter` option
+  - [x] 6.7 Update `ProgramTests.cs` for filter command routing
+  - [x] 6.8 Update `HelpPrinterTests.cs` for new help text
+  - [x] 6.9 Run tests and confirm all pass
 
 - [ ] 7.0 Add `--list` flag support to the `filter` command
   - [ ] 7.1 Update `FilterCommand` to accept a `--list` flag
