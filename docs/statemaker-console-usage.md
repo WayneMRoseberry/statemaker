@@ -38,12 +38,55 @@ statemaker.console export <state-machine-file> [options]
 |--------|-------|-------------|---------|
 | `--format` | `-f` | Output format: `json`, `dot`, `graphml`, `mermaid` | `json` |
 | `--output` | `-o` | Output file path | stdout |
+| `--filter` | | Filter definition file to apply before exporting | none |
 
 **Examples:**
 
 ```
 statemaker.console export machine.json --format dot
 statemaker.console export machine.json -f graphml -o machine.graphml
+statemaker.console export machine.json --filter filter.json --format dot
+```
+
+### `filter`
+
+Applies a filter definition to a state machine, performs path traversal to extract matching paths, and exports the result.
+
+```
+statemaker.console filter <state-machine-file> <filter-file> [options]
+```
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--format` | `-f` | Output format: `json`, `dot`, `graphml`, `mermaid` | `json` |
+| `--output` | `-o` | Output file path | stdout |
+| `--list` | | Output matching states as a JSON array (no path traversal) | off |
+
+**Examples:**
+
+```
+statemaker.console filter machine.json filter.json
+statemaker.console filter machine.json filter.json --format dot
+statemaker.console filter machine.json filter.json --list
+statemaker.console filter machine.json filter.json --list -o matches.json
+```
+
+**`--list` output format:**
+
+When `--list` is provided, the output is a JSON array of matching state definitions instead of a full state machine:
+
+```json
+[
+  {
+    "stateId": "S2",
+    "variables": {
+      "status": "end"
+    },
+    "attributes": {
+      "highlight": "red"
+    }
+  }
+]
 ```
 
 ### No arguments
@@ -329,7 +372,7 @@ Mermaid diagrams render natively in GitHub markdown, GitLab, and the [Mermaid Li
 
 | Scenario | Behavior |
 |----------|----------|
-| Missing file path argument for `build` or `export` | Error message to stderr, exit code 1. |
+| Missing file path argument for `build`, `export`, or `filter` | Error message to stderr, exit code 1. |
 | Definition or state machine file not found | `"not found"` message to stderr, exit code 1. |
 | Invalid JSON in input file | Parse error details to stderr, exit code 1. |
 | Missing required `initialState` section | Error message to stderr, exit code 1. |
@@ -339,5 +382,8 @@ Mermaid diagrams render natively in GitHub markdown, GitLab, and the [Mermaid Li
 | Invalid expression syntax in a rule | Error message with expression details to stderr, exit code 1. |
 | Undefined variable referenced in expression | Error message with expression and variable details to stderr, exit code 1. |
 | Unknown exploration strategy | Error listing supported strategies to stderr, exit code 1. |
+| Filter definition file not found | `"not found"` message to stderr, exit code 1. |
+| Invalid JSON in filter definition file | Parse error details to stderr, exit code 1. |
+| Missing `condition` in a filter rule | Validation error to stderr, exit code 1. |
 
 All errors print the exception message and full stack trace to stderr and return exit code 1.
