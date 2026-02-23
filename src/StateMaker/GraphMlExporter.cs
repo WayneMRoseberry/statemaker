@@ -144,6 +144,14 @@ public class GraphMlExporter : IStateMachineExporter
         {
             sb.Append(CultureInfo.InvariantCulture, $"\n{kvp.Key}={FormatValue(kvp.Value)}");
         }
+        if (state.Attributes.Count > 0)
+        {
+            sb.Append("\n---");
+            foreach (var kvp in state.Attributes)
+            {
+                sb.Append(CultureInfo.InvariantCulture, $"\n{kvp.Key}={FormatValue(kvp.Value)}");
+            }
+        }
         return sb.ToString();
     }
 
