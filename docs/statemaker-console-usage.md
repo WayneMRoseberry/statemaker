@@ -292,6 +292,87 @@ Without single quotes, `"Status": "Approved"` would be interpreted as a referenc
 - Condition expressions must evaluate to a boolean value.
 - Division by zero produces an error.
 
+## Filter Definition File Format
+
+The `filter` command and the `--filter` option on `export` take a JSON filter definition file. This file defines one or more filter rules that select states from a state machine based on conditions and optionally assign attributes to matched states.
+
+### Sample Filter Definition File
+
+```json
+{
+  "filters": [
+    {
+      "condition": "Status == 'Error' && RetryCount > 3",
+      "attributes": {
+        "highlight": "red",
+        "category": "failure"
+      }
+    },
+    {
+      "condition": "_stateId == 'S0'",
+      "attributes": {
+        "role": "entry"
+      }
+    }
+  ]
+}
+```
+
+### `filters` (required)
+
+An array of filter rule objects. Each rule defines a condition to match against states and optional attributes to assign to matching states.
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| `condition` | Yes | A boolean expression evaluated against each state's variables. Uses the same NCalc expression syntax as build rule conditions. |
+| `attributes` | No | An object of key-value pairs to assign to matching states. Defaults to empty if omitted. |
+
+```json
+{
+  "condition": "count > 10",
+  "attributes": {
+    "highlight": "red",
+    "priority": 1
+  }
+}
+```
+
+**Validation rules:**
+- `filters` must be present in the definition file.
+- Each filter rule must contain a `condition` field with a non-null string value.
+- `attributes` is optional. If present, it must be a JSON object.
+- Attribute values follow the same type rules as state variables: string, integer, double, boolean, or null.
+
+### Reserved Variable: `_stateId`
+
+During filter evaluation, the special variable `_stateId` is injected into each state's variable context. It contains the state's ID string (e.g., `"S0"`, `"S1"`), allowing conditions to match states by their ID.
+
+```json
+{
+  "condition": "_stateId == 'S0' || _stateId == 'S5'",
+  "attributes": { "inspect": true }
+}
+```
+
+### Attribute Merging
+
+When multiple rules match the same state, attributes are applied in rule order. Later rules overwrite duplicate attribute keys from earlier rules.
+
+```json
+{
+  "filters": [
+    { "condition": "true", "attributes": { "color": "gray" } },
+    { "condition": "Status == 'Error'", "attributes": { "color": "red" } }
+  ]
+}
+```
+
+In this example, all states get `color=gray`, but error states get `color=red` (overwritten by the second rule).
+
+### Filter Conditions and Expression Syntax
+
+Filter conditions use the same NCalc expression syntax described in the [Expression Syntax](#expression-syntax) section above. Conditions can reference any variable defined in the state, plus the reserved `_stateId` variable.
+
 ## Output Formats
 
 ### JSON (`--format json`)
