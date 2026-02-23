@@ -30,7 +30,7 @@ public class PathFilter
             reverseAdj[transition.TargetStateId].Add(transition);
         }
 
-        // Forward BFS from starting state, stopping at selected states
+        // Forward BFS from starting state to find all reachable states
         var forwardReachable = new HashSet<string>();
         var reachedSelected = new HashSet<string>();
         var queue = new Queue<string>();
@@ -43,10 +43,7 @@ public class PathFilter
             var current = queue.Dequeue();
 
             if (_selectedStateIds.Contains(current))
-            {
                 reachedSelected.Add(current);
-                continue;
-            }
 
             if (!forwardAdj.TryGetValue(current, out var transitions))
                 continue;
@@ -63,7 +60,9 @@ public class PathFilter
         if (reachedSelected.Count == 0)
             return new StateMachine();
 
-        // Reverse BFS from reached selected states, only visiting forward-reachable states
+        // Reverse BFS from reached selected states, only visiting forward-reachable states.
+        // Selected states are already seeded in pathStates, so the check on predecessors
+        // skips them to avoid redundant processing (they are already included).
         var pathStates = new HashSet<string>();
         queue.Clear();
 
@@ -103,8 +102,7 @@ public class PathFilter
         foreach (var transition in _stateMachine.Transitions)
         {
             if (pathStates.Contains(transition.SourceStateId)
-                && pathStates.Contains(transition.TargetStateId)
-                && !_selectedStateIds.Contains(transition.SourceStateId))
+                && pathStates.Contains(transition.TargetStateId))
             {
                 result.Transitions.Add(transition);
             }

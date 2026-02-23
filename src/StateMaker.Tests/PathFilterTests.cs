@@ -308,6 +308,74 @@ public class PathFilterTests
 
     #endregion
 
+    #region Selected States in Sequence
+
+    [Fact]
+    public void Filter_TwoSelectedInSequence_IncludesPathThroughBoth()
+    {
+        // S0 -> S1 -> S2 (selected) -> S3 (selected)
+        // S0 -> S4
+        // Should include S0, S1, S2, S3 and transitions S0->S1, S1->S2, S2->S3
+        var machine = new StateMachine();
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
+        machine.AddOrUpdateState("S2", new State());
+        machine.AddOrUpdateState("S3", new State());
+        machine.AddOrUpdateState("S4", new State());
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S0", "S1", "R1"));
+        machine.Transitions.Add(new Transition("S1", "S2", "R2"));
+        machine.Transitions.Add(new Transition("S2", "S3", "R3"));
+        machine.Transitions.Add(new Transition("S0", "S4", "R4"));
+
+        var selected = new HashSet<string> { "S2", "S3" };
+
+        var result = new PathFilter(machine, selected).Filter();
+
+        Assert.Equal(4, result.States.Count);
+        Assert.Contains("S0", result.States.Keys);
+        Assert.Contains("S1", result.States.Keys);
+        Assert.Contains("S2", result.States.Keys);
+        Assert.Contains("S3", result.States.Keys);
+        Assert.DoesNotContain("S4", result.States.Keys);
+        Assert.Equal(3, result.Transitions.Count);
+        Assert.Contains(result.Transitions, t => t.SourceStateId == "S0" && t.TargetStateId == "S1");
+        Assert.Contains(result.Transitions, t => t.SourceStateId == "S1" && t.TargetStateId == "S2");
+        Assert.Contains(result.Transitions, t => t.SourceStateId == "S2" && t.TargetStateId == "S3");
+    }
+
+    [Fact]
+    public void Filter_SelectedReachableOnlyThroughAnotherSelected_BothIncluded()
+    {
+        // S0 -> S1 -> S2 (selected) -> S3 -> S4 (selected)
+        // S4 is only reachable through S2
+        var machine = new StateMachine();
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
+        machine.AddOrUpdateState("S2", new State());
+        machine.AddOrUpdateState("S3", new State());
+        machine.AddOrUpdateState("S4", new State());
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S0", "S1", "R1"));
+        machine.Transitions.Add(new Transition("S1", "S2", "R2"));
+        machine.Transitions.Add(new Transition("S2", "S3", "R3"));
+        machine.Transitions.Add(new Transition("S3", "S4", "R4"));
+
+        var selected = new HashSet<string> { "S2", "S4" };
+
+        var result = new PathFilter(machine, selected).Filter();
+
+        Assert.Equal(5, result.States.Count);
+        Assert.Contains("S0", result.States.Keys);
+        Assert.Contains("S1", result.States.Keys);
+        Assert.Contains("S2", result.States.Keys);
+        Assert.Contains("S3", result.States.Keys);
+        Assert.Contains("S4", result.States.Keys);
+        Assert.Equal(4, result.Transitions.Count);
+    }
+
+    #endregion
+
     #region No Matches
 
     [Fact]
@@ -368,6 +436,37 @@ public class PathFilterTests
         Assert.Contains("S0", result.States.Keys);
         Assert.Equal("S0", result.StartingStateId);
         Assert.Empty(result.Transitions);
+    }
+
+    [Fact]
+    public void Filter_StartingStateIsSelected_AndOtherSelectedReachable_IncludesPathToOther()
+    {
+        // S0 (selected) -> S1 -> S2 (selected)
+        // S0 -> S3
+        // Should include S0, S1, S2 and transitions S0->S1, S1->S2
+        // Should exclude S3 (not on path to a selected state)
+        var machine = new StateMachine();
+        machine.AddOrUpdateState("S0", new State());
+        machine.AddOrUpdateState("S1", new State());
+        machine.AddOrUpdateState("S2", new State());
+        machine.AddOrUpdateState("S3", new State());
+        machine.StartingStateId = "S0";
+        machine.Transitions.Add(new Transition("S0", "S1", "R1"));
+        machine.Transitions.Add(new Transition("S1", "S2", "R2"));
+        machine.Transitions.Add(new Transition("S0", "S3", "R3"));
+
+        var selected = new HashSet<string> { "S0", "S2" };
+
+        var result = new PathFilter(machine, selected).Filter();
+
+        Assert.Equal(3, result.States.Count);
+        Assert.Contains("S0", result.States.Keys);
+        Assert.Contains("S1", result.States.Keys);
+        Assert.Contains("S2", result.States.Keys);
+        Assert.DoesNotContain("S3", result.States.Keys);
+        Assert.Equal(2, result.Transitions.Count);
+        Assert.Contains(result.Transitions, t => t.SourceStateId == "S0" && t.TargetStateId == "S1");
+        Assert.Contains(result.Transitions, t => t.SourceStateId == "S1" && t.TargetStateId == "S2");
     }
 
     [Fact]
