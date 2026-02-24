@@ -455,4 +455,53 @@ public class ExpressionEvaluatorTests
     }
 
     #endregion
+
+    #region EvaluateBooleanLenient — Undefined Parameters as Null
+
+    [Fact]
+    public void EvaluateBooleanLenient_UndefinedEqualsString_ReturnsFalse()
+    {
+        // null == 'Action1' → false
+        var result = _evaluator.EvaluateBooleanLenient(
+            "name == 'Action1'", Vars());
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void EvaluateBooleanLenient_UndefinedNotEqualString_ReturnsTrue()
+    {
+        // null != 'done' → true
+        var result = _evaluator.EvaluateBooleanLenient(
+            "buy != 'done'", Vars());
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void EvaluateBooleanLenient_CompoundWithUndefined_ReturnsCorrectly()
+    {
+        // Defined variables evaluate normally, undefined treated as null
+        var result = _evaluator.EvaluateBooleanLenient(
+            "displayed != 'options' && step > 1 && cart == 'empty' && buy != 'done'",
+            Vars(("displayed", "fish"), ("step", 2), ("cart", "empty")));
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void EvaluateBooleanLenient_AllDefined_WorksNormally()
+    {
+        var result = _evaluator.EvaluateBooleanLenient(
+            "[Status] == 'Pending' && [Count] < 10",
+            Vars(("Status", "Pending"), ("Count", 5)));
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void EvaluateBoolean_Strict_UndefinedVariable_StillThrows()
+    {
+        // The strict EvaluateBoolean should still throw for undefined params
+        Assert.Throws<ExpressionEvaluationException>(() =>
+            _evaluator.EvaluateBoolean("buy != 'done'", Vars()));
+    }
+
+    #endregion
 }

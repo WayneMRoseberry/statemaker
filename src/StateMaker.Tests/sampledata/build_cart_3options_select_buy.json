@@ -1,0 +1,62 @@
+{
+  "initialState": {
+    "step": 0,
+    "cart": "empty"
+  },
+  "rules": [
+    {
+      "name": "present options",
+      "condition": "step == 0",
+      "transformations": {
+        "step": "step + 1",
+        "displayed": "'options'"
+      }
+    },
+    {
+      "name": "pick option fish",
+      "condition": "displayed == 'options'",
+      "transformations": {
+        "step": "step + 1",
+        "displayed": "'fish'"
+      }
+    },
+    {
+      "name": "pick option salad",
+      "condition": "displayed == 'options'",
+      "transformations": {
+        "step": "step + 1",
+        "displayed": "'salad'"
+      }
+    },
+    {
+      "name": "pick option beef",
+      "condition": "displayed == 'options'",
+      "transformations": {
+        "step": "step + 1",
+        "displayed": "'beef'"
+      }
+    },
+    {
+      "name": "order selected",
+      "condition": "displayed != 'options' && step > 1 && cart == 'empty' && buy != 'done'",
+      "transformations": {
+        "step": "step + 1",
+        "cart": "displayed",
+        "displayed": "'cart'"
+      }
+    },
+    {
+      "name": "buy",
+      "condition": "displayed == 'cart' && displayed != 'options' && cart != 'empty'",
+      "transformations": {
+        "step": "step + 1",
+        "cart": "'empty'",
+        "buy" : "'done'"
+      }
+     }
+  ],
+  "config": {
+    "maxDepth": 10,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}

@@ -116,6 +116,39 @@ public class DeclarativeRuleTests
         Assert.True(rule.IsAvailable(state));
     }
 
+    [Fact]
+    public void IsAvailable_ConditionReferencesUndefinedVariable_ReturnsFalse()
+    {
+        // Rule condition references "name" but state only has "step"
+        // This should return false (rule not available), not throw
+        var rule = new DeclarativeRule("ActionRule", "step >= 0 && name == 'Action1'",
+            Transforms(("step", "step + 1")), _evaluator);
+        var state = MakeState(("step", 0));
+        Assert.False(rule.IsAvailable(state));
+    }
+
+    [Fact]
+    public void IsAvailable_ConditionReferencesUndefinedVariable_WithDefinedState_ReturnsTrue()
+    {
+        // Same rule, but state has both variables — should return true
+        var rule = new DeclarativeRule("ActionRule", "step >= 0 && name == 'Action1'",
+            Transforms(("step", "step + 1")), _evaluator);
+        var state = MakeState(("step", 0), ("name", "Action1"));
+        Assert.True(rule.IsAvailable(state));
+    }
+
+    [Fact]
+    public void IsAvailable_ConditionReferencesUndefinedVariable_NotEqual_ReturnsTrue()
+    {
+        // "buy != 'done'" when "buy" is not defined should return true
+        // (undefined/null is not equal to 'done')
+        var rule = new DeclarativeRule("OrderRule",
+            "displayed != 'options' && step > 1 && cart == 'empty' && buy != 'done'",
+            Transforms(("step", "step + 1")), _evaluator);
+        var state = MakeState(("displayed", "fish"), ("step", 2), ("cart", "empty"));
+        Assert.True(rule.IsAvailable(state));
+    }
+
     #endregion
 
     #region 6.3 — Execute
@@ -274,6 +307,56 @@ public class DeclarativeRuleTests
         Assert.Equal(4, machine.States.Count);
         Assert.Equal(3, machine.Transitions.Count);
         Assert.True(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void WorksWithStateMachineBuilder_RuleReferencesVariableIntroducedByEarlierRule()
+    {
+        // Rule 1 introduces "name" variable at step=0
+        // Rule 2 references "name" — should be skipped for states without "name"
+        var rule1 = new DeclarativeRule("SetName", "step == 0",
+            Transforms(("step", "step + 1"), ("name", "'Action1'")), _evaluator);
+        var rule2 = new DeclarativeRule("UseName", "step >= 0 && name == 'Action1'",
+            Transforms(("step", "step + 1")), _evaluator);
+        var initialState = MakeState(("step", 0));
+        var config = new BuilderConfig { MaxStates = 20 };
+
+        var builder = new StateMachineBuilder();
+        var machine = builder.Build(initialState, new IRule[] { rule1, rule2 }, config);
+
+        // Should not throw — rule2 should be skipped for initial state (no "name" variable)
+        Assert.True(machine.States.Count > 1);
+        Assert.True(machine.IsValidMachine());
+    }
+
+    [Fact]
+    public void WorksWithStateMachineBuilder_CartScenario_RuleWithUndefinedNotEqual()
+    {
+        // Cart scenario: "order selected" references "buy" which doesn't exist until "buy" rule runs
+        // The condition "buy != 'done'" should evaluate to true when "buy" is undefined
+        var presentOptions = new DeclarativeRule("present options", "step == 0",
+            Transforms(("step", "step + 1"), ("displayed", "'options'")), _evaluator);
+        var pickFish = new DeclarativeRule("pick option fish", "displayed == 'options'",
+            Transforms(("step", "step + 1"), ("displayed", "'fish'")), _evaluator);
+        var orderSelected = new DeclarativeRule("order selected",
+            "displayed != 'options' && step > 1 && cart == 'empty' && buy != 'done'",
+            Transforms(("step", "step + 1"), ("cart", "displayed"), ("displayed", "'cart'")),
+            _evaluator);
+        var buy = new DeclarativeRule("buy",
+            "displayed == 'cart' && displayed != 'options' && cart != 'empty'",
+            Transforms(("step", "step + 1"), ("cart", "'empty'"), ("buy", "'done'")),
+            _evaluator);
+
+        var initialState = MakeState(("step", 0), ("cart", "empty"));
+        var config = new BuilderConfig { MaxDepth = 10 };
+
+        var builder = new StateMachineBuilder();
+        var machine = builder.Build(initialState,
+            new IRule[] { presentOptions, pickFish, orderSelected, buy }, config);
+
+        // Should have transitions for "order selected" and "buy"
+        Assert.Contains(machine.Transitions, t => t.RuleName == "order selected");
+        Assert.Contains(machine.Transitions, t => t.RuleName == "buy");
     }
 
     #endregion

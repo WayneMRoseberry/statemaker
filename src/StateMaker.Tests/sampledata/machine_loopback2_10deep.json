@@ -1,0 +1,130 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "step": 0
+    },
+    "S1": {
+      "step": 1
+    },
+    "S2": {
+      "step": 2
+    },
+    "S3": {
+      "step": 3
+    },
+    "S4": {
+      "step": 4
+    },
+    "S5": {
+      "step": 5
+    },
+    "S6": {
+      "step": 6
+    },
+    "S7": {
+      "step": 7
+    },
+    "S8": {
+      "step": 8
+    },
+    "S9": {
+      "step": 9
+    },
+    "S10": {
+      "step": 10
+    }
+  },
+  "transitions": [
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S0",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S1",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S5",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S2",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S6",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S3",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S7",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S4",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S8",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S5",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S9",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S6",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S10",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S7",
+      "ruleName": "loop back 2"
+    }
+  ]
+}

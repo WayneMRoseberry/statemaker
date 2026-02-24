@@ -1,0 +1,373 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "step": 0,
+      "branch": "trunk"
+    },
+    "S1": {
+      "step": 1,
+      "branch": "branch1"
+    },
+    "S2": {
+      "step": 1,
+      "branch": "branch2"
+    },
+    "S3": {
+      "step": 2,
+      "branch": "branch1"
+    },
+    "S4": {
+      "step": 2,
+      "branch": "branch2"
+    },
+    "S5": {
+      "step": 3,
+      "branch": "branch1"
+    },
+    "S6": {
+      "step": 3,
+      "branch": "trunk"
+    },
+    "S7": {
+      "step": 3,
+      "branch": "branch2"
+    },
+    "S8": {
+      "step": 4,
+      "branch": "branch1"
+    },
+    "S9": {
+      "step": 4,
+      "branch": "trunk"
+    },
+    "S10": {
+      "step": 4,
+      "branch": "branch2"
+    },
+    "S11": {
+      "step": 5,
+      "branch": "branch1"
+    },
+    "S12": {
+      "step": 5,
+      "branch": "trunk"
+    },
+    "S13": {
+      "step": 5,
+      "branch": "branch2"
+    },
+    "S14": {
+      "step": 6,
+      "branch": "branch1"
+    },
+    "S15": {
+      "step": 6,
+      "branch": "trunk"
+    },
+    "S16": {
+      "step": 6,
+      "branch": "branch2"
+    },
+    "S17": {
+      "step": 7,
+      "branch": "branch1"
+    },
+    "S18": {
+      "step": 7,
+      "branch": "trunk"
+    },
+    "S19": {
+      "step": 7,
+      "branch": "branch2"
+    },
+    "S20": {
+      "step": 8,
+      "branch": "branch1"
+    },
+    "S21": {
+      "step": 8,
+      "branch": "trunk"
+    },
+    "S22": {
+      "step": 8,
+      "branch": "branch2"
+    },
+    "S23": {
+      "step": 9,
+      "branch": "branch1"
+    },
+    "S24": {
+      "step": 9,
+      "branch": "trunk"
+    },
+    "S25": {
+      "step": 9,
+      "branch": "branch2"
+    },
+    "S26": {
+      "step": 10,
+      "branch": "branch1"
+    },
+    "S27": {
+      "step": 10,
+      "branch": "trunk"
+    },
+    "S28": {
+      "step": 10,
+      "branch": "branch2"
+    }
+  },
+  "transitions": [
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S2",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S3",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S4",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S5",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S6",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S7",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S6",
+      "ruleName": "merge branch2"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S8",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S9",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S8",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S10",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S10",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S9",
+      "ruleName": "merge branch2"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S11",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S12",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S11",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S13",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S13",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S12",
+      "ruleName": "merge branch2"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S14",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S15",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S14",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S16",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S13",
+      "targetStateId": "S16",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S13",
+      "targetStateId": "S15",
+      "ruleName": "merge branch2"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S17",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S18",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S17",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S19",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S16",
+      "targetStateId": "S19",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S16",
+      "targetStateId": "S18",
+      "ruleName": "merge branch2"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S20",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S21",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S20",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S22",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S19",
+      "targetStateId": "S22",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S19",
+      "targetStateId": "S21",
+      "ruleName": "merge branch2"
+    },
+    {
+      "sourceStateId": "S20",
+      "targetStateId": "S23",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S20",
+      "targetStateId": "S24",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S21",
+      "targetStateId": "S23",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S21",
+      "targetStateId": "S25",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S22",
+      "targetStateId": "S25",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S22",
+      "targetStateId": "S24",
+      "ruleName": "merge branch2"
+    },
+    {
+      "sourceStateId": "S23",
+      "targetStateId": "S26",
+      "ruleName": "add branch1"
+    },
+    {
+      "sourceStateId": "S23",
+      "targetStateId": "S27",
+      "ruleName": "merge branch1"
+    },
+    {
+      "sourceStateId": "S24",
+      "targetStateId": "S26",
+      "ruleName": "take branch1"
+    },
+    {
+      "sourceStateId": "S24",
+      "targetStateId": "S28",
+      "ruleName": "take branch2"
+    },
+    {
+      "sourceStateId": "S25",
+      "targetStateId": "S28",
+      "ruleName": "add branch2"
+    },
+    {
+      "sourceStateId": "S25",
+      "targetStateId": "S27",
+      "ruleName": "merge branch2"
+    }
+  ]
+}
