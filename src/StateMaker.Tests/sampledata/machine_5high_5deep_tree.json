@@ -1,0 +1,235 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "step": 0
+    },
+    "S1": {
+      "step": 1,
+      "name": "Action1"
+    },
+    "S2": {
+      "step": 1,
+      "name": "Action2"
+    },
+    "S3": {
+      "step": 1,
+      "name": "Action3"
+    },
+    "S4": {
+      "step": 1,
+      "name": "Action4"
+    },
+    "S5": {
+      "step": 1,
+      "name": "Action5"
+    },
+    "S6": {
+      "step": 2,
+      "name": "Action1"
+    },
+    "S7": {
+      "step": 2,
+      "name": "Action2"
+    },
+    "S8": {
+      "step": 2,
+      "name": "Action3"
+    },
+    "S9": {
+      "step": 2,
+      "name": "Action4"
+    },
+    "S10": {
+      "step": 2,
+      "name": "Action5"
+    },
+    "S11": {
+      "step": 3,
+      "name": "Action1"
+    },
+    "S12": {
+      "step": 3,
+      "name": "Action2"
+    },
+    "S13": {
+      "step": 3,
+      "name": "Action3"
+    },
+    "S14": {
+      "step": 3,
+      "name": "Action4"
+    },
+    "S15": {
+      "step": 3,
+      "name": "Action5"
+    },
+    "S16": {
+      "step": 4,
+      "name": "Action1"
+    },
+    "S17": {
+      "step": 4,
+      "name": "Action2"
+    },
+    "S18": {
+      "step": 4,
+      "name": "Action3"
+    },
+    "S19": {
+      "step": 4,
+      "name": "Action4"
+    },
+    "S20": {
+      "step": 4,
+      "name": "Action5"
+    },
+    "S21": {
+      "step": 5,
+      "name": "Action1"
+    },
+    "S22": {
+      "step": 5,
+      "name": "Action2"
+    },
+    "S23": {
+      "step": 5,
+      "name": "Action3"
+    },
+    "S24": {
+      "step": 5,
+      "name": "Action4"
+    },
+    "S25": {
+      "step": 5,
+      "name": "Action5"
+    }
+  },
+  "transitions": [
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S2",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S3",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S4",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S5",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S6",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S7",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S8",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S9",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S10",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S11",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S12",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S13",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S14",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S15",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S16",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S17",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S13",
+      "targetStateId": "S18",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S19",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S20",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S16",
+      "targetStateId": "S21",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S22",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S23",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S19",
+      "targetStateId": "S24",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S20",
+      "targetStateId": "S25",
+      "ruleName": "Action5"
+    }
+  ]
+}

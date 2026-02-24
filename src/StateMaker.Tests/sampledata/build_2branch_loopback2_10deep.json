@@ -1,0 +1,33 @@
+{
+  "initialState": {
+    "step": 0
+  },
+  "rules": [
+    {
+      "name": "advance",
+      "condition": "step >= 0",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "loop back 3",
+      "condition": "step >= 3",
+      "transformations": {
+        "step": "step -2"
+      }
+    },
+    {
+      "name": "birth branch",
+      "condition": "step == 0",
+      "transformations": {
+        "step": "step + 1",
+        "branch": "'new branch'"
+      }
+    }
+  ],
+  "config": {
+    "maxDepth": 10,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}

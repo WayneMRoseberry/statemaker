@@ -1,0 +1,150 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "step": 0
+    },
+    "S1": {
+      "step": 1
+    },
+    "S2": {
+      "step": 2
+    },
+    "S3": {
+      "step": 3
+    },
+    "S4": {
+      "step": 4
+    },
+    "S5": {
+      "step": 5
+    }
+  },
+  "transitions": [
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "Action5"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S5",
+      "ruleName": "Action1"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S5",
+      "ruleName": "Action2"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S5",
+      "ruleName": "Action3"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S5",
+      "ruleName": "Action4"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S5",
+      "ruleName": "Action5"
+    }
+  ]
+}

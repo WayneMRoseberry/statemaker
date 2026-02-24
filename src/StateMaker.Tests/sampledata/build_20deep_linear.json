@@ -1,0 +1,18 @@
+{
+  "initialState": {
+    "step": 0
+  },
+  "rules": [
+    {
+      "name": "Advance",
+      "condition": "step >= 0",
+      "transformations": {
+        "step": "step + 1"
+      }
+    }
+  ],
+  "config": {
+    "maxDepth": 20,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}

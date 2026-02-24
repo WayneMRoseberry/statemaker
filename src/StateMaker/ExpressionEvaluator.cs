@@ -13,7 +13,21 @@ public class ExpressionEvaluator : IExpressionEvaluator
             $"Expected a boolean result but got: {result?.GetType().Name ?? "null"}");
     }
 
+    public bool EvaluateBooleanLenient(string expression, Dictionary<string, object> variables)
+    {
+        var result = Evaluate(expression, variables, undefinedAsNull: true);
+        if (result is bool boolResult)
+            return boolResult;
+        throw new ExpressionEvaluationException(expression,
+            $"Expected a boolean result but got: {result?.GetType().Name ?? "null"}");
+    }
+
     public object Evaluate(string expression, Dictionary<string, object> variables)
+    {
+        return Evaluate(expression, variables, undefinedAsNull: false);
+    }
+
+    private static object Evaluate(string expression, Dictionary<string, object> variables, bool undefinedAsNull)
     {
         ArgumentNullException.ThrowIfNull(expression);
         ArgumentNullException.ThrowIfNull(variables);
@@ -40,6 +54,16 @@ public class ExpressionEvaluator : IExpressionEvaluator
         foreach (var kvp in variables)
         {
             ncalcExpr.Parameters[kvp.Key] = kvp.Value;
+        }
+
+        // When undefinedAsNull is true, supply null for any parameter not in the variables dict
+        if (undefinedAsNull)
+        {
+            ncalcExpr.EvaluateParameter += (name, args) =>
+            {
+                if (!variables.ContainsKey(name))
+                    args.Result = null;
+            };
         }
 
         try

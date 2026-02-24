@@ -27,7 +27,7 @@ public class DeclarativeRule : IRule
     public bool IsAvailable(State state)
     {
         var variables = GetNonNullableVariables(state);
-        return _evaluator.EvaluateBoolean(_condition, variables);
+        return _evaluator.EvaluateBooleanLenient(_condition, variables);
     }
 
     public State Execute(State state)
