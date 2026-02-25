@@ -1,0 +1,387 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "step": 0,
+      "loops": 0
+    },
+    "S1": {
+      "step": 1,
+      "loops": 0
+    },
+    "S2": {
+      "step": 2,
+      "loops": 0
+    },
+    "S3": {
+      "step": 3,
+      "loops": 0
+    },
+    "S4": {
+      "step": 4,
+      "loops": 0
+    },
+    "S5": {
+      "step": 0,
+      "loops": 1
+    },
+    "S6": {
+      "step": 5,
+      "loops": 0
+    },
+    "S7": {
+      "step": 1,
+      "loops": 1
+    },
+    "S8": {
+      "step": 6,
+      "loops": 0
+    },
+    "S9": {
+      "step": 2,
+      "loops": 1
+    },
+    "S10": {
+      "step": 3,
+      "loops": 1
+    },
+    "S11": {
+      "step": 4,
+      "loops": 1
+    },
+    "S12": {
+      "step": 0,
+      "loops": 2
+    },
+    "S13": {
+      "step": 5,
+      "loops": 1
+    },
+    "S14": {
+      "step": 1,
+      "loops": 2
+    },
+    "S15": {
+      "step": 6,
+      "loops": 1
+    },
+    "S16": {
+      "step": 2,
+      "loops": 2
+    },
+    "S17": {
+      "step": 3,
+      "loops": 2
+    },
+    "S18": {
+      "step": 4,
+      "loops": 2
+    },
+    "S19": {
+      "step": 0,
+      "loops": 3
+    },
+    "S20": {
+      "step": 5,
+      "loops": 2
+    },
+    "S21": {
+      "step": 1,
+      "loops": 3
+    },
+    "S22": {
+      "step": 6,
+      "loops": 2
+    },
+    "S23": {
+      "step": 2,
+      "loops": 3
+    },
+    "S24": {
+      "step": 3,
+      "loops": 3
+    },
+    "S25": {
+      "step": 4,
+      "loops": 3
+    },
+    "S26": {
+      "step": 0,
+      "loops": 4
+    },
+    "S27": {
+      "step": 5,
+      "loops": 3
+    },
+    "S28": {
+      "step": 1,
+      "loops": 4
+    },
+    "S29": {
+      "step": 6,
+      "loops": 3
+    },
+    "S30": {
+      "step": 2,
+      "loops": 4
+    },
+    "S31": {
+      "step": 3,
+      "loops": 4
+    },
+    "S32": {
+      "step": 4,
+      "loops": 4
+    },
+    "S33": {
+      "step": 0,
+      "loops": 5
+    },
+    "S34": {
+      "step": 5,
+      "loops": 4
+    },
+    "S35": {
+      "step": 1,
+      "loops": 5
+    },
+    "S36": {
+      "step": 6,
+      "loops": 4
+    },
+    "S37": {
+      "step": 2,
+      "loops": 5
+    },
+    "S38": {
+      "step": 3,
+      "loops": 5
+    },
+    "S39": {
+      "step": 4,
+      "loops": 5
+    }
+  },
+  "transitions": [
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S5",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S6",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S7",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S8",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S9",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S0",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S10",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S11",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S12",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S13",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S14",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S13",
+      "targetStateId": "S15",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S16",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S5",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S16",
+      "targetStateId": "S17",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S18",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S19",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S20",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S19",
+      "targetStateId": "S21",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S20",
+      "targetStateId": "S22",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S21",
+      "targetStateId": "S23",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S22",
+      "targetStateId": "S12",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S23",
+      "targetStateId": "S24",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S24",
+      "targetStateId": "S25",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S24",
+      "targetStateId": "S26",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S25",
+      "targetStateId": "S27",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S26",
+      "targetStateId": "S28",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S27",
+      "targetStateId": "S29",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S28",
+      "targetStateId": "S30",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S29",
+      "targetStateId": "S19",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S30",
+      "targetStateId": "S31",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S31",
+      "targetStateId": "S32",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S31",
+      "targetStateId": "S33",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S32",
+      "targetStateId": "S34",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S33",
+      "targetStateId": "S35",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S34",
+      "targetStateId": "S36",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S35",
+      "targetStateId": "S37",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S36",
+      "targetStateId": "S26",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S37",
+      "targetStateId": "S38",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S38",
+      "targetStateId": "S39",
+      "ruleName": "advance"
+    }
+  ]
+}

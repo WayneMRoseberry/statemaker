@@ -37,7 +37,7 @@ public class DeclarativeRule : IRule
 
         foreach (var kvp in _transformations)
         {
-            var value = _evaluator.Evaluate(kvp.Value, originalVariables);
+            var value = _evaluator.EvaluateLenient(kvp.Value, originalVariables);
             clone.Variables[kvp.Key] = value;
         }
 

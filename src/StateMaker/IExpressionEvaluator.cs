@@ -11,4 +11,11 @@ public interface IExpressionEvaluator
     /// not yet exist in the state.
     /// </summary>
     bool EvaluateBooleanLenient(string expression, Dictionary<string, object> variables);
+
+    /// <summary>
+    /// Evaluates an expression, treating undefined parameters as null
+    /// instead of throwing. Used for rule transformations where some variables
+    /// may not yet exist in the state.
+    /// </summary>
+    object? EvaluateLenient(string expression, Dictionary<string, object> variables);
 }
