@@ -503,5 +503,34 @@ public class ExpressionEvaluatorTests
             _evaluator.EvaluateBoolean("buy != 'done'", Vars()));
     }
 
+    [Fact]
+    public void Evaluate_Strict_UndefinedVariable_StillThrows()
+    {
+        // The strict Evaluate should still throw for undefined params
+        Assert.Throws<ExpressionEvaluationException>(() =>
+            _evaluator.Evaluate("displayed", Vars()));
+    }
+
+    [Fact]
+    public void EvaluateLenient_UndefinedVariable_ReturnsNull()
+    {
+        var result = _evaluator.EvaluateLenient("displayed", Vars());
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void EvaluateLenient_DefinedVariable_ReturnsValue()
+    {
+        var result = _evaluator.EvaluateLenient("displayed", Vars(("displayed", "fish")));
+        Assert.Equal("fish", result);
+    }
+
+    [Fact]
+    public void EvaluateLenient_ArithmeticWithDefined_Works()
+    {
+        var result = _evaluator.EvaluateLenient("[Count] + 1", Vars(("Count", 5)));
+        Assert.Equal(6, result);
+    }
+
     #endregion
 }

@@ -256,6 +256,33 @@ public class DeclarativeRuleTests
         Assert.Equal(false, result.Variables["IsActive"]);
     }
 
+    [Fact]
+    public void Execute_TransformationReferencesUndefinedVariable_AssignsNull()
+    {
+        // "cart": "displayed" when "displayed" is not in the state
+        // should assign null to cart, not throw
+        var rule = new DeclarativeRule("OrderRule", "true",
+            Transforms(("cart", "displayed")), _evaluator);
+        var state = MakeState(("step", 2), ("cart", "empty"));
+
+        var result = rule.Execute(state);
+
+        Assert.Null(result.Variables["cart"]);
+    }
+
+    [Fact]
+    public void Execute_TransformationReferencesDefinedVariable_AssignsValue()
+    {
+        // Same transformation but with "displayed" defined — should assign its value
+        var rule = new DeclarativeRule("OrderRule", "true",
+            Transforms(("cart", "displayed")), _evaluator);
+        var state = MakeState(("step", 2), ("cart", "empty"), ("displayed", "fish"));
+
+        var result = rule.Execute(state);
+
+        Assert.Equal("fish", result.Variables["cart"]);
+    }
+
     #endregion
 
     #region 6.3 — Execute Error Cases
@@ -357,6 +384,43 @@ public class DeclarativeRuleTests
         // Should have transitions for "order selected" and "buy"
         Assert.Contains(machine.Transitions, t => t.RuleName == "order selected");
         Assert.Contains(machine.Transitions, t => t.RuleName == "buy");
+    }
+
+    [Fact]
+    public void WorksWithStateMachineBuilder_CartWithAdvanceAndLoopback_DoesNotThrow()
+    {
+        // Cart scenario combined with advance/loopback rules.
+        // The "advance" rule creates states without "displayed" or "buy" variables.
+        // The "order selected" rule condition passes (null != 'options' is true)
+        // and its transformation "cart": "displayed" must handle undefined "displayed".
+        var presentOptions = new DeclarativeRule("present options", "step == 0",
+            Transforms(("step", "step + 1"), ("displayed", "'options'")), _evaluator);
+        var pickFish = new DeclarativeRule("pick option fish", "displayed == 'options'",
+            Transforms(("step", "step + 1"), ("displayed", "'fish'")), _evaluator);
+        var orderSelected = new DeclarativeRule("order selected",
+            "displayed != 'options' && step > 1 && cart == 'empty' && buy != 'done'",
+            Transforms(("step", "step + 1"), ("cart", "displayed"), ("displayed", "'cart'")),
+            _evaluator);
+        var buy = new DeclarativeRule("buy",
+            "displayed == 'cart' && displayed != 'options' && cart != 'empty'",
+            Transforms(("step", "step + 1"), ("cart", "'empty'"), ("buy", "'done'")),
+            _evaluator);
+        var advance = new DeclarativeRule("advance", "step >= 0",
+            Transforms(("step", "step + 1")), _evaluator);
+        var loopback = new DeclarativeRule("loop back 2", "step >= 2",
+            Transforms(("step", "step - 2")), _evaluator);
+
+        var initialState = MakeState(("step", 0), ("cart", "empty"));
+        var config = new BuilderConfig { MaxDepth = 10 };
+
+        var builder = new StateMachineBuilder();
+        var machine = builder.Build(initialState,
+            new IRule[] { presentOptions, pickFish, orderSelected, buy, advance, loopback },
+            config);
+
+        // Should not throw and should produce a valid machine
+        Assert.True(machine.States.Count > 1);
+        Assert.True(machine.IsValidMachine());
     }
 
     #endregion

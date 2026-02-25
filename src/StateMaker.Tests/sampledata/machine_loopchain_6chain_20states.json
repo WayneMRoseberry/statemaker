@@ -1,0 +1,192 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "step": 0,
+      "loops": 0
+    },
+    "S1": {
+      "step": 1,
+      "loops": 0
+    },
+    "S2": {
+      "step": 2,
+      "loops": 0
+    },
+    "S3": {
+      "step": 3,
+      "loops": 0
+    },
+    "S4": {
+      "step": 4,
+      "loops": 0
+    },
+    "S5": {
+      "step": 0,
+      "loops": 1
+    },
+    "S6": {
+      "step": 5,
+      "loops": 0
+    },
+    "S7": {
+      "step": 1,
+      "loops": 1
+    },
+    "S8": {
+      "step": 6,
+      "loops": 0
+    },
+    "S9": {
+      "step": 2,
+      "loops": 1
+    },
+    "S10": {
+      "step": 3,
+      "loops": 1
+    },
+    "S11": {
+      "step": 4,
+      "loops": 1
+    },
+    "S12": {
+      "step": 0,
+      "loops": 2
+    },
+    "S13": {
+      "step": 5,
+      "loops": 1
+    },
+    "S14": {
+      "step": 1,
+      "loops": 2
+    },
+    "S15": {
+      "step": 6,
+      "loops": 1
+    },
+    "S16": {
+      "step": 2,
+      "loops": 2
+    },
+    "S17": {
+      "step": 3,
+      "loops": 2
+    },
+    "S18": {
+      "step": 4,
+      "loops": 2
+    },
+    "S19": {
+      "step": 0,
+      "loops": 3
+    }
+  },
+  "transitions": [
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S2",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S3",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S4",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S5",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S6",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S7",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S8",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S9",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S0",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S10",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S11",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S12",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S13",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S14",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S13",
+      "targetStateId": "S15",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S16",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S5",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S16",
+      "targetStateId": "S17",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S18",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S19",
+      "ruleName": "advance"
+    }
+  ]
+}

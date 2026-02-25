@@ -22,6 +22,11 @@ public class ExpressionEvaluator : IExpressionEvaluator
             $"Expected a boolean result but got: {result?.GetType().Name ?? "null"}");
     }
 
+    public object? EvaluateLenient(string expression, Dictionary<string, object> variables)
+    {
+        return Evaluate(expression, variables, undefinedAsNull: true);
+    }
+
     public object Evaluate(string expression, Dictionary<string, object> variables)
     {
         return Evaluate(expression, variables, undefinedAsNull: false);

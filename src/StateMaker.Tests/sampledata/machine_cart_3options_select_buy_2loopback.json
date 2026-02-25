@@ -1,0 +1,3462 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "step": 0,
+      "cart": "empty"
+    },
+    "S1": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S2": {
+      "step": 1,
+      "cart": "empty"
+    },
+    "S3": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S4": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S5": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S6": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S7": {
+      "step": 2,
+      "cart": "empty"
+    },
+    "S8": {
+      "step": 3,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S9": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S10": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S11": {
+      "step": 3,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S12": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S13": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S14": {
+      "step": 3,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S15": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S16": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S17": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S18": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S19": {
+      "step": 3,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S20": {
+      "step": 3,
+      "cart": "empty"
+    },
+    "S21": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S22": {
+      "step": 4,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S23": {
+      "step": 1,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S24": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S25": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S26": {
+      "step": 4,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S27": {
+      "step": 1,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S28": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S29": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S30": {
+      "step": 4,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S31": {
+      "step": 1,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S32": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S33": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S34": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S35": {
+      "step": 4,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S36": {
+      "step": 1,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S37": {
+      "step": 4,
+      "cart": "empty"
+    },
+    "S38": {
+      "step": 5,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S39": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S40": {
+      "step": 5,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S41": {
+      "step": 2,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S42": {
+      "step": 5,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S43": {
+      "step": 5,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S44": {
+      "step": 2,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S45": {
+      "step": 5,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S46": {
+      "step": 5,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S47": {
+      "step": 2,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S48": {
+      "step": 5,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S49": {
+      "step": 5,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S50": {
+      "step": 5,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S51": {
+      "step": 2,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S52": {
+      "step": 5,
+      "cart": "empty"
+    },
+    "S53": {
+      "step": 6,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S54": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S55": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S56": {
+      "step": 6,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S57": {
+      "step": 0,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S58": {
+      "step": 6,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S59": {
+      "step": 6,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S60": {
+      "step": 0,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S61": {
+      "step": 6,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S62": {
+      "step": 6,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S63": {
+      "step": 0,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S64": {
+      "step": 6,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S65": {
+      "step": 6,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S66": {
+      "step": 6,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S67": {
+      "step": 0,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S68": {
+      "step": 6,
+      "cart": "empty"
+    },
+    "S69": {
+      "step": 7,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S70": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S71": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "options",
+      "buy": "done"
+    },
+    "S72": {
+      "step": 7,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S73": {
+      "step": 1,
+      "cart": "fish",
+      "displayed": "options"
+    },
+    "S74": {
+      "step": 7,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S75": {
+      "step": 7,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S76": {
+      "step": 1,
+      "cart": "salad",
+      "displayed": "options"
+    },
+    "S77": {
+      "step": 7,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S78": {
+      "step": 7,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S79": {
+      "step": 1,
+      "cart": "beef",
+      "displayed": "options"
+    },
+    "S80": {
+      "step": 7,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S81": {
+      "step": 7,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S82": {
+      "step": 7,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S83": {
+      "step": 1,
+      "cart": null,
+      "displayed": "options"
+    },
+    "S84": {
+      "step": 7,
+      "cart": "empty"
+    },
+    "S85": {
+      "step": 8,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S86": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "fish",
+      "buy": "done"
+    },
+    "S87": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "salad",
+      "buy": "done"
+    },
+    "S88": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "beef",
+      "buy": "done"
+    },
+    "S89": {
+      "step": 2,
+      "cart": "empty",
+      "displayed": "options",
+      "buy": "done"
+    },
+    "S90": {
+      "step": 8,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S91": {
+      "step": 2,
+      "cart": "fish",
+      "displayed": "fish"
+    },
+    "S92": {
+      "step": 2,
+      "cart": "fish",
+      "displayed": "salad"
+    },
+    "S93": {
+      "step": 2,
+      "cart": "fish",
+      "displayed": "beef"
+    },
+    "S94": {
+      "step": 2,
+      "cart": "fish",
+      "displayed": "options"
+    },
+    "S95": {
+      "step": 8,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S96": {
+      "step": 8,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S97": {
+      "step": 2,
+      "cart": "salad",
+      "displayed": "fish"
+    },
+    "S98": {
+      "step": 2,
+      "cart": "salad",
+      "displayed": "salad"
+    },
+    "S99": {
+      "step": 2,
+      "cart": "salad",
+      "displayed": "beef"
+    },
+    "S100": {
+      "step": 2,
+      "cart": "salad",
+      "displayed": "options"
+    },
+    "S101": {
+      "step": 8,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S102": {
+      "step": 8,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S103": {
+      "step": 2,
+      "cart": "beef",
+      "displayed": "fish"
+    },
+    "S104": {
+      "step": 2,
+      "cart": "beef",
+      "displayed": "salad"
+    },
+    "S105": {
+      "step": 2,
+      "cart": "beef",
+      "displayed": "beef"
+    },
+    "S106": {
+      "step": 2,
+      "cart": "beef",
+      "displayed": "options"
+    },
+    "S107": {
+      "step": 8,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S108": {
+      "step": 8,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S109": {
+      "step": 8,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S110": {
+      "step": 2,
+      "cart": null,
+      "displayed": "fish"
+    },
+    "S111": {
+      "step": 2,
+      "cart": null,
+      "displayed": "salad"
+    },
+    "S112": {
+      "step": 2,
+      "cart": null,
+      "displayed": "beef"
+    },
+    "S113": {
+      "step": 2,
+      "cart": null,
+      "displayed": "options"
+    },
+    "S114": {
+      "step": 8,
+      "cart": "empty"
+    },
+    "S115": {
+      "step": 9,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S116": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "fish",
+      "buy": "done"
+    },
+    "S117": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "fish",
+      "buy": "done"
+    },
+    "S118": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "salad",
+      "buy": "done"
+    },
+    "S119": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "salad",
+      "buy": "done"
+    },
+    "S120": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "beef",
+      "buy": "done"
+    },
+    "S121": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "beef",
+      "buy": "done"
+    },
+    "S122": {
+      "step": 3,
+      "cart": "empty",
+      "displayed": "options",
+      "buy": "done"
+    },
+    "S123": {
+      "step": 0,
+      "cart": "empty",
+      "displayed": "options",
+      "buy": "done"
+    },
+    "S124": {
+      "step": 9,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S125": {
+      "step": 3,
+      "cart": "fish",
+      "displayed": "fish"
+    },
+    "S126": {
+      "step": 0,
+      "cart": "fish",
+      "displayed": "fish"
+    },
+    "S127": {
+      "step": 3,
+      "cart": "fish",
+      "displayed": "salad"
+    },
+    "S128": {
+      "step": 0,
+      "cart": "fish",
+      "displayed": "salad"
+    },
+    "S129": {
+      "step": 3,
+      "cart": "fish",
+      "displayed": "beef"
+    },
+    "S130": {
+      "step": 0,
+      "cart": "fish",
+      "displayed": "beef"
+    },
+    "S131": {
+      "step": 3,
+      "cart": "fish",
+      "displayed": "options"
+    },
+    "S132": {
+      "step": 0,
+      "cart": "fish",
+      "displayed": "options"
+    },
+    "S133": {
+      "step": 9,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S134": {
+      "step": 9,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S135": {
+      "step": 3,
+      "cart": "salad",
+      "displayed": "fish"
+    },
+    "S136": {
+      "step": 0,
+      "cart": "salad",
+      "displayed": "fish"
+    },
+    "S137": {
+      "step": 3,
+      "cart": "salad",
+      "displayed": "salad"
+    },
+    "S138": {
+      "step": 0,
+      "cart": "salad",
+      "displayed": "salad"
+    },
+    "S139": {
+      "step": 3,
+      "cart": "salad",
+      "displayed": "beef"
+    },
+    "S140": {
+      "step": 0,
+      "cart": "salad",
+      "displayed": "beef"
+    },
+    "S141": {
+      "step": 3,
+      "cart": "salad",
+      "displayed": "options"
+    },
+    "S142": {
+      "step": 0,
+      "cart": "salad",
+      "displayed": "options"
+    },
+    "S143": {
+      "step": 9,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S144": {
+      "step": 9,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S145": {
+      "step": 3,
+      "cart": "beef",
+      "displayed": "fish"
+    },
+    "S146": {
+      "step": 0,
+      "cart": "beef",
+      "displayed": "fish"
+    },
+    "S147": {
+      "step": 3,
+      "cart": "beef",
+      "displayed": "salad"
+    },
+    "S148": {
+      "step": 0,
+      "cart": "beef",
+      "displayed": "salad"
+    },
+    "S149": {
+      "step": 3,
+      "cart": "beef",
+      "displayed": "beef"
+    },
+    "S150": {
+      "step": 0,
+      "cart": "beef",
+      "displayed": "beef"
+    },
+    "S151": {
+      "step": 3,
+      "cart": "beef",
+      "displayed": "options"
+    },
+    "S152": {
+      "step": 0,
+      "cart": "beef",
+      "displayed": "options"
+    },
+    "S153": {
+      "step": 9,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S154": {
+      "step": 9,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S155": {
+      "step": 9,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S156": {
+      "step": 3,
+      "cart": null,
+      "displayed": "fish"
+    },
+    "S157": {
+      "step": 0,
+      "cart": null,
+      "displayed": "fish"
+    },
+    "S158": {
+      "step": 3,
+      "cart": null,
+      "displayed": "salad"
+    },
+    "S159": {
+      "step": 0,
+      "cart": null,
+      "displayed": "salad"
+    },
+    "S160": {
+      "step": 3,
+      "cart": null,
+      "displayed": "beef"
+    },
+    "S161": {
+      "step": 0,
+      "cart": null,
+      "displayed": "beef"
+    },
+    "S162": {
+      "step": 3,
+      "cart": null,
+      "displayed": "options"
+    },
+    "S163": {
+      "step": 0,
+      "cart": null,
+      "displayed": "options"
+    },
+    "S164": {
+      "step": 9,
+      "cart": "empty"
+    },
+    "S165": {
+      "step": 10,
+      "cart": "empty",
+      "displayed": "cart",
+      "buy": "done"
+    },
+    "S166": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "fish",
+      "buy": "done"
+    },
+    "S167": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "fish",
+      "buy": "done"
+    },
+    "S168": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "salad",
+      "buy": "done"
+    },
+    "S169": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "salad",
+      "buy": "done"
+    },
+    "S170": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "beef",
+      "buy": "done"
+    },
+    "S171": {
+      "step": 1,
+      "cart": "empty",
+      "displayed": "beef",
+      "buy": "done"
+    },
+    "S172": {
+      "step": 4,
+      "cart": "empty",
+      "displayed": "options",
+      "buy": "done"
+    },
+    "S173": {
+      "step": 10,
+      "cart": "fish",
+      "displayed": "cart"
+    },
+    "S174": {
+      "step": 4,
+      "cart": "fish",
+      "displayed": "fish"
+    },
+    "S175": {
+      "step": 1,
+      "cart": "fish",
+      "displayed": "fish"
+    },
+    "S176": {
+      "step": 4,
+      "cart": "fish",
+      "displayed": "salad"
+    },
+    "S177": {
+      "step": 1,
+      "cart": "fish",
+      "displayed": "salad"
+    },
+    "S178": {
+      "step": 4,
+      "cart": "fish",
+      "displayed": "beef"
+    },
+    "S179": {
+      "step": 1,
+      "cart": "fish",
+      "displayed": "beef"
+    },
+    "S180": {
+      "step": 4,
+      "cart": "fish",
+      "displayed": "options"
+    },
+    "S181": {
+      "step": 10,
+      "cart": "empty",
+      "displayed": "fish"
+    },
+    "S182": {
+      "step": 10,
+      "cart": "salad",
+      "displayed": "cart"
+    },
+    "S183": {
+      "step": 4,
+      "cart": "salad",
+      "displayed": "fish"
+    },
+    "S184": {
+      "step": 1,
+      "cart": "salad",
+      "displayed": "fish"
+    },
+    "S185": {
+      "step": 4,
+      "cart": "salad",
+      "displayed": "salad"
+    },
+    "S186": {
+      "step": 1,
+      "cart": "salad",
+      "displayed": "salad"
+    },
+    "S187": {
+      "step": 4,
+      "cart": "salad",
+      "displayed": "beef"
+    },
+    "S188": {
+      "step": 1,
+      "cart": "salad",
+      "displayed": "beef"
+    },
+    "S189": {
+      "step": 4,
+      "cart": "salad",
+      "displayed": "options"
+    },
+    "S190": {
+      "step": 10,
+      "cart": "empty",
+      "displayed": "salad"
+    },
+    "S191": {
+      "step": 10,
+      "cart": "beef",
+      "displayed": "cart"
+    },
+    "S192": {
+      "step": 4,
+      "cart": "beef",
+      "displayed": "fish"
+    },
+    "S193": {
+      "step": 1,
+      "cart": "beef",
+      "displayed": "fish"
+    },
+    "S194": {
+      "step": 4,
+      "cart": "beef",
+      "displayed": "salad"
+    },
+    "S195": {
+      "step": 1,
+      "cart": "beef",
+      "displayed": "salad"
+    },
+    "S196": {
+      "step": 4,
+      "cart": "beef",
+      "displayed": "beef"
+    },
+    "S197": {
+      "step": 1,
+      "cart": "beef",
+      "displayed": "beef"
+    },
+    "S198": {
+      "step": 4,
+      "cart": "beef",
+      "displayed": "options"
+    },
+    "S199": {
+      "step": 10,
+      "cart": "empty",
+      "displayed": "beef"
+    },
+    "S200": {
+      "step": 10,
+      "cart": "empty",
+      "displayed": "options"
+    },
+    "S201": {
+      "step": 10,
+      "cart": null,
+      "displayed": "cart"
+    },
+    "S202": {
+      "step": 4,
+      "cart": null,
+      "displayed": "fish"
+    },
+    "S203": {
+      "step": 1,
+      "cart": null,
+      "displayed": "fish"
+    },
+    "S204": {
+      "step": 4,
+      "cart": null,
+      "displayed": "salad"
+    },
+    "S205": {
+      "step": 1,
+      "cart": null,
+      "displayed": "salad"
+    },
+    "S206": {
+      "step": 4,
+      "cart": null,
+      "displayed": "beef"
+    },
+    "S207": {
+      "step": 1,
+      "cart": null,
+      "displayed": "beef"
+    },
+    "S208": {
+      "step": 4,
+      "cart": null,
+      "displayed": "options"
+    },
+    "S209": {
+      "step": 10,
+      "cart": "empty"
+    }
+  },
+  "transitions": [
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S1",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S0",
+      "targetStateId": "S2",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S3",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S4",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S5",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S1",
+      "targetStateId": "S6",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S2",
+      "targetStateId": "S7",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S8",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S9",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S3",
+      "targetStateId": "S10",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S11",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S12",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S4",
+      "targetStateId": "S13",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S14",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S15",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S5",
+      "targetStateId": "S16",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S9",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S12",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S15",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S17",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S6",
+      "targetStateId": "S18",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S19",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S20",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S7",
+      "targetStateId": "S0",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S21",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S22",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S8",
+      "targetStateId": "S23",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S22",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S24",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S9",
+      "targetStateId": "S25",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S1",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S10",
+      "targetStateId": "S25",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S21",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S26",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S11",
+      "targetStateId": "S27",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S26",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S28",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S12",
+      "targetStateId": "S29",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S13",
+      "targetStateId": "S1",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S13",
+      "targetStateId": "S29",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S21",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S30",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S14",
+      "targetStateId": "S31",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S30",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S32",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S15",
+      "targetStateId": "S33",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S16",
+      "targetStateId": "S1",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S16",
+      "targetStateId": "S33",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S24",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S28",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S32",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S34",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S17",
+      "targetStateId": "S1",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S1",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S25",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S29",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S33",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S18",
+      "targetStateId": "S1",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S19",
+      "targetStateId": "S21",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S19",
+      "targetStateId": "S35",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S19",
+      "targetStateId": "S36",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S20",
+      "targetStateId": "S35",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S20",
+      "targetStateId": "S37",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S20",
+      "targetStateId": "S2",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S21",
+      "targetStateId": "S38",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S21",
+      "targetStateId": "S39",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S22",
+      "targetStateId": "S38",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S22",
+      "targetStateId": "S40",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S22",
+      "targetStateId": "S41",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S23",
+      "targetStateId": "S39",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S23",
+      "targetStateId": "S41",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S24",
+      "targetStateId": "S40",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S24",
+      "targetStateId": "S42",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S24",
+      "targetStateId": "S3",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S25",
+      "targetStateId": "S3",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S26",
+      "targetStateId": "S38",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S26",
+      "targetStateId": "S43",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S26",
+      "targetStateId": "S44",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S27",
+      "targetStateId": "S39",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S27",
+      "targetStateId": "S44",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S28",
+      "targetStateId": "S43",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S28",
+      "targetStateId": "S45",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S28",
+      "targetStateId": "S4",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S29",
+      "targetStateId": "S4",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S30",
+      "targetStateId": "S38",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S30",
+      "targetStateId": "S46",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S30",
+      "targetStateId": "S47",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S31",
+      "targetStateId": "S39",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S31",
+      "targetStateId": "S47",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S32",
+      "targetStateId": "S46",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S32",
+      "targetStateId": "S48",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S32",
+      "targetStateId": "S5",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S33",
+      "targetStateId": "S5",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S34",
+      "targetStateId": "S42",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S34",
+      "targetStateId": "S45",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S34",
+      "targetStateId": "S48",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S34",
+      "targetStateId": "S49",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S34",
+      "targetStateId": "S6",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S35",
+      "targetStateId": "S38",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S35",
+      "targetStateId": "S50",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S35",
+      "targetStateId": "S51",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S36",
+      "targetStateId": "S39",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S36",
+      "targetStateId": "S51",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S37",
+      "targetStateId": "S50",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S37",
+      "targetStateId": "S52",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S37",
+      "targetStateId": "S7",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S38",
+      "targetStateId": "S53",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S38",
+      "targetStateId": "S54",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S39",
+      "targetStateId": "S54",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S39",
+      "targetStateId": "S55",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S40",
+      "targetStateId": "S53",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S40",
+      "targetStateId": "S56",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S40",
+      "targetStateId": "S8",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S41",
+      "targetStateId": "S54",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S41",
+      "targetStateId": "S8",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S41",
+      "targetStateId": "S57",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S42",
+      "targetStateId": "S56",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S42",
+      "targetStateId": "S58",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S42",
+      "targetStateId": "S9",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S43",
+      "targetStateId": "S53",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S43",
+      "targetStateId": "S59",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S43",
+      "targetStateId": "S11",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S44",
+      "targetStateId": "S54",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S44",
+      "targetStateId": "S11",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S44",
+      "targetStateId": "S60",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S45",
+      "targetStateId": "S59",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S45",
+      "targetStateId": "S61",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S45",
+      "targetStateId": "S12",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S46",
+      "targetStateId": "S53",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S46",
+      "targetStateId": "S62",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S46",
+      "targetStateId": "S14",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S47",
+      "targetStateId": "S54",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S47",
+      "targetStateId": "S14",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S47",
+      "targetStateId": "S63",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S48",
+      "targetStateId": "S62",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S48",
+      "targetStateId": "S64",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S48",
+      "targetStateId": "S15",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S49",
+      "targetStateId": "S58",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S49",
+      "targetStateId": "S61",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S49",
+      "targetStateId": "S64",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S49",
+      "targetStateId": "S65",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S49",
+      "targetStateId": "S17",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S50",
+      "targetStateId": "S53",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S50",
+      "targetStateId": "S66",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S50",
+      "targetStateId": "S19",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S51",
+      "targetStateId": "S54",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S51",
+      "targetStateId": "S19",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S51",
+      "targetStateId": "S67",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S52",
+      "targetStateId": "S66",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S52",
+      "targetStateId": "S68",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S52",
+      "targetStateId": "S20",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S53",
+      "targetStateId": "S69",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S53",
+      "targetStateId": "S21",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S54",
+      "targetStateId": "S21",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S54",
+      "targetStateId": "S70",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S55",
+      "targetStateId": "S71",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S55",
+      "targetStateId": "S70",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S56",
+      "targetStateId": "S69",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S56",
+      "targetStateId": "S72",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S56",
+      "targetStateId": "S22",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S57",
+      "targetStateId": "S73",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S57",
+      "targetStateId": "S70",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S57",
+      "targetStateId": "S23",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S58",
+      "targetStateId": "S72",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S58",
+      "targetStateId": "S74",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S58",
+      "targetStateId": "S24",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S59",
+      "targetStateId": "S69",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S59",
+      "targetStateId": "S75",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S59",
+      "targetStateId": "S26",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S60",
+      "targetStateId": "S76",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S60",
+      "targetStateId": "S70",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S60",
+      "targetStateId": "S27",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S61",
+      "targetStateId": "S75",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S61",
+      "targetStateId": "S77",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S61",
+      "targetStateId": "S28",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S62",
+      "targetStateId": "S69",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S62",
+      "targetStateId": "S78",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S62",
+      "targetStateId": "S30",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S63",
+      "targetStateId": "S79",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S63",
+      "targetStateId": "S70",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S63",
+      "targetStateId": "S31",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S64",
+      "targetStateId": "S78",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S64",
+      "targetStateId": "S80",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S64",
+      "targetStateId": "S32",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S65",
+      "targetStateId": "S74",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S65",
+      "targetStateId": "S77",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S65",
+      "targetStateId": "S80",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S65",
+      "targetStateId": "S81",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S65",
+      "targetStateId": "S34",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S66",
+      "targetStateId": "S69",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S66",
+      "targetStateId": "S82",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S66",
+      "targetStateId": "S35",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S67",
+      "targetStateId": "S83",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S67",
+      "targetStateId": "S70",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S67",
+      "targetStateId": "S36",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S68",
+      "targetStateId": "S82",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S68",
+      "targetStateId": "S84",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S68",
+      "targetStateId": "S37",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S69",
+      "targetStateId": "S85",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S69",
+      "targetStateId": "S38",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S70",
+      "targetStateId": "S39",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S71",
+      "targetStateId": "S86",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S71",
+      "targetStateId": "S87",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S71",
+      "targetStateId": "S88",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S71",
+      "targetStateId": "S89",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S72",
+      "targetStateId": "S85",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S72",
+      "targetStateId": "S90",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S72",
+      "targetStateId": "S40",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S73",
+      "targetStateId": "S91",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S73",
+      "targetStateId": "S92",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S73",
+      "targetStateId": "S93",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S73",
+      "targetStateId": "S94",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S74",
+      "targetStateId": "S90",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S74",
+      "targetStateId": "S95",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S74",
+      "targetStateId": "S42",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S75",
+      "targetStateId": "S85",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S75",
+      "targetStateId": "S96",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S75",
+      "targetStateId": "S43",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S76",
+      "targetStateId": "S97",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S76",
+      "targetStateId": "S98",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S76",
+      "targetStateId": "S99",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S76",
+      "targetStateId": "S100",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S77",
+      "targetStateId": "S96",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S77",
+      "targetStateId": "S101",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S77",
+      "targetStateId": "S45",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S78",
+      "targetStateId": "S85",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S78",
+      "targetStateId": "S102",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S78",
+      "targetStateId": "S46",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S79",
+      "targetStateId": "S103",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S79",
+      "targetStateId": "S104",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S79",
+      "targetStateId": "S105",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S79",
+      "targetStateId": "S106",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S80",
+      "targetStateId": "S102",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S80",
+      "targetStateId": "S107",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S80",
+      "targetStateId": "S48",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S81",
+      "targetStateId": "S95",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S81",
+      "targetStateId": "S101",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S81",
+      "targetStateId": "S107",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S81",
+      "targetStateId": "S108",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S81",
+      "targetStateId": "S49",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S82",
+      "targetStateId": "S85",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S82",
+      "targetStateId": "S109",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S82",
+      "targetStateId": "S50",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S83",
+      "targetStateId": "S110",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S83",
+      "targetStateId": "S111",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S83",
+      "targetStateId": "S112",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S83",
+      "targetStateId": "S113",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S84",
+      "targetStateId": "S109",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S84",
+      "targetStateId": "S114",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S84",
+      "targetStateId": "S52",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S85",
+      "targetStateId": "S115",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S85",
+      "targetStateId": "S53",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S86",
+      "targetStateId": "S116",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S86",
+      "targetStateId": "S117",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S87",
+      "targetStateId": "S118",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S87",
+      "targetStateId": "S119",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S88",
+      "targetStateId": "S120",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S88",
+      "targetStateId": "S121",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S89",
+      "targetStateId": "S116",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S89",
+      "targetStateId": "S118",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S89",
+      "targetStateId": "S120",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S89",
+      "targetStateId": "S122",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S89",
+      "targetStateId": "S123",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S90",
+      "targetStateId": "S115",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S90",
+      "targetStateId": "S124",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S90",
+      "targetStateId": "S56",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S91",
+      "targetStateId": "S125",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S91",
+      "targetStateId": "S126",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S92",
+      "targetStateId": "S127",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S92",
+      "targetStateId": "S128",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S93",
+      "targetStateId": "S129",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S93",
+      "targetStateId": "S130",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S94",
+      "targetStateId": "S125",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S94",
+      "targetStateId": "S127",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S94",
+      "targetStateId": "S129",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S94",
+      "targetStateId": "S131",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S94",
+      "targetStateId": "S132",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S95",
+      "targetStateId": "S124",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S95",
+      "targetStateId": "S133",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S95",
+      "targetStateId": "S58",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S96",
+      "targetStateId": "S115",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S96",
+      "targetStateId": "S134",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S96",
+      "targetStateId": "S59",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S97",
+      "targetStateId": "S135",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S97",
+      "targetStateId": "S136",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S98",
+      "targetStateId": "S137",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S98",
+      "targetStateId": "S138",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S99",
+      "targetStateId": "S139",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S99",
+      "targetStateId": "S140",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S100",
+      "targetStateId": "S135",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S100",
+      "targetStateId": "S137",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S100",
+      "targetStateId": "S139",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S100",
+      "targetStateId": "S141",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S100",
+      "targetStateId": "S142",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S101",
+      "targetStateId": "S134",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S101",
+      "targetStateId": "S143",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S101",
+      "targetStateId": "S61",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S102",
+      "targetStateId": "S115",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S102",
+      "targetStateId": "S144",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S102",
+      "targetStateId": "S62",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S103",
+      "targetStateId": "S145",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S103",
+      "targetStateId": "S146",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S104",
+      "targetStateId": "S147",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S104",
+      "targetStateId": "S148",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S105",
+      "targetStateId": "S149",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S105",
+      "targetStateId": "S150",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S106",
+      "targetStateId": "S145",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S106",
+      "targetStateId": "S147",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S106",
+      "targetStateId": "S149",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S106",
+      "targetStateId": "S151",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S106",
+      "targetStateId": "S152",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S107",
+      "targetStateId": "S144",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S107",
+      "targetStateId": "S153",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S107",
+      "targetStateId": "S64",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S108",
+      "targetStateId": "S133",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S108",
+      "targetStateId": "S143",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S108",
+      "targetStateId": "S153",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S108",
+      "targetStateId": "S154",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S108",
+      "targetStateId": "S65",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S109",
+      "targetStateId": "S115",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S109",
+      "targetStateId": "S155",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S109",
+      "targetStateId": "S66",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S110",
+      "targetStateId": "S156",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S110",
+      "targetStateId": "S157",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S111",
+      "targetStateId": "S158",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S111",
+      "targetStateId": "S159",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S112",
+      "targetStateId": "S160",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S112",
+      "targetStateId": "S161",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S113",
+      "targetStateId": "S156",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S113",
+      "targetStateId": "S158",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S113",
+      "targetStateId": "S160",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S113",
+      "targetStateId": "S162",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S113",
+      "targetStateId": "S163",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S114",
+      "targetStateId": "S155",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S114",
+      "targetStateId": "S164",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S114",
+      "targetStateId": "S68",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S115",
+      "targetStateId": "S165",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S115",
+      "targetStateId": "S69",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S116",
+      "targetStateId": "S166",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S116",
+      "targetStateId": "S167",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S117",
+      "targetStateId": "S71",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S117",
+      "targetStateId": "S167",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S118",
+      "targetStateId": "S168",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S118",
+      "targetStateId": "S169",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S119",
+      "targetStateId": "S71",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S119",
+      "targetStateId": "S169",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S120",
+      "targetStateId": "S170",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S120",
+      "targetStateId": "S171",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S121",
+      "targetStateId": "S71",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S121",
+      "targetStateId": "S171",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S122",
+      "targetStateId": "S166",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S122",
+      "targetStateId": "S168",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S122",
+      "targetStateId": "S170",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S122",
+      "targetStateId": "S172",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S122",
+      "targetStateId": "S71",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S123",
+      "targetStateId": "S71",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S123",
+      "targetStateId": "S167",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S123",
+      "targetStateId": "S169",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S123",
+      "targetStateId": "S171",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S123",
+      "targetStateId": "S71",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S124",
+      "targetStateId": "S165",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S124",
+      "targetStateId": "S173",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S124",
+      "targetStateId": "S72",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S125",
+      "targetStateId": "S174",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S125",
+      "targetStateId": "S175",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S126",
+      "targetStateId": "S73",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S126",
+      "targetStateId": "S175",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S127",
+      "targetStateId": "S176",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S127",
+      "targetStateId": "S177",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S128",
+      "targetStateId": "S73",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S128",
+      "targetStateId": "S177",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S129",
+      "targetStateId": "S178",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S129",
+      "targetStateId": "S179",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S130",
+      "targetStateId": "S73",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S130",
+      "targetStateId": "S179",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S131",
+      "targetStateId": "S174",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S131",
+      "targetStateId": "S176",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S131",
+      "targetStateId": "S178",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S131",
+      "targetStateId": "S180",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S131",
+      "targetStateId": "S73",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S132",
+      "targetStateId": "S73",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S132",
+      "targetStateId": "S175",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S132",
+      "targetStateId": "S177",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S132",
+      "targetStateId": "S179",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S132",
+      "targetStateId": "S73",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S133",
+      "targetStateId": "S173",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S133",
+      "targetStateId": "S181",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S133",
+      "targetStateId": "S74",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S134",
+      "targetStateId": "S165",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S134",
+      "targetStateId": "S182",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S134",
+      "targetStateId": "S75",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S135",
+      "targetStateId": "S183",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S135",
+      "targetStateId": "S184",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S136",
+      "targetStateId": "S76",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S136",
+      "targetStateId": "S184",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S137",
+      "targetStateId": "S185",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S137",
+      "targetStateId": "S186",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S138",
+      "targetStateId": "S76",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S138",
+      "targetStateId": "S186",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S139",
+      "targetStateId": "S187",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S139",
+      "targetStateId": "S188",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S140",
+      "targetStateId": "S76",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S140",
+      "targetStateId": "S188",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S141",
+      "targetStateId": "S183",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S141",
+      "targetStateId": "S185",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S141",
+      "targetStateId": "S187",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S141",
+      "targetStateId": "S189",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S141",
+      "targetStateId": "S76",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S142",
+      "targetStateId": "S76",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S142",
+      "targetStateId": "S184",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S142",
+      "targetStateId": "S186",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S142",
+      "targetStateId": "S188",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S142",
+      "targetStateId": "S76",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S143",
+      "targetStateId": "S182",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S143",
+      "targetStateId": "S190",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S143",
+      "targetStateId": "S77",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S144",
+      "targetStateId": "S165",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S144",
+      "targetStateId": "S191",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S144",
+      "targetStateId": "S78",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S145",
+      "targetStateId": "S192",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S145",
+      "targetStateId": "S193",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S146",
+      "targetStateId": "S79",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S146",
+      "targetStateId": "S193",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S147",
+      "targetStateId": "S194",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S147",
+      "targetStateId": "S195",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S148",
+      "targetStateId": "S79",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S148",
+      "targetStateId": "S195",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S149",
+      "targetStateId": "S196",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S149",
+      "targetStateId": "S197",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S150",
+      "targetStateId": "S79",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S150",
+      "targetStateId": "S197",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S151",
+      "targetStateId": "S192",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S151",
+      "targetStateId": "S194",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S151",
+      "targetStateId": "S196",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S151",
+      "targetStateId": "S198",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S151",
+      "targetStateId": "S79",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S152",
+      "targetStateId": "S79",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S152",
+      "targetStateId": "S193",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S152",
+      "targetStateId": "S195",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S152",
+      "targetStateId": "S197",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S152",
+      "targetStateId": "S79",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S153",
+      "targetStateId": "S191",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S153",
+      "targetStateId": "S199",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S153",
+      "targetStateId": "S80",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S154",
+      "targetStateId": "S181",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S154",
+      "targetStateId": "S190",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S154",
+      "targetStateId": "S199",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S154",
+      "targetStateId": "S200",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S154",
+      "targetStateId": "S81",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S155",
+      "targetStateId": "S165",
+      "ruleName": "buy"
+    },
+    {
+      "sourceStateId": "S155",
+      "targetStateId": "S201",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S155",
+      "targetStateId": "S82",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S156",
+      "targetStateId": "S202",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S156",
+      "targetStateId": "S203",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S157",
+      "targetStateId": "S83",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S157",
+      "targetStateId": "S203",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S158",
+      "targetStateId": "S204",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S158",
+      "targetStateId": "S205",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S159",
+      "targetStateId": "S83",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S159",
+      "targetStateId": "S205",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S160",
+      "targetStateId": "S206",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S160",
+      "targetStateId": "S207",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S161",
+      "targetStateId": "S83",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S161",
+      "targetStateId": "S207",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S162",
+      "targetStateId": "S202",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S162",
+      "targetStateId": "S204",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S162",
+      "targetStateId": "S206",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S162",
+      "targetStateId": "S208",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S162",
+      "targetStateId": "S83",
+      "ruleName": "loop back 2"
+    },
+    {
+      "sourceStateId": "S163",
+      "targetStateId": "S83",
+      "ruleName": "present options"
+    },
+    {
+      "sourceStateId": "S163",
+      "targetStateId": "S203",
+      "ruleName": "pick option fish"
+    },
+    {
+      "sourceStateId": "S163",
+      "targetStateId": "S205",
+      "ruleName": "pick option salad"
+    },
+    {
+      "sourceStateId": "S163",
+      "targetStateId": "S207",
+      "ruleName": "pick option beef"
+    },
+    {
+      "sourceStateId": "S163",
+      "targetStateId": "S83",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S164",
+      "targetStateId": "S201",
+      "ruleName": "order selected"
+    },
+    {
+      "sourceStateId": "S164",
+      "targetStateId": "S209",
+      "ruleName": "advance"
+    },
+    {
+      "sourceStateId": "S164",
+      "targetStateId": "S84",
+      "ruleName": "loop back 2"
+    }
+  ]
+}
