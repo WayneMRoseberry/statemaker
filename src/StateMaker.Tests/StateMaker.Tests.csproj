@@ -23,6 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="sampledata\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\StateMaker\StateMaker.csproj" />
     <ProjectReference Include="..\StateMaker.Console\StateMaker.Console.csproj" />
   </ItemGroup>

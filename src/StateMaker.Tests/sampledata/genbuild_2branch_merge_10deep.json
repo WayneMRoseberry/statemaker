@@ -1,0 +1,58 @@
+{
+  "initialState": {
+    "step": 0,
+    "branch": "trunk"
+  },
+  "rules": [
+    {
+      "name": "take branch1",
+      "condition": "branch == 'trunk'",
+      "transformations": {
+        "step": "step + 1",
+        "branch": "'branch1'"
+      }
+    },
+    {
+      "name": "take branch2",
+      "condition": "branch == 'trunk'",
+      "transformations": {
+        "step": "step + 1",
+        "branch": "'branch2'"
+      }
+    },
+    {
+      "name": "add branch1",
+      "condition": "branch == 'branch1' && step <= 9",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "add branch2",
+      "condition": "branch == 'branch2' && step <= 9",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "merge branch1",
+      "condition": "step >= 2 && branch == 'branch1'",
+      "transformations": {
+        "step": "step + 1",
+        "branch": "'trunk'"
+      }
+    },
+    {
+      "name": "merge branch2",
+      "condition": "step >= 2 && branch == 'branch2'",
+      "transformations": {
+        "step": "step + 1",
+        "branch": "'trunk'"
+      }
+    }
+  ],
+  "config": {
+    "maxStates": 30,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}

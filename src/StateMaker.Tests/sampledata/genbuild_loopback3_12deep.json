@@ -1,0 +1,25 @@
+{
+  "initialState": {
+    "step": 0
+  },
+  "rules": [
+    {
+      "name": "advance",
+      "condition": "step <= 11",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "loop back 3",
+      "condition": "step >= 3 && step <= 12",
+      "transformations": {
+        "step": "step - 3"
+      }
+    }
+  ],
+  "config": {
+    "maxStates": 30,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}

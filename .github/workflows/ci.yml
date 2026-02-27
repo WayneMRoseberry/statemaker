@@ -25,7 +25,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release --warnaserror
 
       - name: Test with coverage
-        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" --results-directory ./test-results --collect:"XPlat Code Coverage"
+        run: dotnet test --no-build --configuration Release --filter "FullyQualifiedName!~GenbuildVerification" --logger "trx;LogFileName=test-results.trx" --results-directory ./test-results --collect:"XPlat Code Coverage"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
