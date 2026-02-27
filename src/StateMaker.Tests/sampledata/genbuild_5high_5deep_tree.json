@@ -1,0 +1,91 @@
+{
+  "initialState": {
+    "step": 0
+  },
+  "rules": [
+    {
+      "name": "Action1",
+      "condition": "step == 0",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action1'"
+      }
+    },
+    {
+      "name": "Action2",
+      "condition": "step == 0",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action2'"
+      }
+    },
+    {
+      "name": "Action3",
+      "condition": "step == 0",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action3'"
+      }
+    },
+    {
+      "name": "Action4",
+      "condition": "step == 0",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action4'"
+      }
+    },
+    {
+      "name": "Action5",
+      "condition": "step == 0",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action5'"
+      }
+    },
+    {
+      "name": "Action1",
+      "condition": "step >= 1 && step <= 4 && name == 'Action1'",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action1'"
+      }
+    },
+    {
+      "name": "Action2",
+      "condition": "step >= 1 && step <= 4 && name == 'Action2'",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action2'"
+      }
+    },
+    {
+      "name": "Action3",
+      "condition": "step >= 1 && step <= 4 && name == 'Action3'",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action3'"
+      }
+    },
+    {
+      "name": "Action4",
+      "condition": "step >= 1 && step <= 4 && name == 'Action4'",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action4'"
+      }
+    },
+    {
+      "name": "Action5",
+      "condition": "step >= 1 && step <= 4 && name == 'Action5'",
+      "transformations": {
+        "step": "step + 1",
+        "name": "'Action5'"
+      }
+    }
+  ],
+  "config": {
+    "maxStates": 30,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "initialState": {
+    "step": 0
+  },
+  "rules": [
+    {
+      "name": "Action1",
+      "condition": "step < 5",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "Action2",
+      "condition": "step < 5",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "Action3",
+      "condition": "step < 5",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "Action4",
+      "condition": "step < 5",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "Action5",
+      "condition": "step < 5",
+      "transformations": {
+        "step": "step + 1"
+      }
+    }
+  ],
+  "config": {
+    "maxStates": 10,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}

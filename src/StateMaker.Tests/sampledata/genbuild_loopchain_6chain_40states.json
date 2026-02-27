@@ -1,0 +1,48 @@
+{
+  "initialState": {
+    "step": 0,
+    "loops": 0
+  },
+  "rules": [
+    {
+      "name": "advance",
+      "condition": "step >= 0 && step < 3",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "advance",
+      "condition": "step == 3",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "advance",
+      "condition": "step == 3",
+      "transformations": {
+        "step": "0",
+        "loops": "loops + 1"
+      }
+    },
+    {
+      "name": "advance",
+      "condition": "step > 3 && step < 6",
+      "transformations": {
+        "step": "step + 1"
+      }
+    },
+    {
+      "name": "advance",
+      "condition": "step == 6",
+      "transformations": {
+        "step": "0"
+      }
+    }
+  ],
+  "config": {
+    "maxStates": 40,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}
