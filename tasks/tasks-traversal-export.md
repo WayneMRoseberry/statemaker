@@ -29,12 +29,12 @@
   - [x] 1.2 Add `ExportType` parsing to the export command path.
   - [x] 1.3 Add `ExportType` documentation to CLI help output.
   - [x] 1.4 Add unit tests for parsing the new `ExportType` flag.
-- [ ] 2.0 Implement traversal coverage export behavior
-  - [ ] 2.1 Define a new `ExportType` enum or value set with `Default`, `AllStates`, `AllTransitions`, `AllPaths`, and `AllStatePairs`.
-  - [ ] 2.2 Extend `src/StateMaker/ExportCommand.cs` to accept and propagate `ExportType`.
-  - [ ] 2.3 Implement traversal generation helpers for each coverage type.
-  - [ ] 2.4 Ensure default export behavior remains unchanged when `ExportType` is omitted or set to `Default`.
-  - [ ] 2.5 Add unit tests covering traversal selection and behavior.
+- [x] 2.0 Implement traversal coverage export behavior
+  - [x] 2.1 Define a new `ExportType` enum or value set with `Default`, `AllStates`, `AllTransitions`, `AllPaths`, and `AllStatePairs`.
+  - [x] 2.2 Extend `src/StateMaker/ExportCommand.cs` to accept and propagate `ExportType`.
+  - [x] 2.3 Implement traversal generation helpers for each coverage type.
+  - [x] 2.4 Ensure default export behavior remains unchanged when `ExportType` is omitted or set to `Default`.
+  - [x] 2.5 Add unit tests covering traversal selection and behavior.
 - [ ] 3.0 Add JSON traversal export schema and formatting
   - [ ] 3.1 Define a traversal schema model with `id`, `name`, `description`, and `transitions`.
   - [ ] 3.2 Update `src/StateMaker/JsonExporter.cs` to emit traversal objects for traversal export types.

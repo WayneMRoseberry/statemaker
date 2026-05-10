@@ -6,12 +6,12 @@ namespace StateMaker;
 
 public class GraphMlExporter : IStateMachineExporter
 {
-    public string Export(StateMachine stateMachine, string exportType = "Default")
+    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default)
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
         // For now, only handle Default; traversal types will be implemented later
-        if (exportType != "Default")
+        if (exportType != ExportType.Default)
             throw new NotImplementedException($"Export type '{exportType}' not yet implemented.");
 
         var sb = new StringBuilder();
