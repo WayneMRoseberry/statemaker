@@ -6,10 +6,10 @@ public class ExportCommand
 
     public void Execute(string inputFilePath, string? outputPath, string format, TextWriter writer)
     {
-        Execute(inputFilePath, outputPath, format, writer, null, "Default");
+        Execute(inputFilePath, outputPath, format, writer, null, ExportType.Default);
     }
 
-    public void Execute(string inputFilePath, string? outputPath, string format, TextWriter writer, string? filterFilePath, string exportType)
+    public void Execute(string inputFilePath, string? outputPath, string format, TextWriter writer, string? filterFilePath, ExportType exportType)
     {
         if (!File.Exists(inputFilePath))
             throw new FileNotFoundException($"State machine file not found: {inputFilePath}", inputFilePath);
