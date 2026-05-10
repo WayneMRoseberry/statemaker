@@ -1,0 +1,63 @@
+{
+  "initialState": {
+    "ui": "FordApp",
+    "vha": false,
+    "user_intent": "Unknown"
+  },
+  "rules": [
+    {
+      "name": "new vha",
+      "condition": "ui == 'FordApp' || ui == 'alerts' || ui == 'BlueAI'",
+      "transformations": {
+        "vha": "true"
+      }
+    },
+    {
+      "name": "user launch alerts",
+      "condition": "ui == 'FordApp'",
+      "transformations": {
+        "ui": "'alerts'"
+      }
+    },
+    {
+      "name": "user launch BlueAI",
+      "condition": "ui == 'FordApp'",
+      "transformations": {
+        "ui": "'BlueAI'"
+      }
+    },
+    {
+      "name": "user wants service",
+      "condition": "ui == 'BlueAI' && user_intent='Unknown'",
+      "transformations": {
+        "user_intent": "'schedule_service'"
+      }
+    },
+    {
+      "name": "user wants service",
+      "condition": "ui == 'alerts' && user_intent='Unknown'",
+      "transformations": {
+        "ui": "'BlueAI'",
+        "user_intent": "'schedule_service'"
+      }
+    },
+    {
+      "name": "BlueAI calls VCAI",
+      "condition": "ui == 'BlueAI' && user_intent == 'schedule_service'",
+      "transformations": {
+        "ui": "'VCAI'"
+      }
+    },
+    {
+      "name": "User Aborts",
+      "condition": "ui == 'BlueAI' || ui == 'alerts'",
+      "transformations": {
+        "ui": "'FordApp'"
+      }
+    }
+  ],
+  "config": {
+    "maxStates": 20,
+    "explorationStrategy": "BreadthFirstSearch"
+  }
+}
