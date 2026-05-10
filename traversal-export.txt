@@ -1,0 +1,12 @@
+Add the ability to specify different traversal types to the export capabilities of statemaker.
+Keep existing default export behavior.
+Add to the export command a flag called "ExportType"
+It includes the following:
+- AllStates: will export a set of traversals which across the set hit each state at least once
+- AllTransitions: will export a set of traversals which across the set hit each transition at least once
+- AllPaths: will export a set of traversals which across the set hit every possible path in the state model at least once, with guards to protect against infinite loop
+- AllStatePairs: will export a set of traversals which attempts to pair every state with every other possible state at least once if there is a path to do so
+
+These options are in addition to the existing default (create an appropriately named export type for the default behavior), which is what the tool will use if not specified.
+
+The Json format should express each traversal as if it were a test case, so assign it names that meaningfully describe what it does and assign each an id.
