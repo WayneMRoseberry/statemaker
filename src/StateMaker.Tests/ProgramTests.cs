@@ -252,6 +252,34 @@ public class ProgramTests
         }
     }
 
+    [Fact]
+    public void Run_ExportCommand_WithExportTypeFlag_ParsesCorrectly()
+    {
+        var sm = new StateMachine();
+        var s0 = new State();
+        s0.Variables["x"] = 0;
+        sm.AddOrUpdateState("S0", s0);
+        sm.StartingStateId = "S0";
+        var json = new JsonExporter().Export(sm);
+        var inputPath = Path.GetTempFileName();
+        File.WriteAllText(inputPath, json);
+        try
+        {
+            var stdout = new StringWriter();
+            var stderr = new StringWriter();
+
+            int exitCode = Program.Run(new[] { "export", inputPath, "--export-type", "AllStates" }, stdout, stderr);
+
+            // For now, it should fail with NotImplementedException since AllStates is not implemented
+            Assert.Equal(1, exitCode);
+            Assert.Contains("not yet implemented", stderr.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            File.Delete(inputPath);
+        }
+    }
+
     #endregion
 
     #region Error Handling
