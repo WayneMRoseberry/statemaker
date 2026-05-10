@@ -73,9 +73,10 @@ public class Program
         var outputPath = GetOptionValue(args, "--output", "-o");
 
         var filterPath = GetOptionValue(args, "--filter", "--filter");
+        var exportType = GetOptionValue(args, "--export-type", "--export-type") ?? "Default";
 
         var exportCommand = new ExportCommand();
-        exportCommand.Execute(filePath, outputPath, format, stdout, filterPath);
+        exportCommand.Execute(filePath, outputPath, format, stdout, filterPath, exportType);
         return 0;
     }
 

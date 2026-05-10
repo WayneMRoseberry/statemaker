@@ -209,7 +209,7 @@ public class ExportCommandTests
             var writer = new StringWriter();
             var command = new ExportCommand();
 
-            command.Execute(smPath, null, "json", writer, filterPath);
+            command.Execute(smPath, null, "json", writer, filterPath, "Default");
 
             var output = writer.ToString();
             var doc = System.Text.Json.JsonDocument.Parse(output);
@@ -235,7 +235,7 @@ public class ExportCommandTests
             var writer = new StringWriter();
             var command = new ExportCommand();
 
-            command.Execute(path, null, "json", writer, null);
+            command.Execute(path, null, "json", writer, null, "Default");
 
             var output = writer.ToString();
             Assert.Contains("startingStateId", output, StringComparison.Ordinal);

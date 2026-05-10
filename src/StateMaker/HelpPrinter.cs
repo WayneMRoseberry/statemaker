@@ -15,6 +15,7 @@ public static class HelpPrinter
         writer.WriteLine("  --format, -f <format>   Export format: json, dot, graphml, mermaid (default: json)");
         writer.WriteLine("  --output, -o <file>     Output file path (default: stdout)");
         writer.WriteLine("  --filter <file>         Filter definition file (for export command)");
+        writer.WriteLine("  --export-type <type>    Export type: Default, AllStates, AllTransitions, AllPaths, AllStatePairs (default: Default)");
         writer.WriteLine("  --list                  Output matching states as a JSON array (for filter command)");
         writer.WriteLine();
         writer.WriteLine("Examples:");

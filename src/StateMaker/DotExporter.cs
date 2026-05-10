@@ -5,9 +5,13 @@ namespace StateMaker;
 
 public class DotExporter : IStateMachineExporter
 {
-    public string Export(StateMachine stateMachine)
+    public string Export(StateMachine stateMachine, string exportType = "Default")
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
+
+        // For now, only handle Default; traversal types will be implemented later
+        if (exportType != "Default")
+            throw new NotImplementedException($"Export type '{exportType}' not yet implemented.");
 
         var sb = new StringBuilder();
         sb.AppendLine("digraph StateMachine {");

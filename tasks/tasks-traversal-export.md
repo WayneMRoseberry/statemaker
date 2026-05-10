@@ -23,12 +23,12 @@
 ## Tasks
 
 - [ ] 0.0 Create feature branch
-  - [ ] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b feature/traversal-export`)
-- [ ] 1.0 Add CLI support for `ExportType`
-  - [ ] 1.1 Review `src/StateMaker.Console/Program.cs` and current CLI option parsing patterns.
-  - [ ] 1.2 Add `ExportType` parsing to the export command path.
-  - [ ] 1.3 Add `ExportType` documentation to CLI help output.
-  - [ ] 1.4 Add unit tests for parsing the new `ExportType` flag.
+  - [x] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b feature/traversal-export`)
+- [x] 1.0 Add CLI support for `ExportType`
+  - [x] 1.1 Review `src/StateMaker.Console/Program.cs` and current CLI option parsing patterns.
+  - [x] 1.2 Add `ExportType` parsing to the export command path.
+  - [x] 1.3 Add `ExportType` documentation to CLI help output.
+  - [x] 1.4 Add unit tests for parsing the new `ExportType` flag.
 - [ ] 2.0 Implement traversal coverage export behavior
   - [ ] 2.1 Define a new `ExportType` enum or value set with `Default`, `AllStates`, `AllTransitions`, `AllPaths`, and `AllStatePairs`.
   - [ ] 2.2 Extend `src/StateMaker/ExportCommand.cs` to accept and propagate `ExportType`.
