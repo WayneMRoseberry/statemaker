@@ -1,21 +1,14 @@
 {
   "initialState": {
-    "step": 0,
-    "done": false
+    "ui": "alerts",
+    "vha": true
   },
   "rules": [
     {
-      "name": "Advance",
-      "condition": "step < 3",
+      "name": "User_Schedules",
+      "condition": "ui == 'alerts'",
       "transformations": {
-        "step": "step + 1"
-      }
-    },
-    {
-      "name": "Finish",
-      "condition": "step == 3 && done == false",
-      "transformations": {
-        "done": "true"
+        "ui": "blueai"
       }
     }
   ],
