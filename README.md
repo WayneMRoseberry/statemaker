@@ -35,7 +35,8 @@ For complete command-line usage, file format reference, and input validation rul
   - Exhaustive mode (all reachable states)
   - Depth-limited mode
   - State-count-limited mode
-- **Export Capabilities**: Export to GraphML, DOT, or JSON for visualization
+- **Export Capabilities**: Export to GraphML, DOT, Mermaid, or JSON for visualization
+- **Traversal Coverage Export**: Generate test paths through the state machine (all states, all transitions, all paths, or all state pairs) for test coverage analysis
 - **Extensible**: Package and share custom rules as NuGet packages
 - **Type-Safe**: Leverages C#/.NET type system for compile-time safety
 
@@ -178,7 +179,9 @@ This project uses **trunk-based development** with continuous integration:
 - Custom rule support (`IRule` interface)
 - Declarative rule support (JSON)
 - Basic expression evaluation
-- Export to GraphML, DOT, JSON
+- Export to GraphML, DOT, Mermaid, JSON
+- Traversal coverage export (`AllStates`, `AllTransitions`, `AllPaths`, `AllStatePairs`)
+- State filtering with attribute assignment
 
 ### Phase 2 (Future)
 - Advanced expression functions

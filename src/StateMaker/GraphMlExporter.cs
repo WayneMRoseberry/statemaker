@@ -6,12 +6,12 @@ namespace StateMaker;
 
 public class GraphMlExporter : IStateMachineExporter
 {
-    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default)
+    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default, bool includeStateVariables = false)
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
         if (exportType != ExportType.Default)
-            return ExportTraversals(stateMachine, exportType);
+            return ExportTraversals(stateMachine, exportType, includeStateVariables);
 
         var sb = new StringBuilder();
         using var writer = XmlWriter.Create(sb, new XmlWriterSettings
@@ -64,7 +64,7 @@ public class GraphMlExporter : IStateMachineExporter
         return sb.ToString();
     }
 
-    private static string ExportTraversals(StateMachine sm, ExportType exportType)
+    private static string ExportTraversals(StateMachine sm, ExportType exportType, bool includeStateVariables)
     {
         var traversals = TraversalGenerator.Generate(sm, exportType);
         var startId = sm.StartingStateId ?? string.Empty;
@@ -93,16 +93,31 @@ public class GraphMlExporter : IStateMachineExporter
         writer.WriteAttributeString("yfiles.type", "edgegraphics");
         writer.WriteEndElement();
 
+        writer.WriteStartElement("key");
+        writer.WriteAttributeString("id", "d2");
+        writer.WriteAttributeString("for", "graph");
+        writer.WriteAttributeString("attr.name", "description");
+        writer.WriteAttributeString("attr.type", "string");
+        writer.WriteEndElement();
+
         foreach (var traversal in traversals)
         {
             writer.WriteStartElement("graph");
             writer.WriteAttributeString("id", traversal.Id);
             writer.WriteAttributeString("edgedefault", "directed");
 
+            writer.WriteStartElement("data");
+            writer.WriteAttributeString("key", "d2");
+            writer.WriteString($"{traversal.Transitions.Count} steps - {traversal.Name}");
+            writer.WriteEndElement();
+
             var nodePrefix = traversal.Id + "_";
             foreach (var stateId in GetTraversalStateIds(traversal, startId))
             {
-                WriteTraversalNode(writer, nodePrefix + stateId, stateId);
+                var label = includeStateVariables && sm.States.TryGetValue(stateId, out var state)
+                    ? BuildNodeLabel(stateId, state)
+                    : stateId;
+                WriteTraversalNode(writer, nodePrefix + stateId, label);
             }
 
             int edgeId = 0;

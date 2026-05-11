@@ -5,12 +5,12 @@ namespace StateMaker;
 
 public class DotExporter : IStateMachineExporter
 {
-    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default)
+    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default, bool includeStateVariables = false)
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
         if (exportType != ExportType.Default)
-            return ExportTraversals(stateMachine, exportType);
+            return ExportTraversals(stateMachine, exportType, includeStateVariables);
 
         var sb = new StringBuilder();
         sb.AppendLine("digraph StateMachine {");
@@ -44,7 +44,7 @@ public class DotExporter : IStateMachineExporter
         return sb.ToString();
     }
 
-    private static string ExportTraversals(StateMachine sm, ExportType exportType)
+    private static string ExportTraversals(StateMachine sm, ExportType exportType, bool includeStateVariables)
     {
         var traversals = TraversalGenerator.Generate(sm, exportType);
         var startId = sm.StartingStateId ?? string.Empty;
@@ -58,12 +58,15 @@ public class DotExporter : IStateMachineExporter
         {
             var clusterId = EscapeDot(traversal.Id);
             sb.AppendLine(CultureInfo.InvariantCulture, $"    subgraph cluster_{clusterId} {{");
-            sb.AppendLine(CultureInfo.InvariantCulture, $"        label=\"{EscapeDot(traversal.Name)}\";");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        label=\"{EscapeDot($"{traversal.Transitions.Count} steps - {traversal.Name}")}\";");
 
             foreach (var stateId in GetTraversalStateIds(traversal, startId))
             {
+                var label = includeStateVariables && sm.States.TryGetValue(stateId, out var state)
+                    ? BuildNodeLabel(stateId, state)
+                    : EscapeDot(stateId);
                 sb.AppendLine(CultureInfo.InvariantCulture,
-                    $"        \"{clusterId}_{EscapeDot(stateId)}\" [label=\"{EscapeDot(stateId)}\"];");
+                    $"        \"{clusterId}_{EscapeDot(stateId)}\" [label=\"{label}\"];");
             }
 
             foreach (var t in traversal.Transitions)

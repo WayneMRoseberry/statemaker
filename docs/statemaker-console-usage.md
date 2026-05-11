@@ -40,6 +40,7 @@ statemaker.console export <state-machine-file> [options]
 | `--output` | `-o` | Output file path | stdout |
 | `--filter` | | Filter definition file to apply before exporting | none |
 | `--export-type` | | Traversal coverage type: `Default`, `AllStates`, `AllTransitions`, `AllPaths`, `AllStatePairs` | `Default` |
+| `--include-state-variables` | | Include state variable values in traversal node labels / JSON states section | off |
 
 **Export types:**
 
@@ -52,8 +53,8 @@ statemaker.console export <state-machine-file> [options]
 | `AllStatePairs` | One traversal per ordered pair of states where the second is reachable from the first. |
 
 When `--export-type` is set to anything other than `Default`, the output schema changes:
-- **JSON**: a `traversals` array of objects with `id`, `name`, `description`, and `transitions`.
-- **DOT / GraphML / Mermaid**: each traversal is rendered as a separate labeled subgraph or graph element within the document.
+- **JSON**: a `traversals` array of objects with `id`, `name`, `description`, and `transitions`. When `--include-state-variables` is set, each traversal object also contains a `states` section with variable values for every state visited in that traversal.
+- **DOT / GraphML / Mermaid**: each traversal is rendered as a separate labeled subgraph or graph element within the document. Node labels show only the state ID by default; `--include-state-variables` adds variable values to each node label.
 
 **Examples:**
 
@@ -64,6 +65,8 @@ statemaker.console export machine.json --filter filter.json --format dot
 statemaker.console export machine.json --export-type AllStates --format json
 statemaker.console export machine.json --export-type AllTransitions --format dot -o traversals.dot
 statemaker.console export machine.json --export-type AllPaths --format mermaid
+statemaker.console export machine.json --export-type AllStates --format json --include-state-variables
+statemaker.console export machine.json --export-type AllTransitions --format dot --include-state-variables -o traversals.dot
 ```
 
 ### `filter`
