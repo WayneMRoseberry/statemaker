@@ -9,9 +9,8 @@ public class DotExporter : IStateMachineExporter
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
-        // For now, only handle Default; traversal types will be implemented later
         if (exportType != ExportType.Default)
-            throw new NotImplementedException($"Export type '{exportType}' not yet implemented.");
+            return ExportTraversals(stateMachine, exportType);
 
         var sb = new StringBuilder();
         sb.AppendLine("digraph StateMachine {");
@@ -43,6 +42,56 @@ public class DotExporter : IStateMachineExporter
 
         sb.AppendLine("}");
         return sb.ToString();
+    }
+
+    private static string ExportTraversals(StateMachine sm, ExportType exportType)
+    {
+        var traversals = TraversalGenerator.Generate(sm, exportType);
+        var startId = sm.StartingStateId ?? string.Empty;
+
+        var sb = new StringBuilder();
+        sb.AppendLine("digraph TraversalCoverage {");
+        sb.AppendLine("    rankdir=LR;");
+        sb.AppendLine("    node [shape=box];");
+
+        foreach (var traversal in traversals)
+        {
+            var clusterId = EscapeDot(traversal.Id);
+            sb.AppendLine(CultureInfo.InvariantCulture, $"    subgraph cluster_{clusterId} {{");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        label=\"{EscapeDot(traversal.Name)}\";");
+
+            foreach (var stateId in GetTraversalStateIds(traversal, startId))
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture,
+                    $"        \"{clusterId}_{EscapeDot(stateId)}\" [label=\"{EscapeDot(stateId)}\"];");
+            }
+
+            foreach (var t in traversal.Transitions)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture,
+                    $"        \"{clusterId}_{EscapeDot(t.SourceStateId)}\" -> \"{clusterId}_{EscapeDot(t.TargetStateId)}\" [label=\"{EscapeDot(t.RuleName)}\"];");
+            }
+
+            sb.AppendLine("    }");
+        }
+
+        sb.AppendLine("}");
+        return sb.ToString();
+    }
+
+    private static IEnumerable<string> GetTraversalStateIds(Traversal traversal, string startStateId)
+    {
+        if (traversal.Transitions.Count == 0)
+            return new[] { startStateId };
+
+        var seen = new HashSet<string>();
+        var result = new List<string>();
+        foreach (var t in traversal.Transitions)
+        {
+            if (seen.Add(t.SourceStateId)) result.Add(t.SourceStateId);
+            if (seen.Add(t.TargetStateId)) result.Add(t.TargetStateId);
+        }
+        return result;
     }
 
     private static string BuildNodeLabel(string stateId, State state)

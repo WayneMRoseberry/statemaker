@@ -39,6 +39,21 @@ statemaker.console export <state-machine-file> [options]
 | `--format` | `-f` | Output format: `json`, `dot`, `graphml`, `mermaid` | `json` |
 | `--output` | `-o` | Output file path | stdout |
 | `--filter` | | Filter definition file to apply before exporting | none |
+| `--export-type` | | Traversal coverage type: `Default`, `AllStates`, `AllTransitions`, `AllPaths`, `AllStatePairs` | `Default` |
+
+**Export types:**
+
+| Value | Description |
+|-------|-------------|
+| `Default` | Standard export — full state machine in the chosen format. |
+| `AllStates` | One traversal per reachable state; collectively visits every state at least once. |
+| `AllTransitions` | One traversal per transition; collectively exercises every transition at least once. |
+| `AllPaths` | All unique simple paths through the state machine, with loop-detection to prevent infinite output. |
+| `AllStatePairs` | One traversal per ordered pair of states where the second is reachable from the first. |
+
+When `--export-type` is set to anything other than `Default`, the output schema changes:
+- **JSON**: a `traversals` array of objects with `id`, `name`, `description`, and `transitions`.
+- **DOT / GraphML / Mermaid**: each traversal is rendered as a separate labeled subgraph or graph element within the document.
 
 **Examples:**
 
@@ -46,6 +61,9 @@ statemaker.console export <state-machine-file> [options]
 statemaker.console export machine.json --format dot
 statemaker.console export machine.json -f graphml -o machine.graphml
 statemaker.console export machine.json --filter filter.json --format dot
+statemaker.console export machine.json --export-type AllStates --format json
+statemaker.console export machine.json --export-type AllTransitions --format dot -o traversals.dot
+statemaker.console export machine.json --export-type AllPaths --format mermaid
 ```
 
 ### `filter`
@@ -459,6 +477,7 @@ Mermaid diagrams render natively in GitHub markdown, GitLab, and the [Mermaid Li
 | Missing required `initialState` section | Error message to stderr, exit code 1. |
 | Missing required `rules` section | Error message to stderr, exit code 1. |
 | Unsupported `--format` value | Error listing supported formats to stderr, exit code 1. |
+| Unsupported `--export-type` value | Error listing supported export types to stderr, exit code 1. |
 | Unknown command | `"Unknown command"` message and help text to stderr, exit code 1. |
 | Invalid expression syntax in a rule | Error message with expression details to stderr, exit code 1. |
 | Undefined variable referenced in expression | Error message with expression and variable details to stderr, exit code 1. |

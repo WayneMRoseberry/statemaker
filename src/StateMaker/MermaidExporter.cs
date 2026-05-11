@@ -9,9 +9,8 @@ public class MermaidExporter : IStateMachineExporter
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
-        // For now, only handle Default; traversal types will be implemented later
         if (exportType != ExportType.Default)
-            throw new NotImplementedException($"Export type '{exportType}' not yet implemented.");
+            return ExportTraversals(stateMachine, exportType);
 
         var sb = new StringBuilder();
         sb.AppendLine("flowchart TD");
@@ -40,6 +39,53 @@ public class MermaidExporter : IStateMachineExporter
         }
 
         return sb.ToString();
+    }
+
+    private static string ExportTraversals(StateMachine sm, ExportType exportType)
+    {
+        var traversals = TraversalGenerator.Generate(sm, exportType);
+        var startId = sm.StartingStateId ?? string.Empty;
+
+        var sb = new StringBuilder();
+        sb.AppendLine("flowchart TD");
+
+        foreach (var traversal in traversals)
+        {
+            var prefix = traversal.Id;
+            sb.AppendLine(CultureInfo.InvariantCulture,
+                $"    subgraph {prefix}[\"{EscapeHtml(traversal.Name)}\"]");
+
+            foreach (var stateId in GetTraversalStateIds(traversal, startId))
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture,
+                    $"        {prefix}_{stateId}[\"{EscapeHtml(stateId)}\"]");
+            }
+
+            foreach (var t in traversal.Transitions)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture,
+                    $"        {prefix}_{t.SourceStateId} -->|{EscapeHtml(t.RuleName)}| {prefix}_{t.TargetStateId}");
+            }
+
+            sb.AppendLine("    end");
+        }
+
+        return sb.ToString();
+    }
+
+    private static IEnumerable<string> GetTraversalStateIds(Traversal traversal, string startStateId)
+    {
+        if (traversal.Transitions.Count == 0)
+            return new[] { startStateId };
+
+        var seen = new HashSet<string>();
+        var result = new List<string>();
+        foreach (var t in traversal.Transitions)
+        {
+            if (seen.Add(t.SourceStateId)) result.Add(t.SourceStateId);
+            if (seen.Add(t.TargetStateId)) result.Add(t.TargetStateId);
+        }
+        return result;
     }
 
     private static string BuildStateLabel(string stateId, State state)

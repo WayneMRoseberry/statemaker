@@ -279,6 +279,33 @@ public class ProgramTests
         }
     }
 
+    [Fact]
+    public void Run_ExportCommand_WithInvalidExportTypeFlag_ReturnsError()
+    {
+        var sm = new StateMachine();
+        var s0 = new State();
+        s0.Variables["x"] = 0;
+        sm.AddOrUpdateState("S0", s0);
+        sm.StartingStateId = "S0";
+        var json = new JsonExporter().Export(sm);
+        var inputPath = Path.GetTempFileName();
+        File.WriteAllText(inputPath, json);
+        try
+        {
+            var stdout = new StringWriter();
+            var stderr = new StringWriter();
+
+            int exitCode = Program.Run(new[] { "export", inputPath, "--export-type", "BadValue" }, stdout, stderr);
+
+            Assert.Equal(1, exitCode);
+            Assert.Contains("Unsupported export type", stderr.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            File.Delete(inputPath);
+        }
+    }
+
     #endregion
 
     #region Error Handling
