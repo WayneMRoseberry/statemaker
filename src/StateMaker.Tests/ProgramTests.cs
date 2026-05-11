@@ -270,9 +270,8 @@ public class ProgramTests
 
             int exitCode = Program.Run(new[] { "export", inputPath, "--export-type", "AllStates" }, stdout, stderr);
 
-            // For now, it should fail with NotImplementedException since AllStates is not implemented
-            Assert.Equal(1, exitCode);
-            Assert.Contains("not yet implemented", stderr.ToString(), StringComparison.OrdinalIgnoreCase);
+            Assert.Equal(0, exitCode);
+            Assert.Contains("traversals", stdout.ToString(), StringComparison.Ordinal);
         }
         finally
         {

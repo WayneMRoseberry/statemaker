@@ -35,10 +35,10 @@
   - [x] 2.3 Implement traversal generation helpers for each coverage type.
   - [x] 2.4 Ensure default export behavior remains unchanged when `ExportType` is omitted or set to `Default`.
   - [x] 2.5 Add unit tests covering traversal selection and behavior.
-- [ ] 3.0 Add JSON traversal export schema and formatting
-  - [ ] 3.1 Define a traversal schema model with `id`, `name`, `description`, and `transitions`.
-  - [ ] 3.2 Update `src/StateMaker/JsonExporter.cs` to emit traversal objects for traversal export types.
-  - [ ] 3.3 Add JSON format tests verifying traversal output structure and content.
+- [x] 3.0 Add JSON traversal export schema and formatting
+  - [x] 3.1 Define a traversal schema model with `id`, `name`, `description`, and `transitions`.
+  - [x] 3.2 Update `src/StateMaker/JsonExporter.cs` to emit traversal objects for traversal export types.
+  - [x] 3.3 Add JSON format tests verifying traversal output structure and content.
 - [ ] 4.0 Extend existing exporters for traversal outputs
   - [ ] 4.1 Update `src/StateMaker/DotExporter.cs` to support traversal-oriented export behavior if needed.
   - [ ] 4.2 Update `src/StateMaker/GraphMlExporter.cs` to support traversal-oriented export behavior if needed.

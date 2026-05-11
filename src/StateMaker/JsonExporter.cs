@@ -8,9 +8,8 @@ public class JsonExporter : IStateMachineExporter
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
-        // For now, only handle Default; traversal types will be implemented later
         if (exportType != ExportType.Default)
-            throw new NotImplementedException($"Export type '{exportType}' not yet implemented.");
+            return ExportTraversals(stateMachine, exportType);
 
         using var stream = new MemoryStream();
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
@@ -51,6 +50,44 @@ public class JsonExporter : IStateMachineExporter
         }
         writer.WriteEndArray();
 
+        writer.WriteEndObject();
+        writer.Flush();
+
+        return System.Text.Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    private static string ExportTraversals(StateMachine stateMachine, ExportType exportType)
+    {
+        var traversals = TraversalGenerator.Generate(stateMachine, exportType);
+
+        using var stream = new MemoryStream();
+        using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+
+        writer.WriteStartObject();
+        writer.WriteStartArray("traversals");
+
+        foreach (var traversal in traversals)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("id", traversal.Id);
+            writer.WriteString("name", traversal.Name);
+            writer.WriteString("description", traversal.Description);
+
+            writer.WriteStartArray(RulesJsonPropertyNames.Transitions);
+            foreach (var t in traversal.Transitions)
+            {
+                writer.WriteStartObject();
+                writer.WriteString(RulesJsonPropertyNames.SourceStateId, t.SourceStateId);
+                writer.WriteString(RulesJsonPropertyNames.TargetStateId, t.TargetStateId);
+                writer.WriteString(RulesJsonPropertyNames.RuleName, t.RuleName);
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
+
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
         writer.WriteEndObject();
         writer.Flush();
 
