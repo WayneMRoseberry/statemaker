@@ -155,6 +155,38 @@ public class JsonTraversalExporterTests
 
     #endregion
 
+    #region Name includes step count prefix
+
+    [Fact]
+    public void AllStates_JsonOutput_NameStartsWithStepCount()
+    {
+        var sm = BuildLinearChain();
+        var json = new JsonExporter().Export(sm, ExportType.AllStates);
+        var doc = JsonDocument.Parse(json);
+        foreach (var t in doc.RootElement.GetProperty("traversals").EnumerateArray())
+        {
+            var name = t.GetProperty("name").GetString()!;
+            var stepCount = t.GetProperty("transitions").GetArrayLength();
+            Assert.StartsWith($"{stepCount} steps - ", name, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void AllTransitions_JsonOutput_NameStepCountMatchesTransitionCount()
+    {
+        var sm = BuildLinearChain();
+        var json = new JsonExporter().Export(sm, ExportType.AllTransitions);
+        var doc = JsonDocument.Parse(json);
+        foreach (var t in doc.RootElement.GetProperty("traversals").EnumerateArray())
+        {
+            var name = t.GetProperty("name").GetString()!;
+            var stepCount = t.GetProperty("transitions").GetArrayLength();
+            Assert.StartsWith($"{stepCount} steps - ", name, StringComparison.Ordinal);
+        }
+    }
+
+    #endregion
+
     #region Default behavior unchanged
 
     [Fact]

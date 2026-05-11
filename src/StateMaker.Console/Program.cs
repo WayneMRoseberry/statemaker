@@ -74,6 +74,7 @@ public class Program
 
         var filterPath = GetOptionValue(args, "--filter", "--filter");
         var exportTypeOption = GetOptionValue(args, "--export-type", "--export-type");
+        var includeStateVariables = HasFlag(args, "--include-state-variables");
 
         ExportType exportType;
         try
@@ -87,7 +88,7 @@ public class Program
         }
 
         var exportCommand = new ExportCommand();
-        exportCommand.Execute(filePath, outputPath, format, stdout, filterPath, exportType);
+        exportCommand.Execute(filePath, outputPath, format, stdout, filterPath, exportType, includeStateVariables);
         return 0;
     }
 

@@ -2,9 +2,11 @@
 
 ## Overview
 
-StateMaker can export generated state machines to three formats: **JSON**, **GraphML**, and **DOT**. Each format represents the same data - states, transitions, and rule names - but is optimized for different use cases.
+StateMaker can export generated state machines to four formats: **JSON**, **GraphML**, **DOT**, and **Mermaid**. Each format represents the same data — states, transitions, and rule names — but is optimized for different use cases.
 
 StateMaker can also **import** a state machine from JSON, enabling round-trip workflows where a state machine is built, stored, and later re-exported to a visualization format.
+
+In addition to full state machine export, the `export` command supports **traversal coverage export** via the `--export-type` flag. Instead of rendering the entire state machine, traversal export produces a set of individual test paths (traversals) through the machine — one per state, transition, path, or state pair depending on the coverage type selected. See [Traversal Coverage Export](#traversal-coverage-export) below.
 
 ## JSON Format
 
@@ -341,6 +343,58 @@ _start_((" ")) --> S0
 style _start_ fill:#000,stroke:#000,color:#000
 ```
 
+## Traversal Coverage Export
+
+When the `--export-type` CLI flag is set to anything other than `Default`, the exporter produces a set of **traversals** — individual paths through the state machine — instead of the full graph.
+
+### Coverage Types
+
+| Value | Description |
+|-------|-------------|
+| `Default` | Standard full state machine export. |
+| `AllStates` | One shortest-path traversal per reachable state; collectively visits every state. |
+| `AllTransitions` | One traversal per transition; collectively exercises every transition. |
+| `AllPaths` | All unique simple paths (DFS with cycle detection), preventing infinite output. |
+| `AllStatePairs` | One traversal per ordered pair (A, B) where B is reachable from A and A ≠ B. |
+
+### Traversal Output Structure by Format
+
+**JSON** — a `traversals` array at the root, each object containing:
+```json
+{
+  "traversals": [
+    {
+      "id": "T1",
+      "name": "Reach S1",
+      "description": "Traversal reaching state S1",
+      "transitions": [
+        { "sourceStateId": "S0", "targetStateId": "S1", "ruleName": "Advance" }
+      ]
+    }
+  ]
+}
+```
+
+When `--include-state-variables` is set, each traversal object also contains a `states` section with variable values for every state visited:
+```json
+{
+  "id": "T1",
+  "name": "Reach S1",
+  "description": "Traversal reaching state S1",
+  "transitions": [ ... ],
+  "states": {
+    "S0": { "step": 0, "done": false },
+    "S1": { "step": 1, "done": false }
+  }
+}
+```
+
+**DOT** — a `digraph TraversalCoverage` with one `subgraph cluster_{id}` per traversal. Node IDs are prefixed with the traversal ID (e.g., `T1_S0`) to avoid collisions. Node labels show only the state ID by default; `--include-state-variables` adds variable values.
+
+**GraphML** — a single `<graphml>` root containing one `<graph id="{traversalId}">` per traversal. Node IDs are prefixed with the traversal ID. Node labels show only the state ID by default; `--include-state-variables` adds variable values.
+
+**Mermaid** — a single `flowchart TD` with one `subgraph {id}["{name}"]` block per traversal. Node IDs are prefixed with the traversal ID. Node labels show only the state ID by default; `--include-state-variables` adds variable values.
+
 ## Format Comparison
 
 | Feature | JSON | DOT | GraphML | Mermaid |
@@ -352,6 +406,7 @@ style _start_ fill:#000,stroke:#000,color:#000
 | State variables | Key-value pairs | Node labels | Node labels | State labels |
 | Transition labels | Rule name field | Edge labels | Edge labels | Edge labels |
 | Visual styling | None | Basic | Rich | Basic |
+| Traversal coverage export | Yes | Yes | Yes | Yes |
 | File size | Small | Small | Large (XML overhead) | Small |
 | Version control | Good (diffable) | Good (diffable) | Poor (XML noise) | Good (diffable) |
 
@@ -362,7 +417,9 @@ style _start_ fill:#000,stroke:#000,color:#000
 ```csharp
 public interface IStateMachineExporter
 {
-    string Export(StateMachine stateMachine);
+    string Export(StateMachine stateMachine,
+                  ExportType exportType = ExportType.Default,
+                  bool includeStateVariables = false);
 }
 
 public class JsonExporter : IStateMachineExporter { ... }
@@ -370,6 +427,8 @@ public class DotExporter : IStateMachineExporter { ... }
 public class GraphMlExporter : IStateMachineExporter { ... }
 public class MermaidExporter : IStateMachineExporter { ... }
 ```
+
+`exportType` selects the coverage algorithm; `includeStateVariables` controls whether state variable values appear in traversal output node labels (visual formats) or a `states` JSON section (JSON format). Both parameters default to their off/standard values, so existing callers are unaffected.
 
 ### Import Interface
 

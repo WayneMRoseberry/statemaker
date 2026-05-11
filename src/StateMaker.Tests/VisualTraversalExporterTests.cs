@@ -17,6 +17,41 @@ public class VisualTraversalExporterTests
         return sm;
     }
 
+    #region Step count in traversal labels
+
+    [Fact]
+    public void DotExporter_AllStates_ClusterLabelIncludesStepCount()
+    {
+        var sm = BuildLinearChain();
+        var output = new DotExporter().Export(sm, ExportType.AllStates);
+        // T1=Reach S0 (0 transitions), T2=Reach S1 (1 transition), T3=Reach S2 (2 transitions)
+        Assert.Contains("0 steps - Reach S0", output, StringComparison.Ordinal);
+        Assert.Contains("1 steps - Reach S1", output, StringComparison.Ordinal);
+        Assert.Contains("2 steps - Reach S2", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MermaidExporter_AllStates_SubgraphLabelIncludesStepCount()
+    {
+        var sm = BuildLinearChain();
+        var output = new MermaidExporter().Export(sm, ExportType.AllStates);
+        Assert.Contains("0 steps - Reach S0", output, StringComparison.Ordinal);
+        Assert.Contains("1 steps - Reach S1", output, StringComparison.Ordinal);
+        Assert.Contains("2 steps - Reach S2", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GraphMlExporter_AllStates_GraphLabelIncludesStepCount()
+    {
+        var sm = BuildLinearChain();
+        var output = new GraphMlExporter().Export(sm, ExportType.AllStates);
+        Assert.Contains("0 steps - Reach S0", output, StringComparison.Ordinal);
+        Assert.Contains("1 steps - Reach S1", output, StringComparison.Ordinal);
+        Assert.Contains("2 steps - Reach S2", output, StringComparison.Ordinal);
+    }
+
+    #endregion
+
     #region DotExporter traversal output
 
     [Fact]

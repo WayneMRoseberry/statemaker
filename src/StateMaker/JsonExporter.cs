@@ -4,12 +4,12 @@ namespace StateMaker;
 
 public class JsonExporter : IStateMachineExporter
 {
-    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default)
+    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default, bool includeStateVariables = false)
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
         if (exportType != ExportType.Default)
-            return ExportTraversals(stateMachine, exportType);
+            return ExportTraversals(stateMachine, exportType, includeStateVariables);
 
         using var stream = new MemoryStream();
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
@@ -56,7 +56,7 @@ public class JsonExporter : IStateMachineExporter
         return System.Text.Encoding.UTF8.GetString(stream.ToArray());
     }
 
-    private static string ExportTraversals(StateMachine stateMachine, ExportType exportType)
+    private static string ExportTraversals(StateMachine stateMachine, ExportType exportType, bool includeStateVariables)
     {
         var traversals = TraversalGenerator.Generate(stateMachine, exportType);
 
@@ -70,7 +70,7 @@ public class JsonExporter : IStateMachineExporter
         {
             writer.WriteStartObject();
             writer.WriteString("id", traversal.Id);
-            writer.WriteString("name", traversal.Name);
+            writer.WriteString("name", $"{traversal.Transitions.Count} steps - {traversal.Name}");
             writer.WriteString("description", traversal.Description);
 
             writer.WriteStartArray(RulesJsonPropertyNames.Transitions);
@@ -84,6 +84,21 @@ public class JsonExporter : IStateMachineExporter
             }
             writer.WriteEndArray();
 
+            if (includeStateVariables)
+            {
+                var stateIds = GetTraversalStateIds(traversal, stateMachine.StartingStateId ?? string.Empty);
+                writer.WriteStartObject("states");
+                foreach (var stateId in stateIds)
+                {
+                    if (!stateMachine.States.TryGetValue(stateId, out var state)) continue;
+                    writer.WriteStartObject(stateId);
+                    foreach (var kvp in state.Variables)
+                        WriteJsonValue(writer, kvp.Key, kvp.Value);
+                    writer.WriteEndObject();
+                }
+                writer.WriteEndObject();
+            }
+
             writer.WriteEndObject();
         }
 
@@ -92,6 +107,21 @@ public class JsonExporter : IStateMachineExporter
         writer.Flush();
 
         return System.Text.Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    private static IEnumerable<string> GetTraversalStateIds(Traversal traversal, string startStateId)
+    {
+        if (traversal.Transitions.Count == 0)
+            return new[] { startStateId };
+
+        var seen = new HashSet<string>();
+        var result = new List<string>();
+        foreach (var t in traversal.Transitions)
+        {
+            if (seen.Add(t.SourceStateId)) result.Add(t.SourceStateId);
+            if (seen.Add(t.TargetStateId)) result.Add(t.TargetStateId);
+        }
+        return result;
     }
 
     private static void WriteJsonValue(Utf8JsonWriter writer, string propertyName, object? value)

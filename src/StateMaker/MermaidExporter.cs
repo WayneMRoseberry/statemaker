@@ -5,12 +5,12 @@ namespace StateMaker;
 
 public class MermaidExporter : IStateMachineExporter
 {
-    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default)
+    public string Export(StateMachine stateMachine, ExportType exportType = ExportType.Default, bool includeStateVariables = false)
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
         if (exportType != ExportType.Default)
-            return ExportTraversals(stateMachine, exportType);
+            return ExportTraversals(stateMachine, exportType, includeStateVariables);
 
         var sb = new StringBuilder();
         sb.AppendLine("flowchart TD");
@@ -41,7 +41,7 @@ public class MermaidExporter : IStateMachineExporter
         return sb.ToString();
     }
 
-    private static string ExportTraversals(StateMachine sm, ExportType exportType)
+    private static string ExportTraversals(StateMachine sm, ExportType exportType, bool includeStateVariables)
     {
         var traversals = TraversalGenerator.Generate(sm, exportType);
         var startId = sm.StartingStateId ?? string.Empty;
@@ -53,12 +53,15 @@ public class MermaidExporter : IStateMachineExporter
         {
             var prefix = traversal.Id;
             sb.AppendLine(CultureInfo.InvariantCulture,
-                $"    subgraph {prefix}[\"{EscapeHtml(traversal.Name)}\"]");
+                $"    subgraph {prefix}[\"{EscapeHtml($"{traversal.Transitions.Count} steps - {traversal.Name}")}\"]");
 
             foreach (var stateId in GetTraversalStateIds(traversal, startId))
             {
+                var label = includeStateVariables && sm.States.TryGetValue(stateId, out var state)
+                    ? BuildStateLabel(stateId, state)
+                    : EscapeHtml(stateId);
                 sb.AppendLine(CultureInfo.InvariantCulture,
-                    $"        {prefix}_{stateId}[\"{EscapeHtml(stateId)}\"]");
+                    $"        {prefix}_{stateId}[\"{label}\"]");
             }
 
             foreach (var t in traversal.Transitions)

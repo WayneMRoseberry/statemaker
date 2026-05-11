@@ -16,6 +16,7 @@ public static class HelpPrinter
         writer.WriteLine("  --output, -o <file>     Output file path (default: stdout)");
         writer.WriteLine("  --filter <file>         Filter definition file (for export command)");
         writer.WriteLine("  --export-type <type>    Export type: Default, AllStates, AllTransitions, AllPaths, AllStatePairs (default: Default)");
+        writer.WriteLine("  --include-state-variables  Include state variable values in traversal node labels (default: off)");
         writer.WriteLine("  --list                  Output matching states as a JSON array (for filter command)");
         writer.WriteLine();
         writer.WriteLine("Examples:");
