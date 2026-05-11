@@ -10,9 +10,8 @@ public class GraphMlExporter : IStateMachineExporter
     {
         ArgumentNullException.ThrowIfNull(stateMachine);
 
-        // For now, only handle Default; traversal types will be implemented later
         if (exportType != ExportType.Default)
-            throw new NotImplementedException($"Export type '{exportType}' not yet implemented.");
+            return ExportTraversals(stateMachine, exportType);
 
         var sb = new StringBuilder();
         using var writer = XmlWriter.Create(sb, new XmlWriterSettings
@@ -63,6 +62,113 @@ public class GraphMlExporter : IStateMachineExporter
         writer.Flush();
 
         return sb.ToString();
+    }
+
+    private static string ExportTraversals(StateMachine sm, ExportType exportType)
+    {
+        var traversals = TraversalGenerator.Generate(sm, exportType);
+        var startId = sm.StartingStateId ?? string.Empty;
+
+        var sb = new StringBuilder();
+        using var writer = XmlWriter.Create(sb, new XmlWriterSettings
+        {
+            Indent = true,
+            Encoding = Encoding.UTF8,
+            OmitXmlDeclaration = false
+        });
+
+        writer.WriteStartDocument();
+        writer.WriteStartElement("graphml", "http://graphml.graphstruct.org/xmlns");
+        writer.WriteAttributeString("xmlns", "y", null, "http://www.yworks.com/xml/graphml");
+
+        writer.WriteStartElement("key");
+        writer.WriteAttributeString("id", "d0");
+        writer.WriteAttributeString("for", "node");
+        writer.WriteAttributeString("yfiles.type", "nodegraphics");
+        writer.WriteEndElement();
+
+        writer.WriteStartElement("key");
+        writer.WriteAttributeString("id", "d1");
+        writer.WriteAttributeString("for", "edge");
+        writer.WriteAttributeString("yfiles.type", "edgegraphics");
+        writer.WriteEndElement();
+
+        foreach (var traversal in traversals)
+        {
+            writer.WriteStartElement("graph");
+            writer.WriteAttributeString("id", traversal.Id);
+            writer.WriteAttributeString("edgedefault", "directed");
+
+            var nodePrefix = traversal.Id + "_";
+            foreach (var stateId in GetTraversalStateIds(traversal, startId))
+            {
+                WriteTraversalNode(writer, nodePrefix + stateId, stateId);
+            }
+
+            int edgeId = 0;
+            foreach (var t in traversal.Transitions)
+            {
+                WriteTraversalEdge(writer, $"e{edgeId++}", nodePrefix + t.SourceStateId, nodePrefix + t.TargetStateId, t.RuleName);
+            }
+
+            writer.WriteEndElement(); // graph
+        }
+
+        writer.WriteEndElement(); // graphml
+        writer.WriteEndDocument();
+        writer.Flush();
+
+        return sb.ToString();
+    }
+
+    private static void WriteTraversalNode(XmlWriter writer, string nodeId, string label)
+    {
+        writer.WriteStartElement("node");
+        writer.WriteAttributeString("id", nodeId);
+        writer.WriteStartElement("data");
+        writer.WriteAttributeString("key", "d0");
+        writer.WriteStartElement("ShapeNode", "http://www.yworks.com/xml/graphml");
+        writer.WriteStartElement("NodeLabel", "http://www.yworks.com/xml/graphml");
+        writer.WriteString(label);
+        writer.WriteEndElement();
+        writer.WriteStartElement("Shape", "http://www.yworks.com/xml/graphml");
+        writer.WriteAttributeString("type", "roundrectangle");
+        writer.WriteEndElement();
+        writer.WriteEndElement(); // ShapeNode
+        writer.WriteEndElement(); // data
+        writer.WriteEndElement(); // node
+    }
+
+    private static void WriteTraversalEdge(XmlWriter writer, string edgeId, string source, string target, string label)
+    {
+        writer.WriteStartElement("edge");
+        writer.WriteAttributeString("id", edgeId);
+        writer.WriteAttributeString("source", source);
+        writer.WriteAttributeString("target", target);
+        writer.WriteStartElement("data");
+        writer.WriteAttributeString("key", "d1");
+        writer.WriteStartElement("PolyLineEdge", "http://www.yworks.com/xml/graphml");
+        writer.WriteStartElement("EdgeLabel", "http://www.yworks.com/xml/graphml");
+        writer.WriteString(label);
+        writer.WriteEndElement();
+        writer.WriteEndElement(); // PolyLineEdge
+        writer.WriteEndElement(); // data
+        writer.WriteEndElement(); // edge
+    }
+
+    private static IEnumerable<string> GetTraversalStateIds(Traversal traversal, string startStateId)
+    {
+        if (traversal.Transitions.Count == 0)
+            return new[] { startStateId };
+
+        var seen = new HashSet<string>();
+        var result = new List<string>();
+        foreach (var t in traversal.Transitions)
+        {
+            if (seen.Add(t.SourceStateId)) result.Add(t.SourceStateId);
+            if (seen.Add(t.TargetStateId)) result.Add(t.TargetStateId);
+        }
+        return result;
     }
 
     private static void WriteNode(XmlWriter writer, string stateId, State state, bool isStarting)

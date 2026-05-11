@@ -102,4 +102,29 @@ public class HelpPrinterTests
         var output = writer.ToString();
         Assert.Contains("--list", output, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void PrintHelp_ContainsExportTypeOption()
+    {
+        var writer = new StringWriter();
+
+        HelpPrinter.PrintHelp(writer);
+
+        var output = writer.ToString();
+        Assert.Contains("--export-type", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PrintHelp_ExportTypeOption_ListsValidValues()
+    {
+        var writer = new StringWriter();
+
+        HelpPrinter.PrintHelp(writer);
+
+        var output = writer.ToString();
+        Assert.Contains("AllStates", output, StringComparison.Ordinal);
+        Assert.Contains("AllTransitions", output, StringComparison.Ordinal);
+        Assert.Contains("AllPaths", output, StringComparison.Ordinal);
+        Assert.Contains("AllStatePairs", output, StringComparison.Ordinal);
+    }
 }

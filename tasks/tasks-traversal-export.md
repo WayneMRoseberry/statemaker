@@ -39,13 +39,13 @@
   - [x] 3.1 Define a traversal schema model with `id`, `name`, `description`, and `transitions`.
   - [x] 3.2 Update `src/StateMaker/JsonExporter.cs` to emit traversal objects for traversal export types.
   - [x] 3.3 Add JSON format tests verifying traversal output structure and content.
-- [ ] 4.0 Extend existing exporters for traversal outputs
-  - [ ] 4.1 Update `src/StateMaker/DotExporter.cs` to support traversal-oriented export behavior if needed.
-  - [ ] 4.2 Update `src/StateMaker/GraphMlExporter.cs` to support traversal-oriented export behavior if needed.
-  - [ ] 4.3 Update `src/StateMaker/MermaidExporter.cs` to support traversal-oriented export behavior if needed.
-  - [ ] 4.4 Add format-specific tests verifying the default and traversal export outputs for supported formats.
-- [ ] 5.0 Update documentation and tests
-  - [ ] 5.1 Update CLI documentation and help text to describe `ExportType` and its valid values.
-  - [ ] 5.2 Update any related README or docs if `export` command usage is documented there.
-  - [ ] 5.3 Add or update tests for failure modes and coverage reporting.
-  - [ ] 5.4 Run the relevant test suite and confirm no regressions.
+- [x] 4.0 Extend existing exporters for traversal outputs
+  - [x] 4.1 Update `src/StateMaker/DotExporter.cs` to support traversal-oriented export behavior if needed.
+  - [x] 4.2 Update `src/StateMaker/GraphMlExporter.cs` to support traversal-oriented export behavior if needed.
+  - [x] 4.3 Update `src/StateMaker/MermaidExporter.cs` to support traversal-oriented export behavior if needed.
+  - [x] 4.4 Add format-specific tests verifying the default and traversal export outputs for supported formats.
+- [x] 5.0 Update documentation and tests
+  - [x] 5.1 Update CLI documentation and help text to describe `ExportType` and its valid values.
+  - [x] 5.2 Update any related README or docs if `export` command usage is documented there.
+  - [x] 5.3 Add or update tests for failure modes and coverage reporting.
+  - [x] 5.4 Run the relevant test suite and confirm no regressions.
