@@ -17,37 +17,48 @@ public class VisualTraversalExporterTests
         return sm;
     }
 
+    // S0 --(a)--> S1 (terminal)
+    // S0 --(b)--> S2 (terminal)
+    private static StateMachine BuildBranchMachine()
+    {
+        var sm = new StateMachine();
+        sm.AddOrUpdateState("S0", new State());
+        sm.AddOrUpdateState("S1", new State());
+        sm.AddOrUpdateState("S2", new State());
+        sm.StartingStateId = "S0";
+        sm.Transitions.Add(new Transition("S0", "S1", "a"));
+        sm.Transitions.Add(new Transition("S0", "S2", "b"));
+        return sm;
+    }
+
     #region Step count in traversal labels
 
     [Fact]
     public void DotExporter_AllStates_ClusterLabelIncludesStepCount()
     {
-        var sm = BuildLinearChain();
+        // Branch machine: S1 and S2 are each one step from S0, so both labels read "1 steps".
+        var sm = BuildBranchMachine();
         var output = new DotExporter().Export(sm, ExportType.AllStates);
-        // T1=Reach S0 (0 transitions), T2=Reach S1 (1 transition), T3=Reach S2 (2 transitions)
-        Assert.Contains("0 steps - Reach S0", output, StringComparison.Ordinal);
         Assert.Contains("1 steps - Reach S1", output, StringComparison.Ordinal);
-        Assert.Contains("2 steps - Reach S2", output, StringComparison.Ordinal);
+        Assert.Contains("1 steps - Reach S2", output, StringComparison.Ordinal);
     }
 
     [Fact]
     public void MermaidExporter_AllStates_SubgraphLabelIncludesStepCount()
     {
-        var sm = BuildLinearChain();
+        var sm = BuildBranchMachine();
         var output = new MermaidExporter().Export(sm, ExportType.AllStates);
-        Assert.Contains("0 steps - Reach S0", output, StringComparison.Ordinal);
         Assert.Contains("1 steps - Reach S1", output, StringComparison.Ordinal);
-        Assert.Contains("2 steps - Reach S2", output, StringComparison.Ordinal);
+        Assert.Contains("1 steps - Reach S2", output, StringComparison.Ordinal);
     }
 
     [Fact]
     public void GraphMlExporter_AllStates_GraphLabelIncludesStepCount()
     {
-        var sm = BuildLinearChain();
+        var sm = BuildBranchMachine();
         var output = new GraphMlExporter().Export(sm, ExportType.AllStates);
-        Assert.Contains("0 steps - Reach S0", output, StringComparison.Ordinal);
         Assert.Contains("1 steps - Reach S1", output, StringComparison.Ordinal);
-        Assert.Contains("2 steps - Reach S2", output, StringComparison.Ordinal);
+        Assert.Contains("1 steps - Reach S2", output, StringComparison.Ordinal);
     }
 
     #endregion
@@ -65,12 +76,12 @@ public class VisualTraversalExporterTests
     [Fact]
     public void DotExporter_AllStates_ContainsClusterPerTraversal()
     {
-        var sm = BuildLinearChain();
+        // Branch machine produces 2 minimum traversals (S1 and S2) => 2 clusters.
+        var sm = BuildBranchMachine();
         var output = new DotExporter().Export(sm, ExportType.AllStates);
-        // Linear chain has 3 reachable states => 3 traversals => 3 clusters
         Assert.Contains("cluster_T1", output, StringComparison.Ordinal);
         Assert.Contains("cluster_T2", output, StringComparison.Ordinal);
-        Assert.Contains("cluster_T3", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("cluster_T3", output, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -96,7 +107,8 @@ public class VisualTraversalExporterTests
     [Fact]
     public void DotExporter_AllTransitions_ProducesTwoTraversals()
     {
-        var sm = BuildLinearChain();
+        // Branch machine: S0->S1 and S0->S2 diverge so neither is a prefix — both kept.
+        var sm = BuildBranchMachine();
         var output = new DotExporter().Export(sm, ExportType.AllTransitions);
         Assert.Contains("cluster_T1", output, StringComparison.Ordinal);
         Assert.Contains("cluster_T2", output, StringComparison.Ordinal);
@@ -127,21 +139,22 @@ public class VisualTraversalExporterTests
     [Fact]
     public void MermaidExporter_AllStates_ContainsSubgraphPerTraversal()
     {
-        var sm = BuildLinearChain();
+        // Branch machine produces 2 minimum traversals => 2 subgraphs.
+        var sm = BuildBranchMachine();
         var output = new MermaidExporter().Export(sm, ExportType.AllStates);
-        // 3 traversals => 3 subgraphs
         var count = CountOccurrences(output, "subgraph");
-        Assert.Equal(3, count);
+        Assert.Equal(2, count);
     }
 
     [Fact]
     public void MermaidExporter_AllStates_SubgraphsHaveTraversalNames()
     {
-        var sm = BuildLinearChain();
+        // Branch machine: S1 and S2 are the minimum set; S0 is filtered as a prefix of both.
+        var sm = BuildBranchMachine();
         var output = new MermaidExporter().Export(sm, ExportType.AllStates);
-        Assert.Contains("Reach S0", output, StringComparison.Ordinal);
         Assert.Contains("Reach S1", output, StringComparison.Ordinal);
         Assert.Contains("Reach S2", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("Reach S0", output, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -177,21 +190,22 @@ public class VisualTraversalExporterTests
     [Fact]
     public void GraphMlExporter_AllStates_ContainsMultipleGraphElements()
     {
-        var sm = BuildLinearChain();
+        // Branch machine produces 2 minimum traversals => 2 graph elements.
+        var sm = BuildBranchMachine();
         var output = new GraphMlExporter().Export(sm, ExportType.AllStates);
-        // 3 traversals => 3 graph elements
         var count = CountOccurrences(output, "<graph ");
-        Assert.Equal(3, count);
+        Assert.Equal(2, count);
     }
 
     [Fact]
     public void GraphMlExporter_AllStates_GraphElementsHaveTraversalIds()
     {
-        var sm = BuildLinearChain();
+        // Branch machine: minimum set is S1 and S2 => IDs T1 and T2, no T3.
+        var sm = BuildBranchMachine();
         var output = new GraphMlExporter().Export(sm, ExportType.AllStates);
         Assert.Contains("id=\"T1\"", output, StringComparison.Ordinal);
         Assert.Contains("id=\"T2\"", output, StringComparison.Ordinal);
-        Assert.Contains("id=\"T3\"", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("id=\"T3\"", output, StringComparison.Ordinal);
     }
 
     [Fact]
