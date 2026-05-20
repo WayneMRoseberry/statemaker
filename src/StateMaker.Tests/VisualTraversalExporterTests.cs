@@ -107,7 +107,8 @@ public class VisualTraversalExporterTests
     [Fact]
     public void DotExporter_AllTransitions_ProducesTwoTraversals()
     {
-        var sm = BuildLinearChain();
+        // Branch machine: S0->S1 and S0->S2 diverge so neither is a prefix — both kept.
+        var sm = BuildBranchMachine();
         var output = new DotExporter().Export(sm, ExportType.AllTransitions);
         Assert.Contains("cluster_T1", output, StringComparison.Ordinal);
         Assert.Contains("cluster_T2", output, StringComparison.Ordinal);

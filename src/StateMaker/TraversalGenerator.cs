@@ -59,19 +59,30 @@ public static class TraversalGenerator
     private static List<Traversal> GenerateAllTransitions(StateMachine sm, string idPrefix)
     {
         var startId = sm.StartingStateId ?? throw new InvalidOperationException("State machine has no starting state.");
-        var result = new List<Traversal>();
         var pathsFromStart = FindAllShortestPaths(sm, startId);
-        int counter = 1;
 
+        var candidates = new List<(Transition target, IReadOnlyList<Transition> path)>();
         foreach (var transition in sm.Transitions)
         {
             if (!pathsFromStart.TryGetValue(transition.SourceStateId, out var pathToSource)) continue;
-
             var fullPath = new List<Transition>(pathToSource) { transition };
-            var id = $"{idPrefix}{counter++}";
-            var name = $"Exercise {transition.SourceStateId} to {transition.TargetStateId} via {transition.RuleName}";
-            var desc = $"Traversal exercising the {transition.RuleName} transition from {transition.SourceStateId} to {transition.TargetStateId}";
-            result.Add(new Traversal(id, name, desc, fullPath));
+            candidates.Add((transition, fullPath));
+        }
+
+        var result = new List<Traversal>();
+        int counter = 1;
+
+        foreach (var (target, path) in candidates)
+        {
+            bool isRedundant = candidates.Any(other =>
+                !ReferenceEquals(other.path, path) && IsPathPrefix(path, other.path));
+
+            if (!isRedundant)
+                result.Add(new Traversal(
+                    $"{idPrefix}{counter++}",
+                    $"Exercise {target.SourceStateId} to {target.TargetStateId} via {target.RuleName}",
+                    $"Traversal exercising the {target.RuleName} transition from {target.SourceStateId} to {target.TargetStateId}",
+                    path));
         }
 
         return result;

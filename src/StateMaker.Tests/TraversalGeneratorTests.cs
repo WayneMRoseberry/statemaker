@@ -201,26 +201,27 @@ public class TraversalGeneratorTests
     #region AllTransitions
 
     [Fact]
-    public void AllTransitions_LinearChain_ProducesOneTraversalPerTransition()
+    public void AllTransitions_LinearChain_ProducesMinimumTraversals()
     {
+        // S0->S1->S2: the S0->S1 traversal is a prefix of the S1->S2 traversal, so only S1->S2 is kept.
         var sm = BuildLinearChain();
         var traversals = TraversalGenerator.Generate(sm, ExportType.AllTransitions);
-        Assert.Equal(2, traversals.Count);
+        Assert.Single(traversals);
     }
 
     [Fact]
     public void AllTransitions_EachTraversalEndsWithItsTargetTransition()
     {
-        var sm = BuildLinearChain();
+        // Branch machine: S0->S1 (a) and S0->S2 (b) diverge at S0 so neither path is a prefix
+        // of the other — both traversals are kept.
+        var sm = BuildBranchMachine();
         var traversals = TraversalGenerator.Generate(sm, ExportType.AllTransitions);
 
-        var t1 = traversals[0];
-        Assert.Equal("S0", t1.Transitions[^1].SourceStateId);
-        Assert.Equal("S1", t1.Transitions[^1].TargetStateId);
-
-        var t2 = traversals[1];
-        Assert.Equal("S1", t2.Transitions[^1].SourceStateId);
-        Assert.Equal("S2", t2.Transitions[^1].TargetStateId);
+        Assert.Equal(2, traversals.Count);
+        Assert.Equal("S0", traversals[0].Transitions[^1].SourceStateId);
+        Assert.Equal("S1", traversals[0].Transitions[^1].TargetStateId);
+        Assert.Equal("S0", traversals[1].Transitions[^1].SourceStateId);
+        Assert.Equal("S2", traversals[1].Transitions[^1].TargetStateId);
     }
 
     [Fact]
@@ -229,10 +230,10 @@ public class TraversalGeneratorTests
         var sm = BuildLinearChain();
         var traversals = TraversalGenerator.Generate(sm, ExportType.AllTransitions);
 
-        // S1->S2 traversal must pass through S0->S1 first
-        var t2 = traversals[1];
-        Assert.Equal(2, t2.Transitions.Count);
-        Assert.Equal("S0", t2.Transitions[0].SourceStateId);
+        // Only the S1->S2 traversal survives; it needs S0->S1 as setup.
+        Assert.Single(traversals);
+        Assert.Equal(2, traversals[0].Transitions.Count);
+        Assert.Equal("S0", traversals[0].Transitions[0].SourceStateId);
     }
 
     [Fact]
@@ -241,6 +242,41 @@ public class TraversalGeneratorTests
         var sm = BuildBranchMachine();
         var traversals = TraversalGenerator.Generate(sm, ExportType.AllTransitions);
         Assert.Equal(2, traversals.Count);
+    }
+
+    [Fact]
+    public void AllTransitions_VcaiVhaMachine_CoversAllTransitions()
+    {
+        var sm = LoadMachineFromSampledata("vcai_vha_machine.json");
+        var traversals = TraversalGenerator.Generate(sm, ExportType.AllTransitions);
+
+        var covered = new HashSet<(string src, string tgt, string rule)>();
+        foreach (var traversal in traversals)
+            foreach (var t in traversal.Transitions)
+                covered.Add((t.SourceStateId, t.TargetStateId, t.RuleName));
+
+        foreach (var t in sm.Transitions)
+            Assert.Contains((t.SourceStateId, t.TargetStateId, t.RuleName), covered);
+    }
+
+    [Fact]
+    public void AllTransitions_VcaiVhaMachine_NoTraversalIsSubtraversalOfAnother()
+    {
+        var sm = LoadMachineFromSampledata("vcai_vha_machine.json");
+        var traversals = TraversalGenerator.Generate(sm, ExportType.AllTransitions);
+
+        for (int i = 0; i < traversals.Count; i++)
+        {
+            for (int j = 0; j < traversals.Count; j++)
+            {
+                if (i == j) continue;
+                Assert.False(
+                    IsStrictPrefix(traversals[i].Transitions, traversals[j].Transitions),
+                    $"Traversal '{traversals[i].Id}' ({traversals[i].Transitions.Count} steps) is a " +
+                    $"sub-traversal of '{traversals[j].Id}' ({traversals[j].Transitions.Count} steps) " +
+                    $"and is redundant.");
+            }
+        }
     }
 
     #endregion

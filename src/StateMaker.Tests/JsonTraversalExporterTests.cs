@@ -82,44 +82,45 @@ public class JsonTraversalExporterTests
     #region Transition fields
 
     [Fact]
-    public void AllTransitions_JsonOutput_TransitionHasCorrectFields()
+    public void AllTransitions_JsonOutput_TargetTransitionHasCorrectFields()
     {
         var sm = BuildLinearChain();
         var json = new JsonExporter().Export(sm, ExportType.AllTransitions);
         var doc = JsonDocument.Parse(json);
         var traversals = doc.RootElement.GetProperty("traversals");
 
-        // First traversal covers S0->S1 via step1; its last (only) transition should reflect this
-        var firstTraversal = traversals[0];
-        var transitions = firstTraversal.GetProperty("transitions");
-        Assert.Equal(1, transitions.GetArrayLength());
-        var tr = transitions[0];
-        Assert.Equal("S0", tr.GetProperty("sourceStateId").GetString());
-        Assert.Equal("S1", tr.GetProperty("targetStateId").GetString());
-        Assert.Equal("step1", tr.GetProperty("ruleName").GetString());
-    }
-
-    [Fact]
-    public void AllTransitions_JsonOutput_CountMatchesTransitionCount()
-    {
-        var sm = BuildLinearChain();
-        var json = new JsonExporter().Export(sm, ExportType.AllTransitions);
-        var doc = JsonDocument.Parse(json);
-        Assert.Equal(2, doc.RootElement.GetProperty("traversals").GetArrayLength());
-    }
-
-    [Fact]
-    public void AllTransitions_JsonOutput_SecondTraversalPathLeadsToTransition()
-    {
-        var sm = BuildLinearChain();
-        var json = new JsonExporter().Export(sm, ExportType.AllTransitions);
-        var doc = JsonDocument.Parse(json);
-        var secondTraversal = doc.RootElement.GetProperty("traversals")[1];
-        var transitions = secondTraversal.GetProperty("transitions");
-        // Path to S1->S2 must include S0->S1 first
+        // Only traversal is S0->S1->S2; the target (last) transition is S1->S2 via step2.
+        var traversal = traversals[0];
+        var transitions = traversal.GetProperty("transitions");
         Assert.Equal(2, transitions.GetArrayLength());
-        Assert.Equal("S1", transitions[1].GetProperty("sourceStateId").GetString());
-        Assert.Equal("S2", transitions[1].GetProperty("targetStateId").GetString());
+        var last = transitions[1];
+        Assert.Equal("S1", last.GetProperty("sourceStateId").GetString());
+        Assert.Equal("S2", last.GetProperty("targetStateId").GetString());
+        Assert.Equal("step2", last.GetProperty("ruleName").GetString());
+    }
+
+    [Fact]
+    public void AllTransitions_JsonOutput_CountIsMinimum()
+    {
+        // Linear chain: S0->S1 is a prefix of S0->S1->S2, so only one traversal is emitted.
+        var sm = BuildLinearChain();
+        var json = new JsonExporter().Export(sm, ExportType.AllTransitions);
+        var doc = JsonDocument.Parse(json);
+        Assert.Equal(1, doc.RootElement.GetProperty("traversals").GetArrayLength());
+    }
+
+    [Fact]
+    public void AllTransitions_JsonOutput_SetupPathLeadsToTargetTransitionSource()
+    {
+        var sm = BuildLinearChain();
+        var json = new JsonExporter().Export(sm, ExportType.AllTransitions);
+        var doc = JsonDocument.Parse(json);
+        var traversal = doc.RootElement.GetProperty("traversals")[0];
+        var transitions = traversal.GetProperty("transitions");
+        // Setup step S0->S1 appears before the target S1->S2.
+        Assert.Equal(2, transitions.GetArrayLength());
+        Assert.Equal("S0", transitions[0].GetProperty("sourceStateId").GetString());
+        Assert.Equal("S1", transitions[0].GetProperty("targetStateId").GetString());
     }
 
     #endregion
