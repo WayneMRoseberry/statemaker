@@ -18,18 +18,42 @@ public static class TraversalGenerator
     private static List<Traversal> GenerateAllStates(StateMachine sm, string idPrefix)
     {
         var startId = sm.StartingStateId ?? throw new InvalidOperationException("State machine has no starting state.");
-        var result = new List<Traversal>();
         var pathsFromStart = FindAllShortestPaths(sm, startId);
+
+        var reachable = sm.States.Keys
+            .Where(id => pathsFromStart.ContainsKey(id))
+            .Select(id => (stateId: id, path: pathsFromStart[id]))
+            .ToList();
+
+        var result = new List<Traversal>();
         int counter = 1;
 
-        foreach (var stateId in sm.States.Keys)
+        foreach (var (stateId, path) in reachable)
         {
-            if (!pathsFromStart.TryGetValue(stateId, out var path)) continue;
-            var id = $"{idPrefix}{counter++}";
-            result.Add(new Traversal(id, $"Reach {stateId}", $"Traversal that reaches state {stateId}", path));
+            bool isRedundant = reachable.Any(other =>
+                other.stateId != stateId && IsPathPrefix(path, other.path));
+
+            if (!isRedundant)
+                result.Add(new Traversal($"{idPrefix}{counter++}",
+                    $"Reach {stateId}",
+                    $"Traversal that reaches state {stateId}",
+                    path));
         }
 
         return result;
+    }
+
+    private static bool IsPathPrefix(IReadOnlyList<Transition> shorter, IReadOnlyList<Transition> longer)
+    {
+        if (shorter.Count >= longer.Count) return false;
+        for (int i = 0; i < shorter.Count; i++)
+        {
+            if (shorter[i].SourceStateId != longer[i].SourceStateId ||
+                shorter[i].TargetStateId != longer[i].TargetStateId ||
+                shorter[i].RuleName != longer[i].RuleName)
+                return false;
+        }
+        return true;
     }
 
     private static List<Traversal> GenerateAllTransitions(StateMachine sm, string idPrefix)

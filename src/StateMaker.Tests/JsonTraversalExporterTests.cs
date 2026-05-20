@@ -30,13 +30,22 @@ public class JsonTraversalExporterTests
     }
 
     [Fact]
-    public void AllStates_JsonOutput_TraversalCountMatchesStateCount()
+    public void AllStates_JsonOutput_TraversalCountIsMinimum()
     {
-        var sm = BuildLinearChain();
+        // Branch machine: S0->S1 and S0->S2. Both S1 and S2 are terminal so both are kept;
+        // S0 is a prefix of both and is filtered out. Result: 2 traversals.
+        var sm = new StateMachine();
+        sm.AddOrUpdateState("S0", new State());
+        sm.AddOrUpdateState("S1", new State());
+        sm.AddOrUpdateState("S2", new State());
+        sm.StartingStateId = "S0";
+        sm.Transitions.Add(new Transition("S0", "S1", "a"));
+        sm.Transitions.Add(new Transition("S0", "S2", "b"));
+
         var json = new JsonExporter().Export(sm, ExportType.AllStates);
         var doc = JsonDocument.Parse(json);
         var traversals = doc.RootElement.GetProperty("traversals");
-        Assert.Equal(3, traversals.GetArrayLength());
+        Assert.Equal(2, traversals.GetArrayLength());
     }
 
     [Fact]

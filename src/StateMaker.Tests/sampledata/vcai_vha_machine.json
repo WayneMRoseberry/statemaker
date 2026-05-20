@@ -1,0 +1,99 @@
+{
+  "startingStateId": "S0",
+  "states": {
+    "S0": {
+      "user_vcai": false,
+      "svc_mgr_vcp": false,
+      "vha": false,
+      "alert_active": false
+    },
+    "S1": {
+      "user_vcai": false,
+      "svc_mgr_vcp": false,
+      "vha": true,
+      "alert_active": false
+    },
+    "S2": {
+      "user_vcai": true,
+      "svc_mgr_vcp": false,
+      "vha": false,
+      "alert_active": false
+    },
+    "S3": {
+      "user_vcai": false,
+      "svc_mgr_vcp": true,
+      "vha": false,
+      "alert_active": false
+    },
+    "S4": {
+      "user_vcai": true,
+      "svc_mgr_vcp": false,
+      "vha": true,
+      "alert_active": false
+    },
+    "S5": {
+      "user_vcai": false,
+      "svc_mgr_vcp": true,
+      "vha": true,
+      "alert_active": false
+    },
+    "S6": {
+      "user_vcai": true,
+      "svc_mgr_vcp": true,
+      "vha": false,
+      "alert_active": false
+    },
+    "S7": {
+      "user_vcai": false,
+      "svc_mgr_vcp": true,
+      "vha": false,
+      "alert_active": true
+    },
+    "S8": {
+      "user_vcai": true,
+      "svc_mgr_vcp": true,
+      "vha": true,
+      "alert_active": false
+    },
+    "S9": {
+      "user_vcai": false,
+      "svc_mgr_vcp": true,
+      "vha": true,
+      "alert_active": true
+    },
+    "S10": {
+      "user_vcai": true,
+      "svc_mgr_vcp": true,
+      "vha": false,
+      "alert_active": true
+    },
+    "S11": {
+      "user_vcai": true,
+      "svc_mgr_vcp": true,
+      "vha": true,
+      "alert_active": true
+    }
+  },
+  "transitions": [
+    { "sourceStateId": "S0", "targetStateId": "S1", "ruleName": "new vha" },
+    { "sourceStateId": "S0", "targetStateId": "S2", "ruleName": "user visits VCAI" },
+    { "sourceStateId": "S0", "targetStateId": "S3", "ruleName": "service manager visits VCP" },
+    { "sourceStateId": "S1", "targetStateId": "S4", "ruleName": "user visits VCAI" },
+    { "sourceStateId": "S1", "targetStateId": "S5", "ruleName": "service manager visits VCP" },
+    { "sourceStateId": "S2", "targetStateId": "S4", "ruleName": "new vha" },
+    { "sourceStateId": "S2", "targetStateId": "S6", "ruleName": "service manager visits VCP" },
+    { "sourceStateId": "S3", "targetStateId": "S5", "ruleName": "new vha" },
+    { "sourceStateId": "S3", "targetStateId": "S6", "ruleName": "user visits VCAI" },
+    { "sourceStateId": "S3", "targetStateId": "S7", "ruleName": "service manager activates alert" },
+    { "sourceStateId": "S4", "targetStateId": "S8", "ruleName": "service manager visits VCP" },
+    { "sourceStateId": "S5", "targetStateId": "S8", "ruleName": "user visits VCAI" },
+    { "sourceStateId": "S5", "targetStateId": "S9", "ruleName": "service manager activates alert" },
+    { "sourceStateId": "S6", "targetStateId": "S8", "ruleName": "new vha" },
+    { "sourceStateId": "S6", "targetStateId": "S10", "ruleName": "service manager activates alert" },
+    { "sourceStateId": "S7", "targetStateId": "S9", "ruleName": "new vha" },
+    { "sourceStateId": "S7", "targetStateId": "S10", "ruleName": "user visits VCAI" },
+    { "sourceStateId": "S8", "targetStateId": "S11", "ruleName": "service manager activates alert" },
+    { "sourceStateId": "S9", "targetStateId": "S11", "ruleName": "user visits VCAI" },
+    { "sourceStateId": "S10", "targetStateId": "S11", "ruleName": "new vha" }
+  ]
+}
